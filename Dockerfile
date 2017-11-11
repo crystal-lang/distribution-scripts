@@ -14,7 +14,7 @@ RUN git clone https://github.com/ivmai/bdwgc \
  && (cd libatomic_ops && git checkout ${libatomic_ops_version}) \
  \
  && ./autogen.sh \
- && ./configure --disable-shared \
+ && ./configure --disable-debug --disable-shared \
  && make -j$(nproc)
 
 # Build libcrystal.a
@@ -53,7 +53,7 @@ RUN git clone https://github.com/ivmai/bdwgc \
  && (cd libatomic_ops && git checkout ${libatomic_ops_version}) \
  \
  && ./autogen.sh \
- && ./configure --disable-shared \
+ && ./configure --disable-debug --disable-shared \
  && make -j$(nproc) CFLAGS=-DNO_GETCONTEXT
 
 # Build libevent
@@ -63,7 +63,7 @@ RUN git clone https://github.com/libevent/libevent \
  && git checkout ${libevent_version} \
  \
  && ./autogen.sh \
- && ./configure --disable-shared \
+ && ./configure --disable-debug --disable-shared \
  && make -j$(nproc)
 
 # Build crystal
@@ -73,7 +73,7 @@ RUN git clone https://github.com/crystal-lang/crystal \
  && git checkout ${crystal_version} \
  \
  # NOTE: don't need to compile our own compiler after next release
- && make crystal doc \
+ && make crystal doc stats=t \
  && env CRYSTAL_CONFIG_VERSION=${crystal_version} CRYSTAL_CONFIG_TARGET=x86_64-unknown-linux-gnu \
       bin/crystal build --stats --link-flags="-L/bdwgc/.libs/ -L/libevent/.libs/" \
       src/compiler/crystal.cr -o crystal -D without_openssl -D without_zlib --static --release
