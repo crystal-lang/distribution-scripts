@@ -1,6 +1,6 @@
 FROM alpine:3.6
 
-ADD julien@portalier.com-56dab02e.rsa.pub /etc/apk/keys/
+COPY julien@portalier.com-56dab02e.rsa.pub /etc/apk/keys/
 
 # Install dependencies
 RUN echo "http://public.portalier.com/alpine/testing" >> /etc/apk/repositories \
@@ -8,7 +8,7 @@ RUN echo "http://public.portalier.com/alpine/testing" >> /etc/apk/repositories \
  && apk upgrade --update \
  && apk add --update \
       # Crystal to compile crystal with
-      crystal \
+      crystal=0.23.1-r1 \
       # Statically-compiled llvm
       llvm4-dev llvm4-static \
       # Static zlib
@@ -16,9 +16,9 @@ RUN echo "http://public.portalier.com/alpine/testing" >> /etc/apk/repositories \
       # Build tools
       git gcc g++ make automake libtool autoconf bash
 
-# Build libgc (gc and libatomic_ops version are master as of 2017-08-22)
-ARG gc_version=119a2a5e58d982ba2a6b10781b13bbcc9ccaf160
-ARG libatomic_ops_version=3265147277bfb7462ab9d190982ace17ea06b640
+# Build libgc
+ARG gc_version=v7.4.6
+ARG libatomic_ops_version=v7.4.8
 RUN git clone https://github.com/ivmai/bdwgc \
  && cd bdwgc \
  && git checkout ${gc_version} \
@@ -40,8 +40,8 @@ RUN git clone https://github.com/libevent/libevent \
  && make
 
 # Build crystal
-ARG crystal_version=4e09b6bb4563845b7123f131413c09e8172b8b23
-RUN git clone https://github.com/RX14/crystal \
+ARG crystal_version=0.24.0
+RUN git clone https://github.com/crystal-lang/crystal \
  && cd crystal \
  && git checkout ${crystal_version} \
  \
@@ -51,7 +51,7 @@ RUN git clone https://github.com/RX14/crystal \
       bin/crystal build --stats --link-flags="-L/bdwgc/.libs/ -L/libevent/.libs/" \
       src/compiler/crystal.cr -o crystal -D without_openssl -D without_zlib --static
 
-ADD crystal-wrapper /output/bin/crystal
+COPY crystal-wrapper /output/bin/crystal
 
 RUN \
  # Copy libgc.a to /lib/crystal/lib/
@@ -68,7 +68,7 @@ RUN \
  \
  # Copy html docs and samples
  && mkdir -p /output/share/doc/crystal/ \
- && cp -r /crystal/doc /output/share/doc/crystal/api \
+ && cp -r /crystal/docs /output/share/doc/crystal/api \
  && cp -r /crystal/samples /output/share/doc/crystal/samples \
  \
  # Copy manpage
