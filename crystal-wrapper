@@ -102,6 +102,3 @@ export PATH="$ROOT_DIR/lib/crystal/bin:$PATH"
 export LIBRARY_PATH="$ROOT_DIR/lib/crystal/lib${LIBRARY_PATH:+:$LIBRARY_PATH}"
 
 exec "$ROOT_DIR/lib/crystal/bin/crystal" "${@}"
-
-
-
