@@ -1,3 +1,22 @@
+FROM debian:9 AS debian
+
+RUN apt-get update \
+ && apt-get install -y build-essential automake libtool pkg-config git \
+ && (pkg-config || true)
+
+# Build libgc
+ARG gc_version=v7.4.6
+ARG libatomic_ops_version=v7.4.8
+RUN git clone https://github.com/ivmai/bdwgc \
+&& cd bdwgc \
+&& git checkout ${gc_version} \
+&& git clone https://github.com/ivmai/libatomic_ops \
+&& (cd libatomic_ops && git checkout ${libatomic_ops_version}) \
+\
+&& ./autogen.sh \
+&& ./configure --disable-shared \
+&& make
+
 FROM alpine:3.6
 
 COPY julien@portalier.com-56dab02e.rsa.pub /etc/apk/keys/
@@ -16,7 +35,7 @@ RUN echo "http://public.portalier.com/alpine/testing" >> /etc/apk/repositories \
       # Build tools
       git gcc g++ make automake libtool autoconf bash
 
-# Build libgc
+# Build libgc (again, this time for musl)
 ARG gc_version=v7.4.6
 ARG libatomic_ops_version=v7.4.8
 RUN git clone https://github.com/ivmai/bdwgc \
@@ -52,11 +71,12 @@ RUN git clone https://github.com/crystal-lang/crystal \
       src/compiler/crystal.cr -o crystal -D without_openssl -D without_zlib --static
 
 COPY crystal-wrapper /output/bin/crystal
+COPY --from=debian /bdwgc/.libs/libgc.a /libgc-debian.a
 
 RUN \
  # Copy libgc.a to /lib/crystal/lib/
     mkdir -p /output/lib/crystal/lib/ \
- && cp /bdwgc/.libs/libgc.a /output/lib/crystal/lib/libgc.a \
+ && cp /libgc-debian.a /output/lib/crystal/lib/libgc.a \
  \
  # Copy libgc.a to /lib/crystal/lib/
  && mkdir -p /output/lib/crystal/bin/ \
