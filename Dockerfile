@@ -1,7 +1,7 @@
 FROM debian:7 AS debian
 
 RUN apt-get update \
- && apt-get install -y build-essential automake libtool pkg-config git \
+ && apt-get install -y build-essential automake libtool pkg-config git llvm-dev \
  && (pkg-config || true)
 
 # Build libgc
@@ -16,6 +16,14 @@ RUN git clone https://github.com/ivmai/bdwgc \
  && ./autogen.sh \
  && ./configure --disable-shared \
  && make -j$(nproc)
+
+# Build libcrystal.a
+ARG crystal_version=0.24.0
+RUN git clone https://github.com/crystal-lang/crystal \
+ && cd crystal \
+ && git checkout ${crystal_version} \
+ \
+ && make libcrystal
 
 FROM alpine:3.6
 
@@ -72,10 +80,15 @@ RUN git clone https://github.com/crystal-lang/crystal \
 
 COPY crystal-wrapper /output/bin/crystal
 COPY --from=debian /bdwgc/.libs/libgc.a /libgc-debian.a
+COPY --from=debian /crystal/src/ext/libcrystal.a /libcrystal-debian.a
 
 RUN \
+ # Remove musl binaries from source and replace with debian ones
+    rm -Rf /crystal/src/{llvm/ext/llvm_ext.o,ext/sigfault.o,ext/libcrystal.a} \
+ && mv /libcrystal-debian.a /crystal/src/ext/libcrystal.a \
+ \
  # Copy libgc.a to /lib/crystal/lib/
-    mkdir -p /output/lib/crystal/lib/ \
+ && mkdir -p /output/lib/crystal/lib/ \
  && cp /libgc-debian.a /output/lib/crystal/lib/libgc.a \
  \
  # Copy libgc.a to /lib/crystal/lib/
