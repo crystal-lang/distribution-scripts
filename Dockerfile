@@ -1,4 +1,4 @@
-FROM debian:9 AS debian
+FROM debian:7 AS debian
 
 RUN apt-get update \
  && apt-get install -y build-essential automake libtool pkg-config git \
