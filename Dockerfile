@@ -76,7 +76,7 @@ RUN git clone https://github.com/crystal-lang/crystal \
  && make crystal doc \
  && env CRYSTAL_CONFIG_VERSION=${crystal_version} CRYSTAL_CONFIG_TARGET=x86_64-unknown-linux-gnu \
       bin/crystal build --stats --link-flags="-L/bdwgc/.libs/ -L/libevent/.libs/" \
-      src/compiler/crystal.cr -o crystal -D without_openssl -D without_zlib --static
+      src/compiler/crystal.cr -o crystal -D without_openssl -D without_zlib --static --release
 
 COPY crystal-wrapper /output/bin/crystal
 COPY --from=debian /bdwgc/.libs/libgc.a /libgc-debian.a
