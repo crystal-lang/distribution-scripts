@@ -1,7 +1,7 @@
 #!/bin/sh
 set -euo pipefail
 
-[ -d build ] || mkdir build
+rm -Rf build && mkdir build
 
 docker build -t crystal-build-temp .
 container_id="$(docker create crystal-build-temp)"
