@@ -4,6 +4,8 @@ RUN apt-get update \
  && apt-get install -y build-essential automake libtool pkg-config git llvm-dev \
  && (pkg-config || true)
 
+ENV CFLAGS="-fPIC -pipe"
+
 # Build libgc
 ARG gc_version=v7.4.6
 ARG libatomic_ops_version=v7.4.8
@@ -42,6 +44,8 @@ RUN echo "http://public.portalier.com/alpine/testing" >> /etc/apk/repositories \
       zlib-dev \
       # Build tools
       git gcc g++ make automake libtool autoconf bash coreutils
+
+ENV CFLAGS="-fPIC -pipe"
 
 # Build libgc (again, this time for musl)
 ARG gc_version=v7.4.6
