@@ -8,14 +8,14 @@ RUN apt-get update \
 ARG gc_version=v7.4.6
 ARG libatomic_ops_version=v7.4.8
 RUN git clone https://github.com/ivmai/bdwgc \
-&& cd bdwgc \
-&& git checkout ${gc_version} \
-&& git clone https://github.com/ivmai/libatomic_ops \
-&& (cd libatomic_ops && git checkout ${libatomic_ops_version}) \
-\
-&& ./autogen.sh \
-&& ./configure --disable-shared \
-&& make -j$(nproc)
+ && cd bdwgc \
+ && git checkout ${gc_version} \
+ && git clone https://github.com/ivmai/libatomic_ops \
+ && (cd libatomic_ops && git checkout ${libatomic_ops_version}) \
+ \
+ && ./autogen.sh \
+ && ./configure --disable-shared \
+ && make -j$(nproc)
 
 FROM alpine:3.6
 
