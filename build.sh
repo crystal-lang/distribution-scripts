@@ -11,4 +11,3 @@ mv output/crystal-* build
 rm -Rf output
 
 docker rm -v "$container_id"
-docker rmi crystal-build-temp
