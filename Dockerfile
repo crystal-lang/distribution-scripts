@@ -40,8 +40,8 @@ RUN echo "http://public.portalier.com/alpine/testing" >> /etc/apk/repositories \
       crystal=0.23.1-r1 \
       # Statically-compiled llvm
       llvm4-dev llvm4-static \
-      # Static zlib
-      zlib-dev \
+      # Static zlib and libyaml
+      zlib-dev yaml-dev \
       # Build tools
       git gcc g++ make automake libtool autoconf bash coreutils
 
@@ -80,7 +80,18 @@ RUN git clone https://github.com/crystal-lang/crystal \
  && make crystal doc stats=t \
  && env CRYSTAL_CONFIG_VERSION=${crystal_version} CRYSTAL_CONFIG_TARGET=x86_64-unknown-linux-gnu \
       bin/crystal build --stats --link-flags="-L/bdwgc/.libs/ -L/libevent/.libs/" \
-      src/compiler/crystal.cr -o crystal -D without_openssl -D without_zlib --static --release
+      src/compiler/crystal.cr -o crystal -D without_openssl -D without_zlib --static
+
+# Build shards
+ARG shards_version=v0.7.2
+RUN git clone https://github.com/crystal-lang/shards \
+ && cd shards \
+ && git checkout ${shards_version} \
+ \
+ # Hack to make shards not segfault
+ && echo 'require "llvm/lib_llvm"; require "llvm/enums"; require "./src/shards"' > hack.cr \
+ && /crystal/bin/crystal build --stats --link-flags="-L/bdwgc/.libs/ -L/libevent/.libs/" \
+    hack.cr -o shards --static
 
 COPY crystal-wrapper /output/bin/crystal
 COPY --from=debian /bdwgc/.libs/libgc.a /libgc-debian.a
@@ -95,9 +106,13 @@ RUN \
  && mkdir -p /output/lib/crystal/lib/ \
  && cp /libgc-debian.a /output/lib/crystal/lib/libgc.a \
  \
- # Copy libgc.a to /lib/crystal/lib/
+ # Copy crystal to /lib/crystal/bin/
  && mkdir -p /output/lib/crystal/bin/ \
  && cp /crystal/crystal /output/lib/crystal/bin/crystal \
+ \
+ # Copy shards to /lib/crystal/bin/
+ && cp /shards/shards /output/lib/crystal/bin/shards \
+ && ln -s ../lib/crystal/bin/shards /output/bin/shards \
  \
  # Copy stdlib to /share/crystal/src/
  && mkdir -p /output/share/crystal/ \
