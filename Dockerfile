@@ -15,7 +15,7 @@ RUN git clone https://github.com/ivmai/bdwgc \
 \
 && ./autogen.sh \
 && ./configure --disable-shared \
-&& make
+&& make -j$(nproc)
 
 FROM alpine:3.6
 
@@ -33,7 +33,7 @@ RUN echo "http://public.portalier.com/alpine/testing" >> /etc/apk/repositories \
       # Static zlib
       zlib-dev \
       # Build tools
-      git gcc g++ make automake libtool autoconf bash
+      git gcc g++ make automake libtool autoconf bash coreutils
 
 # Build libgc (again, this time for musl)
 ARG gc_version=v7.4.6
@@ -46,7 +46,7 @@ RUN git clone https://github.com/ivmai/bdwgc \
  \
  && ./autogen.sh \
  && ./configure --disable-shared \
- && make CFLAGS=-DNO_GETCONTEXT
+ && make -j$(nproc) CFLAGS=-DNO_GETCONTEXT
 
 # Build libevent
 ARG libevent_version=release-2.1.8-stable
@@ -56,7 +56,7 @@ RUN git clone https://github.com/libevent/libevent \
  \
  && ./autogen.sh \
  && ./configure --disable-shared \
- && make
+ && make -j$(nproc)
 
 # Build crystal
 ARG crystal_version=0.24.0
