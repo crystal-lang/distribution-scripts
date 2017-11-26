@@ -8,13 +8,16 @@ LIBATOMIC_OPS_VERSION = v7.4.8
 LIBEVENT_VERSION = release-2.1.8-stable
 
 OUTPUT_DIR = build
-OUTPUT_BASENAME = $(OUTPUT_DIR)/crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION)
+OUTPUT_BASENAME = $(OUTPUT_DIR)/crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION)-x86_64
 FILES = files/crystal-wrapper files/ysbaddaden.pub
 
 BUILD_ARGS = --build-arg crystal_version=$(CRYSTAL_VERSION) --build-arg shards_version=$(SHARDS_VERSION) --build-arg gc_version=$(GC_VERSION) --build-arg libatomic_ops_version=$(LIBATOMIC_OPS_VERSION) --build-arg libevent_version=$(LIBEVENT_VERSION)
+DEB_NAME = crystal_$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION)_amd64.deb
+RPM_NAME = crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION).x86_64.rpm
+
 
 .PHONY: all
-dist: build compress package
+all: package
 
 .PHONY: build
 build: $(OUTPUT_BASENAME).tar
@@ -36,9 +39,9 @@ $(OUTPUT_BASENAME).tar.xz: $(OUTPUT_BASENAME).tar
 	xz -T 0 -c $(OUTPUT_BASENAME).tar > $(OUTPUT_BASENAME).tar.xz
 
 .PHONY: package
-package: compress $(OUTPUT_BASENAME).deb $(OUTPUT_BASENAME).rpm
+package: compress $(OUTPUT_DIR)/$(DEB_NAME) $(OUTPUT_DIR)/$(RPM_NAME)
 
-$(OUTPUT_BASENAME).deb: $(OUTPUT_BASENAME).tar
+$(OUTPUT_DIR)/$(DEB_NAME): $(OUTPUT_BASENAME).tar
 	tmpdir=$$(mktemp -d) \
     && tar -C $$tmpdir -xf $(OUTPUT_BASENAME).tar \
     && mv $$tmpdir/crystal-$(CRYSTAL_VERSION)/share/licenses/crystal/LICENSE $$tmpdir/crystal-$(CRYSTAL_VERSION)/share/doc/crystal/copyright \
@@ -49,18 +52,18 @@ $(OUTPUT_BASENAME).deb: $(OUTPUT_BASENAME).tar
            --depends gcc --depends libpcre3-dev --depends libevent-dev \
            --deb-recommends git --deb-recommends libssl-dev \
            --deb-suggests libxml2-dev --deb-suggests libgmp-dev --deb-suggests libyaml-dev --deb-suggests libreadline-dev \
-           --force --package $(OUTPUT_BASENAME).deb \
+           --force --package $(OUTPUT_DIR)/$(DEB_NAME) \
            --prefix /usr --chdir $$tmpdir/crystal-$(CRYSTAL_VERSION) bin lib share \
     && rm -Rf $$tempdir
 
-$(OUTPUT_BASENAME).rpm: $(OUTPUT_BASENAME).tar
+$(OUTPUT_DIR)/$(RPM_NAME): $(OUTPUT_BASENAME).tar
 	tmpdir=$$(mktemp -d) \
     && tar -C $$tmpdir -xf $(OUTPUT_BASENAME).tar \
     && fpm --input-type dir --output-type rpm \
            --name crystal --version $(CRYSTAL_VERSION) --iteration $(PACKAGE_ITERATION) \
            --architecture x86_64 --maintainer "Chris Hobbs <chris@rx14.co.uk>" \
            --depends gcc --depends pcre-devel --depends libevent-devel \
-           --force --package $(OUTPUT_BASENAME).rpm \
+           --force --package $(OUTPUT_DIR)/$(RPM_NAME) \
            --prefix /usr --chdir $$tmpdir/crystal-$(CRYSTAL_VERSION) bin lib share \
     && rm -Rf $$tempdir
 
