@@ -1,3 +1,16 @@
+# Recipes for this Makefile
+
+## Build everything
+##   $ make
+## Build just distribution packages
+##   $ make package
+## Build everything for final release
+##   $ make clean all no_cache=true pull_images=true release=true
+
+no_cache ?=    ## Disable the docker build cache
+pull_images ?= ## Always pull docker images to ensure they're up to date
+release ?=     ## Create an optimized build for the final release
+
 CRYSTAL_VERSION = 0.24.0
 PACKAGE_ITERATION = 1
 SHARDS_VERSION = v0.7.2
@@ -17,10 +30,27 @@ RPM_NAME = crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION).x86_64.rpm
 BUILD_ARGS = $(if $(no_cache),--no-cache )$(if $(pull_images),--pull )$(if $(release),--build-arg release=true )--build-arg crystal_version=$(CRYSTAL_VERSION) --build-arg shards_version=$(SHARDS_VERSION) --build-arg gc_version=$(GC_VERSION) --build-arg libatomic_ops_version=$(LIBATOMIC_OPS_VERSION) --build-arg libevent_version=$(LIBEVENT_VERSION)
 
 .PHONY: all
-all: package
+all: compress package ## Build compressed omnibus and distribution packages [default]
+
+.PHONY: help
+help: ## Show this help
+	@echo
+	@printf '\033[34mtargets:\033[0m\n'
+	@grep -hE '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) |\
+		sort |\
+		awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2}'
+	@echo
+	@printf '\033[34moptional variables:\033[0m\n'
+	@grep -hE '^[a-zA-Z_-]+ \?=.*?## .*$$' $(MAKEFILE_LIST) |\
+		sort |\
+		awk 'BEGIN {FS = " \\?=.*?## "}; {printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2}'
+	@echo
+	@printf '\033[34mrecipes:\033[0m\n'
+	@grep -hE '^##.*$$' $(MAKEFILE_LIST) |\
+awk 'BEGIN {FS = "## "}; /^## [a-zA-Z_-]/ {printf "  \033[36m%s\033[0m\n", $$2}; /^##  / {printf "  %s\n", $$2}'
 
 .PHONY: build
-build: $(OUTPUT_BASENAME).tar
+build: $(OUTPUT_BASENAME).tar ## Build the raw uncompressed omnibus tarball
 
 $(OUTPUT_BASENAME).tar: Dockerfile $(FILES)
 	mkdir -p $(OUTPUT_DIR)
@@ -30,7 +60,7 @@ $(OUTPUT_BASENAME).tar: Dockerfile $(FILES)
 	  && docker rm -v "$$container_id"
 
 .PHONY: compress
-compress: $(OUTPUT_BASENAME).tar.gz $(OUTPUT_BASENAME).tar.xz
+compress: $(OUTPUT_BASENAME).tar.gz $(OUTPUT_BASENAME).tar.xz ## Build compressed omnibus tarballs
 
 $(OUTPUT_BASENAME).tar.gz: $(OUTPUT_BASENAME).tar
 	gzip -c $(OUTPUT_BASENAME).tar > $(OUTPUT_BASENAME).tar.gz
@@ -39,7 +69,7 @@ $(OUTPUT_BASENAME).tar.xz: $(OUTPUT_BASENAME).tar
 	xz -T 0 -c $(OUTPUT_BASENAME).tar > $(OUTPUT_BASENAME).tar.xz
 
 .PHONY: package
-package: compress $(OUTPUT_DIR)/$(DEB_NAME) $(OUTPUT_DIR)/$(RPM_NAME)
+package: $(OUTPUT_DIR)/$(DEB_NAME) $(OUTPUT_DIR)/$(RPM_NAME) ## Build distribution packages from the omnibus tarballs
 
 $(OUTPUT_DIR)/$(DEB_NAME): $(OUTPUT_BASENAME).tar
 	tmpdir=$$(mktemp -d) \
@@ -68,5 +98,5 @@ $(OUTPUT_DIR)/$(RPM_NAME): $(OUTPUT_BASENAME).tar
     && rm -Rf $$tempdir
 
 .PHONY: clean
-clean:
+clean: ## Clean up build directory
 	rm -Rf $(OUTPUT_DIR)
