@@ -5,7 +5,8 @@ RUN apt-get update \
  && apt-get install -y build-essential automake libtool pkg-config git llvm-dev \
  && (pkg-config || true)
 
-ENV CFLAGS="-fPIC -pipe"
+ARG release
+ENV CFLAGS="-fPIC -pipe ${release:+-O2}"
 
 # Build libgc
 ARG gc_version
@@ -46,7 +47,8 @@ RUN echo "http://public.portalier.com/alpine/testing" >> /etc/apk/repositories \
       # Build tools
       git gcc g++ make automake libtool autoconf bash coreutils
 
-ENV CFLAGS="-fPIC -pipe"
+ARG release
+ENV CFLAGS="-fPIC -pipe ${release:+-O2}"
 
 # Build libgc (again, this time for musl)
 ARG gc_version
@@ -78,10 +80,10 @@ RUN git clone https://github.com/crystal-lang/crystal \
  && git checkout ${crystal_version} \
  \
  # NOTE: don't need to compile our own compiler after next release
- && make crystal doc stats=t \
+ && env release= make crystal doc stats=t \
  && env CRYSTAL_CONFIG_VERSION=${crystal_version} CRYSTAL_CONFIG_TARGET=x86_64-unknown-linux-gnu \
       bin/crystal build --stats --link-flags="-L/bdwgc/.libs/ -L/libevent/.libs/" \
-      src/compiler/crystal.cr -o crystal -D without_openssl -D without_zlib --static
+      src/compiler/crystal.cr -o crystal -D without_openssl -D without_zlib --static ${release:+--release}
 
 # Build shards
 ARG shards_version
@@ -92,7 +94,7 @@ RUN git clone https://github.com/crystal-lang/shards \
  # Hack to make shards not segfault
  && echo 'require "llvm/lib_llvm"; require "llvm/enums"; require "./src/shards"' > hack.cr \
  && /crystal/bin/crystal build --stats --link-flags="-L/bdwgc/.libs/ -L/libevent/.libs/" \
-    hack.cr -o shards --static
+    hack.cr -o shards --static ${release:+--release}
 
 COPY files/crystal-wrapper /output/bin/crystal
 COPY --from=debian /bdwgc/.libs/libgc.a /libgc-debian.a
