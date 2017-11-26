@@ -1,6 +1,7 @@
 FROM debian:7 AS debian
 
 RUN apt-get update \
+ && apt-get dist-upgrade -y \
  && apt-get install -y build-essential automake libtool pkg-config git llvm-dev \
  && (pkg-config || true)
 
