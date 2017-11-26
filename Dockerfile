@@ -121,11 +121,12 @@ RUN \
  # Copy html docs and samples
  && mkdir -p /output/share/doc/crystal/ \
  && cp -r /crystal/docs /output/share/doc/crystal/api \
- && cp -r /crystal/samples /output/share/doc/crystal/samples \
+ && cp -r /crystal/samples /output/share/doc/crystal/examples \
  \
- # Copy manpage
+ # Copy and compress manpage
  && mkdir -p /output/share/man/man1/ \
  && cp /crystal/man/crystal.1 /output/share/man/man1/crystal.1 \
+ && gzip -9 /output/share/man/man1/crystal.1 \
  \
  # Copy license
  && mkdir -p /output/share/licenses/crystal/ \
