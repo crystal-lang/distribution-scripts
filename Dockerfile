@@ -7,8 +7,8 @@ RUN apt-get update \
 ENV CFLAGS="-fPIC -pipe"
 
 # Build libgc
-ARG gc_version=v7.4.6
-ARG libatomic_ops_version=v7.4.8
+ARG gc_version
+ARG libatomic_ops_version
 RUN git clone https://github.com/ivmai/bdwgc \
  && cd bdwgc \
  && git checkout ${gc_version} \
@@ -20,7 +20,7 @@ RUN git clone https://github.com/ivmai/bdwgc \
  && make -j$(nproc)
 
 # Build libcrystal.a
-ARG crystal_version=0.24.0
+ARG crystal_version
 RUN git clone https://github.com/crystal-lang/crystal \
  && cd crystal \
  && git checkout ${crystal_version} \
@@ -29,7 +29,7 @@ RUN git clone https://github.com/crystal-lang/crystal \
 
 FROM alpine:3.6
 
-COPY julien@portalier.com-56dab02e.rsa.pub /etc/apk/keys/
+COPY files/ysbaddaden.pub /etc/apk/keys/julien@portalier.com-56dab02e.rsa.pub
 
 # Install dependencies
 RUN echo "http://public.portalier.com/alpine/testing" >> /etc/apk/repositories \
@@ -48,8 +48,8 @@ RUN echo "http://public.portalier.com/alpine/testing" >> /etc/apk/repositories \
 ENV CFLAGS="-fPIC -pipe"
 
 # Build libgc (again, this time for musl)
-ARG gc_version=v7.4.6
-ARG libatomic_ops_version=v7.4.8
+ARG gc_version
+ARG libatomic_ops_version
 RUN git clone https://github.com/ivmai/bdwgc \
  && cd bdwgc \
  && git checkout ${gc_version} \
@@ -61,7 +61,7 @@ RUN git clone https://github.com/ivmai/bdwgc \
  && make -j$(nproc) CFLAGS=-DNO_GETCONTEXT
 
 # Build libevent
-ARG libevent_version=release-2.1.8-stable
+ARG libevent_version
 RUN git clone https://github.com/libevent/libevent \
  && cd libevent \
  && git checkout ${libevent_version} \
@@ -71,7 +71,7 @@ RUN git clone https://github.com/libevent/libevent \
  && make -j$(nproc)
 
 # Build crystal
-ARG crystal_version=0.24.0
+ARG crystal_version
 RUN git clone https://github.com/crystal-lang/crystal \
  && cd crystal \
  && git checkout ${crystal_version} \
@@ -83,7 +83,7 @@ RUN git clone https://github.com/crystal-lang/crystal \
       src/compiler/crystal.cr -o crystal -D without_openssl -D without_zlib --static
 
 # Build shards
-ARG shards_version=v0.7.2
+ARG shards_version
 RUN git clone https://github.com/crystal-lang/shards \
  && cd shards \
  && git checkout ${shards_version} \
@@ -93,7 +93,7 @@ RUN git clone https://github.com/crystal-lang/shards \
  && /crystal/bin/crystal build --stats --link-flags="-L/bdwgc/.libs/ -L/libevent/.libs/" \
     hack.cr -o shards --static
 
-COPY crystal-wrapper /output/bin/crystal
+COPY files/crystal-wrapper /output/bin/crystal
 COPY --from=debian /bdwgc/.libs/libgc.a /libgc-debian.a
 COPY --from=debian /crystal/src/ext/libcrystal.a /libcrystal-debian.a
 
