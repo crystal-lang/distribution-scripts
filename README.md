@@ -1,16 +1,11 @@
-# crystal-dist-static
+# Distribution scripts for Crystal
 
-`crystal-dist-static` is an automated tool for building self-contained
-statically built packages for the crystal compiler, stdlib, and the shards
-package manager. It builds both compressed, portable tarballs and complete
-distribution packages ready for installation.
+This repository contains scripts to build distributions of the crystal compiler
+ready for release. It is used for building the tarballs and linux packages -
+currently only for `x86_64`, but eventually for every well supported platform.
 
-# Dependencies
+These packages contain `crystal`, `shards`, a copy of the standard library, and
+anything else required to make use of crystal.
 
-- `docker`
-- [`fpm`](https://github.com/jordansissel/fpm)
-- `rpmbuild` (available from the `rpm-org` AUR package)
-
-# Getting started
-
-Just run `make help`!
+Each logical platform has it's own sub-directory, containing a `README` with
+information on it's own dependencies and it's own information on how to build.
