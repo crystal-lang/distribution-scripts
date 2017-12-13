@@ -80,7 +80,7 @@ RUN git clone https://github.com/crystal-lang/crystal \
  && git checkout ${crystal_version} \
  \
  # NOTE: don't need to compile our own compiler after next release
- && env release= make crystal doc stats=t \
+ && env release= make crystal docs stats=t \
  && env CRYSTAL_CONFIG_VERSION=${crystal_version} CRYSTAL_CONFIG_TARGET=x86_64-unknown-linux-gnu \
       bin/crystal build --stats --link-flags="-L/bdwgc/.libs/ -L/libevent/.libs/" \
       src/compiler/crystal.cr -o crystal -D without_openssl -D without_zlib --static ${release:+--release}

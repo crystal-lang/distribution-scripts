@@ -11,7 +11,7 @@ no_cache ?=    ## Disable the docker build cache
 pull_images ?= ## Always pull docker images to ensure they're up to date
 release ?=     ## Create an optimized build for the final release
 
-CRYSTAL_VERSION = 0.24.0
+CRYSTAL_VERSION = 0.24.1
 PACKAGE_ITERATION = 1
 SHARDS_VERSION = v0.7.2
 
