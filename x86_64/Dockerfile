@@ -1,9 +1,17 @@
-FROM debian:7 AS debian
+FROM debian:8 AS debian
 
 RUN apt-get update \
  && apt-get dist-upgrade -y \
- && apt-get install -y build-essential automake libtool pkg-config git llvm-dev \
+ && apt-get install -y build-essential automake libtool pkg-config git software-properties-common apt-transport-https curl \
+ \
  && (pkg-config || true)
+
+RUN add-apt-repository "deb http://apt.llvm.org/jessie/ llvm-toolchain-jessie-4.0 main" \
+ && curl -sSL https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add - \
+ && add-apt-repository "deb https://dist.crystal-lang.org/apt crystal main" \
+ && apt-key adv --keyserver keys.gnupg.net --recv-keys 09617FD37CC06B54 \
+ && apt-get update \
+ && apt-get install -y llvm-4.0-dev crystal
 
 ARG release
 ENV CFLAGS="-fPIC -pipe ${release:+-O2}"
@@ -21,29 +29,26 @@ RUN git clone https://github.com/ivmai/bdwgc \
  && ./configure --disable-debug --disable-shared \
  && make -j$(nproc)
 
-# Build libcrystal.a
+# Cross-compile crystal and build libcrystal.a
 ARG crystal_version
 RUN git clone https://github.com/crystal-lang/crystal \
  && cd crystal \
  && git checkout ${crystal_version} \
  \
- && make libcrystal
+ && make deps \
+ \
+ && bin/crystal build src/compiler/crystal.cr -D without_openssl -D without_zlib \
+                      --cross-compile --target "x86_64-linux-musl" -o /crystal-musl
 
 FROM alpine:3.6
 
-COPY files/ysbaddaden.pub /etc/apk/keys/julien@portalier.com-56dab02e.rsa.pub
-
 # Install dependencies
-RUN echo "http://public.portalier.com/alpine/testing" >> /etc/apk/repositories \
- \
- && apk upgrade --update \
+RUN apk upgrade --update \
  && apk add --update \
-      # Crystal to compile crystal with
-      crystal=0.23.1-r1 \
       # Statically-compiled llvm
       llvm4-dev llvm4-static \
-      # Static zlib and libyaml
-      zlib-dev yaml-dev \
+      # Static zlib, libyaml, and pcre
+      zlib-dev yaml-dev pcre-dev \
       # Build tools
       git gcc g++ make automake libtool autoconf bash coreutils
 
@@ -73,17 +78,24 @@ RUN git clone https://github.com/libevent/libevent \
  && ./configure --disable-debug --disable-shared \
  && make -j$(nproc)
 
+ENV LIBRARY_PATH=/bdwgc/.libs/:/libevent/.libs/
+
 # Build crystal
+COPY --from=debian /crystal-musl.o /
 ARG crystal_version
 RUN git clone https://github.com/crystal-lang/crystal \
  && cd crystal \
  && git checkout ${crystal_version} \
  \
- # NOTE: don't need to compile our own compiler after next release
- && env release= make crystal docs stats=t \
- && env CRYSTAL_CONFIG_VERSION=${crystal_version} CRYSTAL_CONFIG_TARGET=x86_64-unknown-linux-gnu \
-      bin/crystal build --stats --link-flags="-L/bdwgc/.libs/ -L/libevent/.libs/" \
-      src/compiler/crystal.cr -o crystal -D without_openssl -D without_zlib --static ${release:+--release}
+ && make deps \
+ && mkdir .build \
+ && cc '/crystal-musl.o' -o '.build/crystal' -rdynamic src/llvm/ext/llvm_ext.o `llvm-config --libs --system-libs --ldflags` -lstdc++ -lpcre -lm -lgc -lpthread src/ext/libcrystal.a -levent -lrt \
+ \
+ && make docs \
+ && touch src/compiler/crystal.cr \
+ && make crystal stats=true static=true ${release:+release=true} \
+                 CRYSTAL_CONFIG_VERSION=${crystal_version} \
+                 CRYSTAL_CONFIG_TARGET=x86_64-unknown-linux-gnu
 
 # Build shards
 ARG shards_version
@@ -93,7 +105,7 @@ RUN git clone https://github.com/crystal-lang/shards \
  \
  # Hack to make shards not segfault
  && echo 'require "llvm/lib_llvm"; require "llvm/enums"; require "./src/shards"' > hack.cr \
- && /crystal/bin/crystal build --stats --link-flags="-L/bdwgc/.libs/ -L/libevent/.libs/" \
+ && /crystal/bin/crystal build --stats --target x86_64-linux-musl \
     hack.cr -o shards --static ${release:+--release}
 
 COPY files/crystal-wrapper /output/bin/crystal
@@ -111,7 +123,7 @@ RUN \
  \
  # Copy crystal to /lib/crystal/bin/
  && mkdir -p /output/lib/crystal/bin/ \
- && cp /crystal/crystal /output/lib/crystal/bin/crystal \
+ && cp /crystal/.build/crystal /output/lib/crystal/bin/crystal \
  \
  # Copy shards to /lib/crystal/bin/
  && cp /shards/shards /output/lib/crystal/bin/shards \
