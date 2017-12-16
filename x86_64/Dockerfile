@@ -8,10 +8,15 @@ RUN apt-get update \
 
 RUN add-apt-repository "deb http://apt.llvm.org/jessie/ llvm-toolchain-jessie-4.0 main" \
  && curl -sSL https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add - \
- && add-apt-repository "deb https://dist.crystal-lang.org/apt crystal main" \
- && apt-key adv --keyserver keys.gnupg.net --recv-keys 09617FD37CC06B54 \
  && apt-get update \
- && apt-get install -y llvm-4.0-dev crystal
+ && apt-get install -y llvm-4.0-dev
+
+ARG previous_crystal_release
+ADD ${previous_crystal_release} /tmp/crystal.tar.gz
+ENV PATH=${PATH}:/tmp/crystal/bin
+RUN mkdir -p /tmp/crystal \
+ && tar xz -f /tmp/crystal.tar.gz -C /tmp/crystal --strip-component=1 \
+ && crystal --version
 
 ARG release
 ENV CFLAGS="-fPIC -pipe ${release:+-O2}"

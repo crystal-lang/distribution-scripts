@@ -14,6 +14,7 @@ release ?=     ## Create an optimized build for the final release
 CRYSTAL_VERSION = 0.24.1
 PACKAGE_ITERATION = 1
 SHARDS_VERSION = v0.7.2
+PREVIOUS_CRYSTAL_RELEASE = https://github.com/crystal-lang/crystal/releases/download/0.23.1/crystal-0.23.1-3-linux-x86_64.tar.gz
 
 GC_VERSION = v7.4.6
 LIBATOMIC_OPS_VERSION = v7.4.8
@@ -27,7 +28,7 @@ FILES = files/crystal-wrapper files/ysbaddaden.pub
 DEB_NAME = crystal_$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION)_amd64.deb
 RPM_NAME = crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION).x86_64.rpm
 
-BUILD_ARGS = $(if $(no_cache),--no-cache )$(if $(pull_images),--pull )$(if $(release),--build-arg release=true )--build-arg crystal_version=$(CRYSTAL_VERSION) --build-arg shards_version=$(SHARDS_VERSION) --build-arg gc_version=$(GC_VERSION) --build-arg libatomic_ops_version=$(LIBATOMIC_OPS_VERSION) --build-arg libevent_version=$(LIBEVENT_VERSION)
+BUILD_ARGS = $(if $(no_cache),--no-cache )$(if $(pull_images),--pull )$(if $(release),--build-arg release=true )--build-arg crystal_version=$(CRYSTAL_VERSION) --build-arg shards_version=$(SHARDS_VERSION) --build-arg gc_version=$(GC_VERSION) --build-arg libatomic_ops_version=$(LIBATOMIC_OPS_VERSION) --build-arg libevent_version=$(LIBEVENT_VERSION) --build-arg previous_crystal_release=$(PREVIOUS_CRYSTAL_RELEASE)
 
 .PHONY: all
 all: compress package ## Build compressed omnibus and distribution packages [default]
