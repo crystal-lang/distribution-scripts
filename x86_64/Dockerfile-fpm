@@ -1,0 +1,8 @@
+FROM ruby:2.4
+
+RUN apt-get update \
+ && apt-get install -y rpm \
+ # cleanup
+ && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+RUN gem install --no-ri --no-rdoc fpm -v 1.9.3

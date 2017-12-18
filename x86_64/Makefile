@@ -28,7 +28,8 @@ FILES = files/crystal-wrapper files/ysbaddaden.pub
 DEB_NAME = crystal_$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION)_amd64.deb
 RPM_NAME = crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION).x86_64.rpm
 
-BUILD_ARGS = $(if $(no_cache),--no-cache )$(if $(pull_images),--pull )$(if $(release),--build-arg release=true )--build-arg crystal_version=$(CRYSTAL_VERSION) --build-arg shards_version=$(SHARDS_VERSION) --build-arg gc_version=$(GC_VERSION) --build-arg libatomic_ops_version=$(LIBATOMIC_OPS_VERSION) --build-arg libevent_version=$(LIBEVENT_VERSION) --build-arg previous_crystal_release=$(PREVIOUS_CRYSTAL_RELEASE)
+DOCKER_BUILD_ARGS = $(if $(no_cache),--no-cache )$(if $(pull_images),--pull )
+BUILD_ARGS = $(DOCKER_BUILD_ARGS)$(if $(release),--build-arg release=true )--build-arg crystal_version=$(CRYSTAL_VERSION) --build-arg shards_version=$(SHARDS_VERSION) --build-arg gc_version=$(GC_VERSION) --build-arg libatomic_ops_version=$(LIBATOMIC_OPS_VERSION) --build-arg libevent_version=$(LIBEVENT_VERSION) --build-arg previous_crystal_release=$(PREVIOUS_CRYSTAL_RELEASE)
 
 .PHONY: all
 all: compress package ## Build compressed omnibus and distribution packages [default]
@@ -72,31 +73,35 @@ $(OUTPUT_BASENAME).tar.xz: $(OUTPUT_BASENAME).tar
 .PHONY: package
 package: $(OUTPUT_DIR)/$(DEB_NAME) $(OUTPUT_DIR)/$(RPM_NAME) ## Build distribution packages from the omnibus tarballs
 
-$(OUTPUT_DIR)/$(DEB_NAME): $(OUTPUT_BASENAME).tar
-	tmpdir=$$(mktemp -d) \
-    && tar -C $$tmpdir -xf $(OUTPUT_BASENAME).tar \
-    && mv $$tmpdir/crystal-$(CRYSTAL_VERSION)/share/licenses/crystal/LICENSE $$tmpdir/crystal-$(CRYSTAL_VERSION)/share/doc/crystal/copyright \
-    && rm -Rf $$tmpdir/crystal-*/share/licenses \
+PHONY: docker-fpm
+docker-fpm: Dockerfile-fpm
+	docker build $(DOCKER_BUILD_ARGS) -t crystal-fpm -f Dockerfile-fpm .
+
+$(OUTPUT_DIR)/$(DEB_NAME): docker-fpm $(OUTPUT_BASENAME).tar
+	docker run --rm -v $(CURDIR)/build:/build crystal-fpm /bin/sh -c "\
+    mkdir -p /tmp/crystal \
+    && tar -C /tmp/crystal -xf $(OUTPUT_BASENAME).tar \
+    && mv /tmp/crystal/crystal-$(CRYSTAL_VERSION)/share/licenses/crystal/LICENSE /tmp/crystal/crystal-$(CRYSTAL_VERSION)/share/doc/crystal/copyright \
+    && rm -Rf /tmp/crystal/crystal-*/share/licenses \
     && fpm --input-type dir --output-type deb \
            --name crystal --version $(CRYSTAL_VERSION) --iteration $(PACKAGE_ITERATION) \
-           --architecture x86_64 --maintainer "Chris Hobbs <chris@rx14.co.uk>" \
+           --architecture x86_64 --maintainer \"Chris Hobbs <chris@rx14.co.uk>\" \
            --depends gcc --depends libpcre3-dev --depends libevent-dev \
            --deb-recommends git --deb-recommends libssl-dev \
            --deb-suggests libxml2-dev --deb-suggests libgmp-dev --deb-suggests libyaml-dev --deb-suggests libreadline-dev \
            --force --package $(OUTPUT_DIR)/$(DEB_NAME) \
-           --prefix /usr --chdir $$tmpdir/crystal-$(CRYSTAL_VERSION) bin lib share \
-    && rm -Rf $$tempdir
+           --prefix /usr --chdir /tmp/crystal/crystal-$(CRYSTAL_VERSION) bin lib share"
 
-$(OUTPUT_DIR)/$(RPM_NAME): $(OUTPUT_BASENAME).tar
-	tmpdir=$$(mktemp -d) \
-    && tar -C $$tmpdir -xf $(OUTPUT_BASENAME).tar \
+$(OUTPUT_DIR)/$(RPM_NAME): docker-fpm $(OUTPUT_BASENAME).tar
+	docker run --rm -v $(CURDIR)/build:/build crystal-fpm /bin/sh -c "\
+    mkdir -p /tmp/crystal \
+    && tar -C /tmp/crystal -xf $(OUTPUT_BASENAME).tar \
     && fpm --input-type dir --output-type rpm \
            --name crystal --version $(CRYSTAL_VERSION) --iteration $(PACKAGE_ITERATION) \
-           --architecture x86_64 --maintainer "Chris Hobbs <chris@rx14.co.uk>" \
+           --architecture x86_64 --maintainer \"Chris Hobbs <chris@rx14.co.uk>\" \
            --depends gcc --depends pcre-devel --depends libevent-devel \
            --force --package $(OUTPUT_DIR)/$(RPM_NAME) \
-           --prefix /usr --chdir $$tmpdir/crystal-$(CRYSTAL_VERSION) bin lib share \
-    && rm -Rf $$tempdir
+           --prefix /usr --chdir /tmp/crystal/crystal-$(CRYSTAL_VERSION) bin lib share"
 
 .PHONY: clean
 clean: ## Clean up build directory
