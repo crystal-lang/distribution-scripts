@@ -1,9 +1,7 @@
 FROM debian:8 AS debian
 
 RUN apt-get update \
- && apt-get dist-upgrade -y \
  && apt-get install -y build-essential automake libtool pkg-config git software-properties-common apt-transport-https curl \
- \
  && (pkg-config || true)
 
 RUN add-apt-repository "deb http://apt.llvm.org/jessie/ llvm-toolchain-jessie-4.0 main" \
