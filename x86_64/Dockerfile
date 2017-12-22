@@ -1,9 +1,7 @@
 FROM debian:8 AS debian
 
 RUN apt-get update \
- && apt-get dist-upgrade -y \
  && apt-get install -y build-essential automake libtool pkg-config git software-properties-common apt-transport-https curl \
- \
  && (pkg-config || true)
 
 RUN add-apt-repository "deb http://apt.llvm.org/jessie/ llvm-toolchain-jessie-4.0 main" \
@@ -45,11 +43,10 @@ RUN git clone https://github.com/crystal-lang/crystal \
  && bin/crystal build src/compiler/crystal.cr -D without_openssl -D without_zlib \
                       --cross-compile --target "x86_64-linux-musl" -o /crystal-musl
 
-FROM alpine:3.6
+FROM alpine:3.7
 
 # Install dependencies
-RUN apk upgrade --update \
- && apk add --update \
+RUN apk add --no-cache \
       # Statically-compiled llvm
       llvm4-dev llvm4-static \
       # Static zlib, libyaml, and pcre
@@ -84,6 +81,8 @@ RUN git clone https://github.com/libevent/libevent \
  && make -j$(nproc)
 
 ENV LIBRARY_PATH=/bdwgc/.libs/:/libevent/.libs/
+ENV PATH=/usr/lib/llvm4/bin:$PATH
+RUN llvm-config --version
 
 # Build crystal
 COPY --from=debian /crystal-musl.o /

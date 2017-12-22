@@ -23,7 +23,7 @@ LIBEVENT_VERSION = release-2.1.8-stable
 
 OUTPUT_DIR = build
 OUTPUT_BASENAME = $(OUTPUT_DIR)/crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION)-x86_64
-FILES = files/crystal-wrapper files/ysbaddaden.pub
+FILES = files/crystal-wrapper
 
 DEB_NAME = crystal_$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION)_amd64.deb
 RPM_NAME = crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION).x86_64.rpm
