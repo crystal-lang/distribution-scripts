@@ -34,9 +34,10 @@ RUN git clone https://github.com/ivmai/bdwgc \
 
 # Cross-compile crystal and build libcrystal.a
 ARG crystal_version
+ARG crystal_sha1
 RUN git clone https://github.com/crystal-lang/crystal \
  && cd crystal \
- && git checkout ${crystal_version} \
+ && git checkout ${crystal_sha1} \
  \
  && make deps \
  \
@@ -87,9 +88,10 @@ RUN llvm-config --version
 # Build crystal
 COPY --from=debian /crystal-musl.o /
 ARG crystal_version
+ARG crystal_sha1
 RUN git clone https://github.com/crystal-lang/crystal \
  && cd crystal \
- && git checkout ${crystal_version} \
+ && git checkout ${crystal_sha1} \
  \
  && make deps \
  && mkdir .build \
