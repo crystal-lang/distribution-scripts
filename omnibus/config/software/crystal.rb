@@ -1,4 +1,5 @@
-CRYSTAL_VERSION = ENV['CRYSTAL_RELEASE_VERSION'] || "0.20.4"
+CRYSTAL_VERSION = ENV['CRYSTAL_VERSION']
+CRYSTAL_SHA1 = ENV['CRYSTAL_SHA1']
 FIRST_RUN = ENV["FIRST_RUN"]
 
 name "crystal"
@@ -35,7 +36,7 @@ else
 end
 
 build do
-  command "git checkout #{CRYSTAL_VERSION}", cwd: project_dir
+  command "git checkout #{CRYSTAL_SHA1}", cwd: project_dir
 
   mkdir "#{project_dir}/deps"
   command "make deps", env: env

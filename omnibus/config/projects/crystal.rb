@@ -6,7 +6,7 @@ install_dir '/opt/crystal'
 build_version do
   source :version, from_dependency: 'crystal'
 end
-build_iteration 2
+build_iteration ENV['PACKAGE_ITERATION']
 
 dependency 'crystal'
 dependency 'shards'
