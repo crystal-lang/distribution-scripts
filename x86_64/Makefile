@@ -112,7 +112,7 @@ darwin: darwin-previous $(OUTPUT_DIR)/$(DARWIN_NAME) $(OUTPUT_DIR)/$(DARWIN_PKG_
 
 .PHONY: darwin-previous
 darwin-previous:
-	wget -O /tmp/crystal-darwin-x86_64.tar.gz $(PREVIOUS_CRYSTAL_DARWIN_RELEASE) \
+	curl -L -o /tmp/crystal-darwin-x86_64.tar.gz $(PREVIOUS_CRYSTAL_DARWIN_RELEASE) \
 	&& tar xfz /tmp/crystal-darwin-x86_64.tar.gz -O "crystal-*/embedded/bin/crystal" > $(CURDIR)/../omnibus/crystal-darwin-x86_64 \
 	&& rm /tmp/crystal-darwin-x86_64.tar.gz \
 	&& chmod +x $(CURDIR)/../omnibus/crystal-darwin-x86_64
