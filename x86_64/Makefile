@@ -130,3 +130,4 @@ clean: ## Clean up build directory
 	rm -Rf $(CURDIR)/../omnibus/pkg/crystal-*
 	rm -Rf $(CURDIR)/../omnibus/pkg/version-*
 	rm -Rf /var/cache/omnibus/*
+	rm -Rf /opt/crystal/*
