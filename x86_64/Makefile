@@ -127,6 +127,9 @@ $(OUTPUT_DIR)/$(DARWIN_NAME) $(OUTPUT_DIR)/$(DARWIN_PKG_NAME):
 .PHONY: clean
 clean: ## Clean up build directory
 	rm -Rf $(OUTPUT_DIR)
+
+.PHONY: clean_darwin
+clean_darwin: ## Clean up build directory
 	rm -Rf $(CURDIR)/../omnibus/pkg/crystal-*
 	rm -Rf $(CURDIR)/../omnibus/pkg/version-*
 	rm -Rf /var/cache/omnibus/*
