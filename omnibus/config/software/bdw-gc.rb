@@ -1,8 +1,8 @@
 name "bdw-gc"
-default_version "7.4.2"
+default_version "7.4.10"
 
-source :url => "http://www.hboehm.info/gc/gc_source/gc-#{version}.tar.gz",
-       :md5 => "12c05fd2811d989341d8c6d81f66af87"
+source :url => "https://github.com/ivmai/bdwgc/releases/download/v#{version}/gc-#{version}.tar.gz",
+       :md5 => "6d894c05c218aa380cd13f54f9c715e9"
 
 dependency "libatomic_ops"
 

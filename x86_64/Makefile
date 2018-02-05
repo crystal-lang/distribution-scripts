@@ -18,8 +18,8 @@ SHARDS_VERSION = v0.7.2
 PREVIOUS_CRYSTAL_RELEASE = https://github.com/crystal-lang/crystal/releases/download/v0.24.1/crystal-0.24.1-2-linux-x86_64.tar.gz
 PREVIOUS_CRYSTAL_DARWIN_RELEASE = https://github.com/crystal-lang/crystal/releases/download/v0.24.1/crystal-0.24.1-2-darwin-x86_64.tar.gz
 
-GC_VERSION = v7.4.6
-LIBATOMIC_OPS_VERSION = v7.4.8
+GC_VERSION = v7.4.10
+LIBATOMIC_OPS_VERSION = v7.4.10
 
 LIBEVENT_VERSION = release-2.1.8-stable
 
