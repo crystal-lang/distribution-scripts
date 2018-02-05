@@ -1,10 +1,10 @@
-FROM ubuntu:xenial
+FROM ubuntu:xenial as runtime
 
 RUN \
   apt-get update && \
   apt-get install -y apt-transport-https && \
   apt-get update && \
-  apt-get install -y gcc pkg-config libssl-dev libxml2-dev libyaml-dev libgmp-dev git make && \
+  apt-get install -y tzdata gcc pkg-config libssl-dev libxml2-dev libyaml-dev libgmp-dev git make && \
   apt-get install -y libpcre3-dev libevent-dev && \
   apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
@@ -13,4 +13,13 @@ COPY ${crystal_deb} /tmp/crystal.deb
 # nightly packages do not have valid version numbers
 RUN dpkg --force-bad-version -i /tmp/crystal.deb
 
-CMD ["bash"]
+CMD ["/bin/bash"]
+
+FROM runtime as build
+
+RUN \
+  apt-get update && \
+  apt-get install -y build-essential llvm-4.0 libedit-dev libreadline-dev gdb && \
+  apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+CMD ["/bin/bash"]
