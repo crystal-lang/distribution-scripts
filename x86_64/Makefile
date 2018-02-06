@@ -11,13 +11,14 @@ no_cache ?=    ## Disable the docker build cache
 pull_images ?= ## Always pull docker images to ensure they're up to date
 release ?=     ## Create an optimized build for the final release
 
-CRYSTAL_VERSION ?= ## How the binaries should be branded
-CRYSTAL_SHA1 ?=    ## Git tag/branch/sha1 to checkout and build source
-PACKAGE_ITERATION = 1
-SHARDS_VERSION = v0.7.2
-PREVIOUS_CRYSTAL_RELEASE = https://github.com/crystal-lang/crystal/releases/download/v0.24.1/crystal-0.24.1-2-linux-x86_64.tar.gz
-PREVIOUS_CRYSTAL_DARWIN_RELEASE = https://github.com/crystal-lang/crystal/releases/download/v0.24.1/crystal-0.24.1-2-darwin-x86_64.tar.gz
+CRYSTAL_VERSION ?=    ## How the binaries should be branded
+CRYSTAL_SHA1 ?=       ## Git tag/branch/sha1 to checkout and build source
+PACKAGE_ITERATION ?=  ## The package iteration
 
+PREVIOUS_CRYSTAL_RELEASE_LINUX_TARGZ ?=  ## url to crystal-{version}-{package}-linux-x86_64.tar.gz
+PREVIOUS_CRYSTAL_RELEASE_DARWIN_TARGZ ?= ## url to crystal-{version}-{package}-darwin-x86_64.tar.gz
+
+SHARDS_VERSION = v0.7.2
 GC_VERSION = v7.4.10
 LIBATOMIC_OPS_VERSION = v7.4.10
 
@@ -33,7 +34,7 @@ DARWIN_NAME = crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION)-darwin-x86_64.tar.
 DARWIN_PKG_NAME = crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION).pkg
 
 DOCKER_BUILD_ARGS = $(if $(no_cache),--no-cache )$(if $(pull_images),--pull )
-BUILD_ARGS = $(DOCKER_BUILD_ARGS)$(if $(release),--build-arg release=true )--build-arg crystal_version=$(CRYSTAL_VERSION) --build-arg crystal_sha1=$(CRYSTAL_SHA1) --build-arg shards_version=$(SHARDS_VERSION) --build-arg gc_version=$(GC_VERSION) --build-arg libatomic_ops_version=$(LIBATOMIC_OPS_VERSION) --build-arg libevent_version=$(LIBEVENT_VERSION) --build-arg previous_crystal_release=$(PREVIOUS_CRYSTAL_RELEASE)
+BUILD_ARGS = $(DOCKER_BUILD_ARGS)$(if $(release),--build-arg release=true )--build-arg crystal_version=$(CRYSTAL_VERSION) --build-arg crystal_sha1=$(CRYSTAL_SHA1) --build-arg shards_version=$(SHARDS_VERSION) --build-arg gc_version=$(GC_VERSION) --build-arg libatomic_ops_version=$(LIBATOMIC_OPS_VERSION) --build-arg libevent_version=$(LIBEVENT_VERSION) --build-arg previous_crystal_release=$(PREVIOUS_CRYSTAL_RELEASE_LINUX_TARGZ)
 
 .PHONY: all
 all: compress package ## Build compressed omnibus and distribution packages [default]
@@ -112,7 +113,7 @@ darwin: darwin-previous $(OUTPUT_DIR)/$(DARWIN_NAME) $(OUTPUT_DIR)/$(DARWIN_PKG_
 
 .PHONY: darwin-previous
 darwin-previous:
-	curl -L -o /tmp/crystal-darwin-x86_64.tar.gz $(PREVIOUS_CRYSTAL_DARWIN_RELEASE) \
+	curl -L -o /tmp/crystal-darwin-x86_64.tar.gz $(PREVIOUS_CRYSTAL_RELEASE_DARWIN_TARGZ) \
 	&& tar xfz /tmp/crystal-darwin-x86_64.tar.gz -O "crystal-*/embedded/bin/crystal" > $(CURDIR)/../omnibus/crystal-darwin-x86_64 \
 	&& rm /tmp/crystal-darwin-x86_64.tar.gz \
 	&& chmod +x $(CURDIR)/../omnibus/crystal-darwin-x86_64
