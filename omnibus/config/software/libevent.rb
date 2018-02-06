@@ -1,8 +1,8 @@
 name "libevent"
-default_version "2.0.22"
+default_version "2.1.8"
 
 source url: "https://github.com/libevent/libevent/archive/release-#{version}-stable.tar.gz",
-       md5: "8913ef56ec329f2c046007bd634c7201"
+       md5: "80f8652e4b08d2ec86a5f5eb46b74510"
 
 relative_path "libevent-release-#{version}-stable"
 env = with_standard_compiler_flags(with_embedded_path)
