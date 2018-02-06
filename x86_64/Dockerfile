@@ -100,7 +100,6 @@ RUN git clone https://github.com/crystal-lang/crystal \
  && make docs \
  && touch src/compiler/crystal.cr \
  && make crystal stats=true static=true ${release:+release=true} \
-                 CRYSTAL_CONFIG_VERSION=${crystal_version} \
                  CRYSTAL_CONFIG_TARGET=x86_64-unknown-linux-gnu
 
 # Build shards
