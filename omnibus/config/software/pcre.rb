@@ -17,7 +17,7 @@
 name "pcre"
 default_version "8.40"
 
-source url: "http://downloads.sourceforge.net/project/pcre/pcre/#{version}/pcre-#{version}.tar.gz",
+source url: "https://ftp.pcre.org/pub/pcre/pcre-#{version}.tar.gz",
        md5: "890c808122bd90f398e6bc40ec862102"
 
 relative_path "pcre-#{version}"
