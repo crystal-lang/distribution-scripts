@@ -16,7 +16,6 @@ CRYSTAL_SHA1 ?=       ## Git tag/branch/sha1 to checkout and build source
 PACKAGE_ITERATION ?=  ## The package iteration
 
 PREVIOUS_CRYSTAL_RELEASE_LINUX_TARGZ ?=  ## url to crystal-{version}-{package}-linux-x86_64.tar.gz
-PREVIOUS_CRYSTAL_RELEASE_DARWIN_TARGZ ?= ## url to crystal-{version}-{package}-darwin-x86_64.tar.gz
 
 SHARDS_VERSION = v0.7.2
 GC_VERSION = v7.4.10
@@ -30,8 +29,6 @@ FILES = files/crystal-wrapper
 
 DEB_NAME = crystal_$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION)_amd64.deb
 RPM_NAME = crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION).x86_64.rpm
-DARWIN_NAME = crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION)-darwin-x86_64.tar.gz
-DARWIN_PKG_NAME = crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION).pkg
 
 DOCKER_BUILD_ARGS = $(if $(no_cache),--no-cache )$(if $(pull_images),--pull )
 BUILD_ARGS = $(DOCKER_BUILD_ARGS)$(if $(release),--build-arg release=true )--build-arg crystal_version=$(CRYSTAL_VERSION) --build-arg crystal_sha1=$(CRYSTAL_SHA1) --build-arg shards_version=$(SHARDS_VERSION) --build-arg gc_version=$(GC_VERSION) --build-arg libatomic_ops_version=$(LIBATOMIC_OPS_VERSION) --build-arg libevent_version=$(LIBEVENT_VERSION) --build-arg previous_crystal_release=$(PREVIOUS_CRYSTAL_RELEASE_LINUX_TARGZ)
@@ -108,30 +105,6 @@ $(OUTPUT_DIR)/$(RPM_NAME): docker-fpm $(OUTPUT_BASENAME).tar
            --force --package $(OUTPUT_DIR)/$(RPM_NAME) \
            --prefix /usr --chdir /tmp/crystal/crystal-$(CRYSTAL_VERSION) bin lib share"
 
-.PHONY: darwin
-darwin: darwin-previous $(OUTPUT_DIR)/$(DARWIN_NAME) $(OUTPUT_DIR)/$(DARWIN_PKG_NAME)
-
-.PHONY: darwin-previous
-darwin-previous:
-	curl -L -o /tmp/crystal-darwin-x86_64.tar.gz $(PREVIOUS_CRYSTAL_RELEASE_DARWIN_TARGZ) \
-	&& tar xfz /tmp/crystal-darwin-x86_64.tar.gz -O "crystal-*/embedded/bin/crystal" > $(CURDIR)/../omnibus/crystal-darwin-x86_64 \
-	&& rm /tmp/crystal-darwin-x86_64.tar.gz \
-	&& chmod +x $(CURDIR)/../omnibus/crystal-darwin-x86_64
-
-$(OUTPUT_DIR)/$(DARWIN_NAME) $(OUTPUT_DIR)/$(DARWIN_PKG_NAME):
-	mkdir -p $(OUTPUT_DIR) \
-	&& cd ../omnibus \
-	&& bundle exec omnibus clean crystal shards \
-  && CRYSTAL_VERSION=$(CRYSTAL_VERSION) PACKAGE_ITERATION=$(PACKAGE_ITERATION) CRYSTAL_SHA1=$(CRYSTAL_SHA1) bundle exec omnibus build crystal \
-  && cp ./pkg/$(DARWIN_NAME) ./pkg/$(DARWIN_PKG_NAME) $(CURDIR)/$(OUTPUT_DIR)/
-
 .PHONY: clean
 clean: ## Clean up build directory
 	rm -Rf $(OUTPUT_DIR)
-
-.PHONY: clean_darwin
-clean_darwin: ## Clean up build directory
-	rm -Rf $(CURDIR)/../omnibus/pkg/crystal-*
-	rm -Rf $(CURDIR)/../omnibus/pkg/version-*
-	rm -Rf /var/cache/omnibus/*
-	rm -Rf /opt/crystal/*
