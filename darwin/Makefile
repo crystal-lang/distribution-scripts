@@ -3,9 +3,9 @@
 ## Build everything
 ##   $ make
 
-CRYSTAL_VERSION ?=    ## How the binaries should be branded
-CRYSTAL_SHA1 ?=       ## Git tag/branch/sha1 to checkout and build source
-PACKAGE_ITERATION ?=  ## The package iteration
+CRYSTAL_VERSION ?=                 ## How the binaries should be branded
+CRYSTAL_SHA1 ?= $(CRYSTAL_VERSION) ## Git tag/branch/sha1 to checkout and build source
+PACKAGE_ITERATION ?= 1             ## The package iteration
 
 PREVIOUS_CRYSTAL_RELEASE_DARWIN_TARGZ ?= ## url to crystal-{version}-{package}-darwin-x86_64.tar.gz
 
