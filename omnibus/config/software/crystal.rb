@@ -1,11 +1,16 @@
 CRYSTAL_VERSION = ENV['CRYSTAL_VERSION']
 CRYSTAL_SHA1 = ENV['CRYSTAL_SHA1']
 FIRST_RUN = ENV["FIRST_RUN"]
+CRYSTAL_SRC = (ENV['CRYSTAL_SRC'] || "").strip
 
 name "crystal"
 default_version CRYSTAL_VERSION
 
-source git: "https://github.com/crystal-lang/crystal"
+if CRYSTAL_SRC.empty?
+  source git: "https://github.com/crystal-lang/crystal"
+else
+  source git: CRYSTAL_SRC
+end
 
 dependency "pcre"
 dependency "bdw-gc"
