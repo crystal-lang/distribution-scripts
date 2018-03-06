@@ -37,7 +37,9 @@ help: ## Show this help
 awk 'BEGIN {FS = "## "}; /^## [a-zA-Z_-]/ {printf "  \033[36m%s\033[0m\n", $$2}; /^##  / {printf "  %s\n", $$2}'
 
 .PHONY: darwin-previous
-darwin-previous: ## download previous crystal darwin release
+darwin-previous: $(CURDIR)/../omnibus/crystal-darwin-x86_64 ## download previous crystal darwin release
+
+$(CURDIR)/../omnibus/crystal-darwin-x86_64:
 	curl -L -o /tmp/crystal-darwin-x86_64.tar.gz $(PREVIOUS_CRYSTAL_RELEASE_DARWIN_TARGZ) \
 	&& tar xfz /tmp/crystal-darwin-x86_64.tar.gz -O "crystal-*/embedded/bin/crystal" > $(CURDIR)/../omnibus/crystal-darwin-x86_64 \
 	&& rm /tmp/crystal-darwin-x86_64.tar.gz \
@@ -52,7 +54,9 @@ $(OUTPUT_DIR)/$(DARWIN_NAME) $(OUTPUT_DIR)/$(DARWIN_PKG_NAME): ## Build omnibus 
 
 .PHONY: clean
 clean: ## Clean up build directory
+	rm -Rf $(OUTPUT_DIR)
 	rm -Rf $(CURDIR)/../omnibus/pkg/crystal-*
 	rm -Rf $(CURDIR)/../omnibus/pkg/version-*
+	rm -Rf $(CURDIR)/../omnibus/crystal-darwin-x86_64
 	rm -Rf /var/cache/omnibus/*
 	rm -Rf /opt/crystal/*
