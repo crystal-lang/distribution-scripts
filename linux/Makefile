@@ -13,7 +13,7 @@ release ?=     ## Create an optimized build for the final release
 
 CRYSTAL_VERSION ?=                 ## How the binaries should be branded
 CRYSTAL_SHA1 ?= $(CRYSTAL_VERSION) ## Git tag/branch/sha1 to checkout and build source
-PACKAGE_ITERATION ?= 1             ## The package iteration
+PACKAGE_ITERATION ?= 1
 
 PREVIOUS_CRYSTAL_RELEASE_LINUX_TARGZ ?=  ## url to crystal-{version}-{package}-linux-x86_64.tar.gz
 

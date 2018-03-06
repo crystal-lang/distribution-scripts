@@ -5,7 +5,7 @@
 
 CRYSTAL_VERSION ?=                 ## How the binaries should be branded
 CRYSTAL_SHA1 ?= $(CRYSTAL_VERSION) ## Git tag/branch/sha1 to checkout and build source
-PACKAGE_ITERATION ?= 1             ## The package iteration
+PACKAGE_ITERATION ?= 1
 FORCE_GIT_TAGGED ?= 1              ## Require build to be based on git tag/branch
 
 PREVIOUS_CRYSTAL_RELEASE_DARWIN_TARGZ ?= ## url to crystal-{version}-{package}-darwin-x86_64.tar.gz
