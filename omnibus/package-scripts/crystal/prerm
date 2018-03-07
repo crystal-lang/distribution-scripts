@@ -1,0 +1,22 @@
+#!/bin/bash
+#
+# Perform necessary crystal setup steps
+# prior to installing package.
+#
+
+PROGNAME=$(basename $0)
+
+function error_exit
+{
+  echo "${PROGNAME}: ${1:-"Unknown Error"}" 1>&2
+  exit 1
+}
+
+INSTALL_PATH=/usr
+if [ `uname` = "Darwin" -a `uname -r|cut -f1 -d.` -ge 15 ]; then
+	INSTALL_PATH=/usr/local
+fi
+
+rm -f ${INSTALL_PATH}/bin/crystal ${INSTALL_PATH}/bin/shards
+
+exit 0

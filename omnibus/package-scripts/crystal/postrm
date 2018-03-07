@@ -1,0 +1,9 @@
+#!/bin/bash
+#
+# Perform necessary crystal removal steps
+# after package is uninstalled.
+#
+
+echo "crystal has been uninstalled!"
+
+exit 0

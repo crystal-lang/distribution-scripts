@@ -1,7 +1,7 @@
 FROM debian:8 AS debian
 
 RUN apt-get update \
- && apt-get install -y build-essential automake libtool pkg-config git software-properties-common apt-transport-https curl \
+ && apt-get install -y build-essential libevent-core-2.0-5 libevent-dev libevent-extra-2.0-5 libevent-openssl-2.0-5 libevent-pthreads-2.0-5 libpcre3-dev automake libtool pkg-config git software-properties-common apt-transport-https curl \
  && (pkg-config || true)
 
 RUN add-apt-repository "deb http://apt.llvm.org/jessie/ llvm-toolchain-jessie-4.0 main" \
@@ -34,9 +34,10 @@ RUN git clone https://github.com/ivmai/bdwgc \
 
 # Cross-compile crystal and build libcrystal.a
 ARG crystal_version
+ARG crystal_sha1
 RUN git clone https://github.com/crystal-lang/crystal \
  && cd crystal \
- && git checkout ${crystal_version} \
+ && git checkout ${crystal_sha1} \
  \
  && make deps \
  \
@@ -87,9 +88,10 @@ RUN llvm-config --version
 # Build crystal
 COPY --from=debian /crystal-musl.o /
 ARG crystal_version
+ARG crystal_sha1
 RUN git clone https://github.com/crystal-lang/crystal \
  && cd crystal \
- && git checkout ${crystal_version} \
+ && git checkout ${crystal_sha1} \
  \
  && make deps \
  && mkdir .build \
@@ -98,7 +100,6 @@ RUN git clone https://github.com/crystal-lang/crystal \
  && make docs \
  && touch src/compiler/crystal.cr \
  && make crystal stats=true static=true ${release:+release=true} \
-                 CRYSTAL_CONFIG_VERSION=${crystal_version} \
                  CRYSTAL_CONFIG_TARGET=x86_64-unknown-linux-gnu
 
 # Build shards
