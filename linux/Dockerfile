@@ -29,7 +29,7 @@ RUN git clone https://github.com/ivmai/bdwgc \
  && (cd libatomic_ops && git checkout ${libatomic_ops_version}) \
  \
  && ./autogen.sh \
- && ./configure --disable-debug --disable-shared \
+ && ./configure --disable-debug --disable-shared --enable-large-config \
  && make -j$(nproc)
 
 # Cross-compile crystal and build libcrystal.a
@@ -68,7 +68,7 @@ RUN git clone https://github.com/ivmai/bdwgc \
  && (cd libatomic_ops && git checkout ${libatomic_ops_version}) \
  \
  && ./autogen.sh \
- && ./configure --disable-debug --disable-shared \
+ && ./configure --disable-debug --disable-shared --enable-large-config \
  && make -j$(nproc) CFLAGS=-DNO_GETCONTEXT
 
 # Build libevent

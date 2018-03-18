@@ -16,6 +16,7 @@ build do
           " --disable-debug" \
           " --disable-dependency-tracking" \
           " --disable-shared" \
+          " --enable-large-config" \
           " --prefix=#{install_dir}/embedded", env: env
 
 
