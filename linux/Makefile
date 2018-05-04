@@ -31,7 +31,7 @@ DEB_NAME = crystal_$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION)_amd64.deb
 RPM_NAME = crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION).x86_64.rpm
 
 DOCKER_BUILD_ARGS = $(if $(no_cache),--no-cache )$(if $(pull_images),--pull )
-BUILD_ARGS = $(DOCKER_BUILD_ARGS)$(if $(release),--build-arg release=true )--build-arg crystal_version=$(CRYSTAL_VERSION) --build-arg crystal_sha1=$(CRYSTAL_SHA1) --build-arg shards_version=$(SHARDS_VERSION) --build-arg gc_version=$(GC_VERSION) --build-arg libatomic_ops_version=$(LIBATOMIC_OPS_VERSION) --build-arg libevent_version=$(LIBEVENT_VERSION) --build-arg previous_crystal_release=$(PREVIOUS_CRYSTAL_RELEASE_LINUX_TARGZ)
+BUILD_ARGS = $(DOCKER_BUILD_ARGS)$(if $(release),--build-arg release=true )--build-arg crystal_version=$(CRYSTAL_VERSION) --build-arg crystal_sha1=$(CRYSTAL_SHA1) --build-arg shards_version=$(SHARDS_VERSION) --build-arg gc_version=$(GC_VERSION) --build-arg libatomic_ops_version=$(LIBATOMIC_OPS_VERSION) --build-arg libevent_version=$(LIBEVENT_VERSION) --build-arg previous_crystal_release=$(PREVIOUS_CRYSTAL_RELEASE_LINUX_TARGZ) --build-arg package_iteration=$(PACKAGE_ITERATION)
 
 .PHONY: all
 all: compress package ## Build compressed omnibus and distribution packages [default]
@@ -60,7 +60,7 @@ $(OUTPUT_BASENAME).tar: Dockerfile $(FILES)
 	mkdir -p $(OUTPUT_DIR)
 	docker build $(BUILD_ARGS) -t crystal-build-temp .
 	container_id="$$(docker create crystal-build-temp)" \
-	  && docker cp "$$container_id":/output/crystal-$(CRYSTAL_VERSION).tar $(OUTPUT_BASENAME).tar \
+	  && docker cp "$$container_id":/output/crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION).tar $(OUTPUT_BASENAME).tar \
 	  && docker rm -v "$$container_id"
 
 .PHONY: compress
@@ -83,7 +83,7 @@ $(OUTPUT_DIR)/$(DEB_NAME): docker-fpm $(OUTPUT_BASENAME).tar
 	docker run --rm -v $(CURDIR)/build:/build crystal-fpm /bin/sh -c "\
     mkdir -p /tmp/crystal \
     && tar -C /tmp/crystal -xf $(OUTPUT_BASENAME).tar \
-    && mv /tmp/crystal/crystal-$(CRYSTAL_VERSION)/share/licenses/crystal/LICENSE /tmp/crystal/crystal-$(CRYSTAL_VERSION)/share/doc/crystal/copyright \
+    && mv /tmp/crystal/crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION)/share/licenses/crystal/LICENSE /tmp/crystal/crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION)/share/doc/crystal/copyright \
     && rm -Rf /tmp/crystal/crystal-*/share/licenses \
     && fpm --input-type dir --output-type deb \
            --name crystal --version $(CRYSTAL_VERSION) --iteration $(PACKAGE_ITERATION) \
@@ -92,7 +92,7 @@ $(OUTPUT_DIR)/$(DEB_NAME): docker-fpm $(OUTPUT_BASENAME).tar
            --deb-recommends git --deb-recommends libssl-dev \
            --deb-suggests libxml2-dev --deb-suggests libgmp-dev --deb-suggests libyaml-dev --deb-suggests libreadline-dev \
            --force --package $(OUTPUT_DIR)/$(DEB_NAME) \
-           --prefix /usr --chdir /tmp/crystal/crystal-$(CRYSTAL_VERSION) bin lib share"
+           --prefix /usr --chdir /tmp/crystal/crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION) bin lib share"
 
 $(OUTPUT_DIR)/$(RPM_NAME): docker-fpm $(OUTPUT_BASENAME).tar
 	docker run --rm -v $(CURDIR)/build:/build crystal-fpm /bin/sh -c "\
@@ -103,7 +103,7 @@ $(OUTPUT_DIR)/$(RPM_NAME): docker-fpm $(OUTPUT_BASENAME).tar
            --architecture x86_64 --maintainer \"Chris Hobbs <chris@rx14.co.uk>\" \
            --depends gcc --depends pcre-devel --depends libevent-devel \
            --force --package $(OUTPUT_DIR)/$(RPM_NAME) \
-           --prefix /usr --chdir /tmp/crystal/crystal-$(CRYSTAL_VERSION) bin lib share"
+           --prefix /usr --chdir /tmp/crystal/crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION) bin lib share"
 
 .PHONY: clean
 clean: ## Clean up build directory
