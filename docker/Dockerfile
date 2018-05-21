@@ -13,7 +13,7 @@ COPY ${crystal_deb} /tmp/crystal.deb
 # nightly packages do not have valid version numbers
 RUN dpkg --force-bad-version -i /tmp/crystal.deb
 
-CMD ["/bin/bash"]
+CMD ["/bin/sh"]
 
 FROM runtime as build
 
@@ -24,4 +24,4 @@ RUN \
 
 ENV LIBRARY_PATH=/usr/lib/crystal/lib/
 
-CMD ["/bin/bash"]
+CMD ["/bin/sh"]
