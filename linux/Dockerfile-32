@@ -117,6 +117,8 @@ COPY files/crystal-wrapper /output/bin/crystal
 COPY --from=debian /bdwgc/.libs/libgc.a /libgc-debian.a
 COPY --from=debian /crystal/src/ext/libcrystal.a /libcrystal-debian.a
 
+ARG package_iteration
+
 RUN \
  # Remove musl binaries from source and replace with debian ones
     rm -Rf /crystal/src/{llvm/ext/llvm_ext.o,ext/sigfault.o,ext/libcrystal.a} \
@@ -153,6 +155,6 @@ RUN \
  && cp /crystal/LICENSE /output/share/licenses/crystal/LICENSE \
  \
  # Create tarball
- && mv /output /crystal-${crystal_version} \
+ && mv /output /crystal-${crystal_version}-${package_iteration} \
  && mkdir /output \
- && tar -cvf /output/crystal-${crystal_version}.tar /crystal-${crystal_version}
+ && tar -cvf /output/crystal-${crystal_version}-${package_iteration}.tar /crystal-${crystal_version}-${package_iteration}
