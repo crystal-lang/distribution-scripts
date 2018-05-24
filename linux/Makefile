@@ -33,12 +33,12 @@ DEB_NAME = crystal_$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION)_amd64.deb
 RPM_NAME = crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION).x86_64.rpm
 
 DEB_NAME32 = crystal_$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION)_i386.deb
-RPM_NAME32 = crystal_$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION).i386.rpm
+RPM_NAME32 = crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION).i386.rpm
 
 DOCKER_BUILD_ARGS = $(if $(no_cache),--no-cache )$(if $(pull_images),--pull )
 BUILD_ARGS_COMMON = $(DOCKER_BUILD_ARGS)$(if $(release),--build-arg release=true )--build-arg crystal_version=$(CRYSTAL_VERSION) --build-arg crystal_sha1=$(CRYSTAL_SHA1) --build-arg shards_version=$(SHARDS_VERSION) --build-arg gc_version=$(GC_VERSION) --build-arg libatomic_ops_version=$(LIBATOMIC_OPS_VERSION) --build-arg libevent_version=$(LIBEVENT_VERSION) --build-arg package_iteration=$(PACKAGE_ITERATION)
-BUILD_ARGS = $(BUILD_ARGS_COMMON) --build-arg previous_crystal_release=$(PREVIOUS_CRYSTAL_RELEASE_LINUX_TARGZ)
-BUILD_ARGS32 = $(BUILD_ARGS_COMMON) --build-arg previous_crystal_release=$(PREVIOUS_CRYSTAL_RELEASE_LINUX32_TARGZ)
+BUILD_ARGS = $(BUILD_ARGS_COMMON)   --build-arg previous_crystal_release=$(PREVIOUS_CRYSTAL_RELEASE_LINUX_TARGZ)   --build-arg debian_image=debian:8       --build-arg alpine_image=alpine:3.7       --build-arg musl_target=x86_64-linux-musl  --build-arg gnu_target=x86_64-unknown-linux-gnu
+BUILD_ARGS32 = $(BUILD_ARGS_COMMON) --build-arg previous_crystal_release=$(PREVIOUS_CRYSTAL_RELEASE_LINUX32_TARGZ) --build-arg debian_image=i386/debian:8  --build-arg alpine_image=i386/alpine:3.7  --build-arg musl_target=i686-linux-musl    --build-arg gnu_target=i686-unknown-linux-gnu
 
 .PHONY: all
 all: compress package ## Build compressed and distribution packages [default]
@@ -118,9 +118,9 @@ $(OUTPUT_DIR)/$(RPM_NAME): docker-fpm $(OUTPUT_BASENAME).tar
 .PHONY: build32
 build32: $(OUTPUT_BASENAME32).tar ## Build the raw uncompressed tarball
 
-$(OUTPUT_BASENAME32).tar: Dockerfile-32 $(FILES)
+$(OUTPUT_BASENAME32).tar: Dockerfile $(FILES)
 	mkdir -p $(OUTPUT_DIR)
-	docker build $(BUILD_ARGS32) -f Dockerfile-32 -t crystal-build32-temp .
+	docker build $(BUILD_ARGS32) -t crystal-build32-temp .
 	container_id="$$(docker create crystal-build32-temp)" \
 	  && docker cp "$$container_id":/output/crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION).tar $(OUTPUT_BASENAME32).tar \
 	  && docker rm -v "$$container_id"
