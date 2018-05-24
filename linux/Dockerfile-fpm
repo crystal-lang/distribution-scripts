@@ -5,4 +5,5 @@ RUN apt-get update \
  # cleanup
  && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
+ENV PATH="/usr/local/bundle/bin/:${PATH}"
 RUN gem install --no-ri --no-rdoc fpm -v 1.9.3
