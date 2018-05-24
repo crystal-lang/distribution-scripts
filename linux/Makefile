@@ -85,7 +85,7 @@ $(OUTPUT_BASENAME).tar.xz: $(OUTPUT_BASENAME).tar
 .PHONY: package
 package: $(OUTPUT_DIR)/$(DEB_NAME) $(OUTPUT_DIR)/$(RPM_NAME) ## Build distribution packages from the tarballs
 
-PHONY: docker-fpm
+.PHONY: docker-fpm
 docker-fpm: Dockerfile-fpm
 	docker build $(DOCKER_BUILD_ARGS) -t crystal-fpm -f Dockerfile-fpm .
 
