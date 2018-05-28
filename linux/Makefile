@@ -41,10 +41,10 @@ BUILD_ARGS = $(BUILD_ARGS_COMMON)   --build-arg previous_crystal_release=$(PREVI
 BUILD_ARGS32 = $(BUILD_ARGS_COMMON) --build-arg previous_crystal_release=$(PREVIOUS_CRYSTAL_RELEASE_LINUX32_TARGZ) --build-arg debian_image=i386/debian:8  --build-arg alpine_image=i386/alpine:3.7  --build-arg musl_target=i686-linux-musl    --build-arg gnu_target=i686-unknown-linux-gnu
 
 .PHONY: all
-all: compress package ## Build compressed and distribution packages [default]
+all: compress package ## Build compressed and distribution packages for 64 bits [default]
 
 .PHONY: all32
-all32: compress32 package32 ## Build compressed and distribution packages for 32 bits [default]
+all32: compress32 package32 ## Build compressed and distribution packages for 32 bits
 
 .PHONY: help
 help: ## Show this help
