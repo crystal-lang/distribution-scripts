@@ -37,7 +37,7 @@ RPM_NAME32 = crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION).i386.rpm
 
 DOCKER_BUILD_ARGS = $(if $(no_cache),--no-cache )$(if $(pull_images),--pull )
 BUILD_ARGS_COMMON = $(DOCKER_BUILD_ARGS)$(if $(release),--build-arg release=true )--build-arg crystal_version=$(CRYSTAL_VERSION) --build-arg crystal_sha1=$(CRYSTAL_SHA1) --build-arg shards_version=$(SHARDS_VERSION) --build-arg gc_version=$(GC_VERSION) --build-arg libatomic_ops_version=$(LIBATOMIC_OPS_VERSION) --build-arg libevent_version=$(LIBEVENT_VERSION) --build-arg package_iteration=$(PACKAGE_ITERATION)
-BUILD_ARGS = $(BUILD_ARGS_COMMON)   --build-arg previous_crystal_release=$(PREVIOUS_CRYSTAL_RELEASE_LINUX_TARGZ)   --build-arg debian_image=debian:8       --build-arg alpine_image=alpine:3.7       --build-arg musl_target=x86_64-linux-musl  --build-arg gnu_target=x86_64-unknown-linux-gnu
+BUILD_ARGS   = $(BUILD_ARGS_COMMON) --build-arg previous_crystal_release=$(PREVIOUS_CRYSTAL_RELEASE_LINUX_TARGZ)   --build-arg debian_image=debian:8       --build-arg alpine_image=alpine:3.7       --build-arg musl_target=x86_64-linux-musl  --build-arg gnu_target=x86_64-unknown-linux-gnu
 BUILD_ARGS32 = $(BUILD_ARGS_COMMON) --build-arg previous_crystal_release=$(PREVIOUS_CRYSTAL_RELEASE_LINUX32_TARGZ) --build-arg debian_image=i386/debian:8  --build-arg alpine_image=i386/alpine:3.7  --build-arg musl_target=i686-linux-musl    --build-arg gnu_target=i686-unknown-linux-gnu
 
 .PHONY: all
