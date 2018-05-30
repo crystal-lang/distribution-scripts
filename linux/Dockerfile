@@ -47,7 +47,6 @@ RUN git clone https://github.com/crystal-lang/crystal \
  && bin/crystal build src/compiler/crystal.cr -D without_openssl -D without_zlib \
                       --cross-compile --target ${musl_target} -o /crystal-musl
 
-ARG alpine_image
 FROM ${alpine_image}
 
 # Install dependencies
