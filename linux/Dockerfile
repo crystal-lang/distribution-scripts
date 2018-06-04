@@ -1,4 +1,6 @@
-FROM debian:8 AS debian
+ARG alpine_image
+ARG debian_image
+FROM ${debian_image} AS debian
 
 RUN apt-get update \
  && apt-get install -y build-essential libevent-core-2.0-5 libevent-dev libevent-extra-2.0-5 libevent-openssl-2.0-5 libevent-pthreads-2.0-5 libpcre3-dev automake libtool pkg-config git software-properties-common apt-transport-https curl \
@@ -35,6 +37,7 @@ RUN git clone https://github.com/ivmai/bdwgc \
 # Cross-compile crystal and build libcrystal.a
 ARG crystal_version
 ARG crystal_sha1
+ARG musl_target
 RUN git clone https://github.com/crystal-lang/crystal \
  && cd crystal \
  && git checkout ${crystal_sha1} \
@@ -42,9 +45,9 @@ RUN git clone https://github.com/crystal-lang/crystal \
  && make deps \
  \
  && bin/crystal build src/compiler/crystal.cr -D without_openssl -D without_zlib \
-                      --cross-compile --target "x86_64-linux-musl" -o /crystal-musl
+                      --cross-compile --target ${musl_target} -o /crystal-musl
 
-FROM alpine:3.7
+FROM ${alpine_image}
 
 # Install dependencies
 RUN apk add --no-cache \
@@ -89,6 +92,7 @@ RUN llvm-config --version
 COPY --from=debian /crystal-musl.o /
 ARG crystal_version
 ARG crystal_sha1
+ARG gnu_target
 RUN git clone https://github.com/crystal-lang/crystal \
  && cd crystal \
  && git checkout ${crystal_sha1} \
@@ -100,17 +104,18 @@ RUN git clone https://github.com/crystal-lang/crystal \
  && make docs \
  && touch src/compiler/crystal.cr \
  && make crystal stats=true static=true ${release:+release=true} \
-                 CRYSTAL_CONFIG_TARGET=x86_64-unknown-linux-gnu
+                 CRYSTAL_CONFIG_TARGET=${gnu_target}
 
 # Build shards
 ARG shards_version
+ARG musl_target
 RUN git clone https://github.com/crystal-lang/shards \
  && cd shards \
  && git checkout ${shards_version} \
  \
  # Hack to make shards not segfault
  && echo 'require "llvm/lib_llvm"; require "llvm/enums"; require "./src/shards"' > hack.cr \
- && /crystal/bin/crystal build --stats --target x86_64-linux-musl \
+ && /crystal/bin/crystal build --stats --target ${musl_target} \
     hack.cr -o shards --static ${release:+--release}
 
 COPY files/crystal-wrapper /output/bin/crystal

@@ -20,4 +20,5 @@ Just run `make help`!
 * `CRYSTAL_VERSION`: How the binaries should be branded.
 * `CRYSTAL_SHA1`: Git tag/branch/sha1 to checkout and build source
 * `PACKAGE_ITERATION`: The package iteration
-* `PREVIOUS_CRYSTAL_RELEASE_LINUX_TARGZ`: Url to crystal-{version}-{package}-linux-x86_64.tar.gz
+* `PREVIOUS_CRYSTAL_RELEASE_LINUX64_TARGZ`: Url to crystal-{version}-{package}-linux-x86_64.tar.gz
+* `PREVIOUS_CRYSTAL_RELEASE_LINUX32_TARGZ`: Url to crystal-{version}-{package}-linux-x86_64.tar.gz
