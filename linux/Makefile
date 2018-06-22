@@ -40,6 +40,8 @@ BUILD_ARGS_COMMON = $(DOCKER_BUILD_ARGS)$(if $(release),--build-arg release=true
 BUILD_ARGS64 = $(BUILD_ARGS_COMMON) --build-arg previous_crystal_release=$(PREVIOUS_CRYSTAL_RELEASE_LINUX64_TARGZ) --build-arg debian_image=debian:8       --build-arg alpine_image=alpine:3.7       --build-arg musl_target=x86_64-linux-musl  --build-arg gnu_target=x86_64-unknown-linux-gnu
 BUILD_ARGS32 = $(BUILD_ARGS_COMMON) --build-arg previous_crystal_release=$(PREVIOUS_CRYSTAL_RELEASE_LINUX32_TARGZ) --build-arg debian_image=i386/debian:8  --build-arg alpine_image=i386/alpine:3.7  --build-arg musl_target=i686-linux-musl    --build-arg gnu_target=i686-unknown-linux-gnu
 
+PACKAGE_BRANDING_ARGS = --maintainer \"Chris Hobbs <chris@rx14.co.uk>\" --url \"https://crystal-lang.org/\"
+
 .PHONY: all
 all: all64 all32 ## Build compressed and distribution packages [default]
 
@@ -100,7 +102,7 @@ $(OUTPUT_DIR)/$(DEB_NAME64): docker-fpm $(OUTPUT_BASENAME64).tar
     && rm -Rf /tmp/crystal/crystal-*/share/licenses \
     && fpm --input-type dir --output-type deb \
            --name crystal --version $(CRYSTAL_VERSION) --iteration $(PACKAGE_ITERATION) \
-           --architecture x86_64 --maintainer \"Chris Hobbs <chris@rx14.co.uk>\" \
+           --architecture x86_64 $(PACKAGE_BRANDING_ARGS) \
            --depends gcc --depends libpcre3-dev --depends libevent-dev \
            --deb-recommends git --deb-recommends libssl-dev \
            --deb-suggests libxml2-dev --deb-suggests libgmp-dev --deb-suggests libyaml-dev --deb-suggests libreadline-dev \
@@ -113,7 +115,7 @@ $(OUTPUT_DIR)/$(RPM_NAME64): docker-fpm $(OUTPUT_BASENAME64).tar
     && tar -C /tmp/crystal -xf $(OUTPUT_BASENAME64).tar \
     && fpm --input-type dir --output-type rpm \
            --name crystal --version $(CRYSTAL_VERSION) --iteration $(PACKAGE_ITERATION) \
-           --architecture x86_64 --maintainer \"Chris Hobbs <chris@rx14.co.uk>\" \
+           --architecture x86_64 $(PACKAGE_BRANDING_ARGS) \
            --depends gcc --depends pcre-devel --depends libevent-devel \
            --force --package $(OUTPUT_DIR)/$(RPM_NAME64) \
            --prefix /usr --chdir /tmp/crystal/crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION) bin lib share"
@@ -148,7 +150,7 @@ $(OUTPUT_DIR)/$(DEB_NAME32): docker-fpm $(OUTPUT_BASENAME32).tar
     && rm -Rf /tmp/crystal/crystal-*/share/licenses \
     && fpm --input-type dir --output-type deb \
            --name crystal --version $(CRYSTAL_VERSION) --iteration $(PACKAGE_ITERATION) \
-           --architecture i386 --maintainer \"Chris Hobbs <chris@rx14.co.uk>\" \
+           --architecture i386 $(PACKAGE_BRANDING_ARGS) \
            --depends gcc --depends libpcre3-dev --depends libevent-dev \
            --deb-recommends git --deb-recommends libssl-dev \
            --deb-suggests libxml2-dev --deb-suggests libgmp-dev --deb-suggests libyaml-dev --deb-suggests libreadline-dev \
@@ -161,7 +163,7 @@ $(OUTPUT_DIR)/$(RPM_NAME32): docker-fpm $(OUTPUT_BASENAME32).tar
     && tar -C /tmp/crystal -xf $(OUTPUT_BASENAME32).tar \
     && fpm --input-type dir --output-type rpm \
            --name crystal --version $(CRYSTAL_VERSION) --iteration $(PACKAGE_ITERATION) \
-           --architecture i386 --maintainer \"Chris Hobbs <chris@rx14.co.uk>\" \
+           --architecture i386 $(PACKAGE_BRANDING_ARGS) \
            --depends gcc --depends pcre-devel --depends libevent-devel \
            --force --package $(OUTPUT_DIR)/$(RPM_NAME32) \
            --prefix /usr --chdir /tmp/crystal/crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION) bin lib share"
