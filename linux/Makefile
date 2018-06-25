@@ -40,7 +40,7 @@ BUILD_ARGS_COMMON = $(DOCKER_BUILD_ARGS)$(if $(release),--build-arg release=true
 BUILD_ARGS64 = $(BUILD_ARGS_COMMON) --build-arg previous_crystal_release=$(PREVIOUS_CRYSTAL_RELEASE_LINUX64_TARGZ) --build-arg debian_image=debian:8       --build-arg alpine_image=alpine:3.7       --build-arg musl_target=x86_64-linux-musl  --build-arg gnu_target=x86_64-unknown-linux-gnu
 BUILD_ARGS32 = $(BUILD_ARGS_COMMON) --build-arg previous_crystal_release=$(PREVIOUS_CRYSTAL_RELEASE_LINUX32_TARGZ) --build-arg debian_image=i386/debian:8  --build-arg alpine_image=i386/alpine:3.7  --build-arg musl_target=i686-linux-musl    --build-arg gnu_target=i686-unknown-linux-gnu
 
-PACKAGE_BRANDING_ARGS = --maintainer \"Chris Hobbs <chris@rx14.co.uk>\" --url \"https://crystal-lang.org/\"
+PACKAGE_BRANDING_ARGS = --maintainer \"Crystal Team <crystal@manas.tech>\" --url \"https://crystal-lang.org/\"
 
 .PHONY: all
 all: all64 all32 ## Build compressed and distribution packages [default]
