@@ -15,6 +15,7 @@ build do
   command "./configure" \
           " --disable-dependency-tracking" \
           " --disable-shared" \
+          " --disable-clock-gettime" \
           " --prefix=#{install_dir}/embedded", env: env
   make "-j #{workers}", env: env
   make  "install"
