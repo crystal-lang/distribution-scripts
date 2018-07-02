@@ -58,6 +58,7 @@ endif
 	mkdir -p $(OUTPUT_DIR) \
 	&& cd ../omnibus \
   && if [ "$(FORCE_GIT_TAGGED)" -eq "0" ]; then export CRYSTAL_SRC=$(CURDIR)/tmp/crystal/.git; fi \
+  && export MACOSX_DEPLOYMENT_TARGET=10.11 \
 	&& bundle exec omnibus clean crystal shards \
   && bundle exec omnibus build crystal \
   && cp ./pkg/$(DARWIN_NAME) ./pkg/$(DARWIN_PKG_NAME) $(CURDIR)/$(OUTPUT_DIR)/
