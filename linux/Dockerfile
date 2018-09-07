@@ -150,10 +150,12 @@ RUN \
  && cp -r /crystal/docs /output/share/doc/crystal/api \
  && cp -r /crystal/samples /output/share/doc/crystal/examples \
  \
- # Copy and compress manpage
- && mkdir -p /output/share/man/man1/ \
+ # Copy and compress manpages
+ && mkdir -p /output/share/man/man1/ /output/share/man/man5/ \
  && cp /crystal/man/crystal.1 /output/share/man/man1/crystal.1 \
- && gzip -9 /output/share/man/man1/crystal.1 \
+ && cp /shards/man/shards.1 /output/share/man/man1/shards.1 \
+ && cp /shards/man/shard.yml.5 /output/share/man/man5/shard.yml.5 \
+ && gzip -9 /output/share/man/man1/crystal.1 /output/share/man/man1/shards.1 /output/share/man/man5/shard.yml.5 \
  \
  # Copy license
  && mkdir -p /output/share/licenses/crystal/ \
