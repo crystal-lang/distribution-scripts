@@ -103,8 +103,8 @@ $(OUTPUT_DIR)/$(DEB_NAME64): docker-fpm $(OUTPUT_BASENAME64).tar
     && fpm --input-type dir --output-type deb \
            --name crystal --version $(CRYSTAL_VERSION) --iteration $(PACKAGE_ITERATION) \
            --architecture x86_64 $(PACKAGE_BRANDING_ARGS) \
-           --depends gcc --depends pkg-config --depends libpcre3-dev --depends libevent-dev --depends libz-dev \
-           --deb-recommends git --deb-recommends libssl-dev \
+           --depends gcc --depends pkgconf --depends libpcre3-dev --depends libevent-dev \
+           --deb-recommends git --deb-recommends libssl-dev --deb-recommends libz-dev \
            --deb-suggests libxml2-dev --deb-suggests libgmp-dev --deb-suggests libyaml-dev --deb-suggests libreadline-dev \
            --force --package $(OUTPUT_DIR)/$(DEB_NAME64) \
            --prefix /usr --chdir /tmp/crystal/crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION) bin lib share"
@@ -116,7 +116,7 @@ $(OUTPUT_DIR)/$(RPM_NAME64): docker-fpm $(OUTPUT_BASENAME64).tar
     && fpm --input-type dir --output-type rpm \
            --name crystal --version $(CRYSTAL_VERSION) --iteration $(PACKAGE_ITERATION) \
            --architecture x86_64 $(PACKAGE_BRANDING_ARGS) \
-           --depends gcc --depends pcre-devel --depends libevent-devel \
+           --depends gcc --depends pkgconfig --depends pcre-devel --depends libevent-devel \
            --force --package $(OUTPUT_DIR)/$(RPM_NAME64) \
            --prefix /usr --chdir /tmp/crystal/crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION) bin lib share"
 
@@ -151,8 +151,8 @@ $(OUTPUT_DIR)/$(DEB_NAME32): docker-fpm $(OUTPUT_BASENAME32).tar
     && fpm --input-type dir --output-type deb \
            --name crystal --version $(CRYSTAL_VERSION) --iteration $(PACKAGE_ITERATION) \
            --architecture i386 $(PACKAGE_BRANDING_ARGS) \
-           --depends gcc --depends pkg-config --depends libpcre3-dev --depends libevent-dev --depends libz-dev  \
-           --deb-recommends git --deb-recommends libssl-dev \
+           --depends gcc --depends pkgconf --depends libpcre3-dev --depends libevent-dev \
+           --deb-recommends git --deb-recommends libssl-dev --deb-recommends libz-dev \
            --deb-suggests libxml2-dev --deb-suggests libgmp-dev --deb-suggests libyaml-dev --deb-suggests libreadline-dev \
            --force --package $(OUTPUT_DIR)/$(DEB_NAME32) \
            --prefix /usr --chdir /tmp/crystal/crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION) bin lib share"
