@@ -1,11 +1,11 @@
 # Recipes for this Makefile
 
 ## Build everything
-##   $ make
-## Build just distribution packages
-##   $ make package
+##   $ make CRYSTAL_VERSION=0.xx.y PREVIOUS_CRYSTAL_RELEASE_LINUX64_TARGZ=...
+## Build just 64bit distribution packages
+##   $ make package64 CRYSTAL_VERSION=0.xx.y PREVIOUS_CRYSTAL_RELEASE_LINUX64_TARGZ=...
 ## Build everything for final release
-##   $ make clean all no_cache=true pull_images=true release=true
+##   $ make clean all no_cache=true pull_images=true release=true CRYSTAL_VERSION=0.xx.y PREVIOUS_CRYSTAL_RELEASE_LINUX64_TARGZ=...
 
 no_cache ?=    ## Disable the docker build cache
 pull_images ?= ## Always pull docker images to ensure they're up to date
