@@ -1,11 +1,11 @@
 # Recipes for this Makefile
 
 ## Build everything
-##   $ make
-## Build just distribution packages
-##   $ make package
+##   $ make CRYSTAL_VERSION=0.xx.y PREVIOUS_CRYSTAL_RELEASE_LINUX64_TARGZ=...
+## Build just 64bit distribution packages
+##   $ make package64 CRYSTAL_VERSION=0.xx.y PREVIOUS_CRYSTAL_RELEASE_LINUX64_TARGZ=...
 ## Build everything for final release
-##   $ make clean all no_cache=true pull_images=true release=true
+##   $ make clean all no_cache=true pull_images=true release=true CRYSTAL_VERSION=0.xx.y PREVIOUS_CRYSTAL_RELEASE_LINUX64_TARGZ=...
 
 no_cache ?=    ## Disable the docker build cache
 pull_images ?= ## Always pull docker images to ensure they're up to date
@@ -55,12 +55,12 @@ all32: compress32 package32 ## Build compressed and distribution packages for 32
 help: ## Show this help
 	@echo
 	@printf '\033[34mtargets:\033[0m\n'
-	@grep -hE '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) |\
+	@grep -hE '^[a-zA-Z0-9_-]+:.*?## .*$$' $(MAKEFILE_LIST) |\
 		sort |\
 		awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2}'
 	@echo
 	@printf '\033[34moptional variables:\033[0m\n'
-	@grep -hE '^[a-zA-Z_-]+ \?=.*?## .*$$' $(MAKEFILE_LIST) |\
+	@grep -hE '^[a-zA-Z0-9_-]+ \?=.*?## .*$$' $(MAKEFILE_LIST) |\
 		sort |\
 		awk 'BEGIN {FS = " \\?=.*?## "}; {printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2}'
 	@echo

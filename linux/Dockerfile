@@ -35,7 +35,6 @@ RUN git clone https://github.com/ivmai/bdwgc \
  && make -j$(nproc)
 
 # Cross-compile crystal and build libcrystal.a
-ARG crystal_version
 ARG crystal_sha1
 ARG musl_target
 RUN git clone https://github.com/crystal-lang/crystal \
