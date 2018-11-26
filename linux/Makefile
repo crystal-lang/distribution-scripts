@@ -22,8 +22,6 @@ SHARDS_VERSION = v0.8.1
 GC_VERSION = v7.6.8
 LIBATOMIC_OPS_VERSION = v7.6.6
 
-LIBEVENT_VERSION = release-2.1.8-stable
-
 OUTPUT_DIR = build
 OUTPUT_BASENAME64 = $(OUTPUT_DIR)/crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION)-linux-x86_64
 OUTPUT_BASENAME32 = $(OUTPUT_DIR)/crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION)-linux-i686
@@ -44,7 +42,6 @@ BUILD_ARGS_COMMON = $(DOCKER_BUILD_ARGS) \
                     --build-arg shards_version=$(SHARDS_VERSION) \
                     --build-arg gc_version=$(GC_VERSION) \
                     --build-arg libatomic_ops_version=$(LIBATOMIC_OPS_VERSION) \
-                    --build-arg libevent_version=$(LIBEVENT_VERSION) \
                     --build-arg package_iteration=$(PACKAGE_ITERATION)
 
 BUILD_ARGS64 = $(BUILD_ARGS_COMMON) \
