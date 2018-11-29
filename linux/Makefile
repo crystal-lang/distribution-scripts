@@ -61,8 +61,11 @@ BUILD_ARGS32 = $(BUILD_ARGS_COMMON) \
 
 PACKAGE_BRANDING_ARGS = --maintainer \"$(PACKAGE_MAINTAINER)\" --url \"https://crystal-lang.org/\"
 
-FPM_FLAGS = --name crystal --version $(CRYSTAL_VERSION) --iteration $(PACKAGE_ITERATION) --vendor \"$(PACKAGE_MAINTAINER)\" --license APACHE-2.0 --prefix /usr --chdir /tmp/crystal/crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION) bin lib share
-
+FPM_FLAGS = --name crystal \
+            --version $(CRYSTAL_VERSION) \
+	    --iteration $(PACKAGE_ITERATION) \
+	    --vendor \"$(PACKAGE_MAINTAINER)\" \
+	    --license APACHE-2.0
 
 .PHONY: all
 all: all64 all32 ## Build compressed and distribution packages [default]
@@ -128,7 +131,9 @@ $(OUTPUT_DIR)/$(DEB_NAME64): docker-fpm $(OUTPUT_BASENAME64).tar
            --deb-recommends git --deb-recommends libssl-dev --deb-recommends libz-dev \
            --deb-suggests libxml2-dev --deb-suggests libgmp-dev --deb-suggests libyaml-dev --deb-suggests libreadline-dev \
            --force --package $(OUTPUT_DIR)/$(DEB_NAME64) \
-	   $(FPM_FLAGS)"
+	   --prefix /usr \
+	   --chdir /tmp/crystal/crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION) \
+	   $(FPM_FLAGS) bin lib share"
 
 $(OUTPUT_DIR)/$(RPM_NAME64): docker-fpm $(OUTPUT_BASENAME64).tar
 	docker run --rm -v $(CURDIR)/build:/build crystal-fpm /bin/sh -c "\
@@ -138,7 +143,9 @@ $(OUTPUT_DIR)/$(RPM_NAME64): docker-fpm $(OUTPUT_BASENAME64).tar
            --architecture x86_64 $(PACKAGE_BRANDING_ARGS) \
            --depends gcc --depends pkgconfig --depends pcre-devel --depends libevent-devel \
            --force --package $(OUTPUT_DIR)/$(RPM_NAME64) \
-	   $(FPM_FLAGS)"
+	   --prefix /usr \
+	   --chdir /tmp/crystal/crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION) \
+	   $(FPM_FLAGS) bin lib share"
 
 .PHONY: build32
 build32: $(OUTPUT_BASENAME32).tar ## Build the raw uncompressed tarball
@@ -174,7 +181,9 @@ $(OUTPUT_DIR)/$(DEB_NAME32): docker-fpm $(OUTPUT_BASENAME32).tar
            --deb-recommends git --deb-recommends libssl-dev --deb-recommends libz-dev \
            --deb-suggests libxml2-dev --deb-suggests libgmp-dev --deb-suggests libyaml-dev --deb-suggests libreadline-dev \
            --force --package $(OUTPUT_DIR)/$(DEB_NAME32) \
-	   $(FPM_FLAGS)"
+	   --prefix /usr \
+	   --chdir /tmp/crystal/crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION) \
+	   $(FPM_FLAGS) bin lib share"
 
 $(OUTPUT_DIR)/$(RPM_NAME32): docker-fpm $(OUTPUT_BASENAME32).tar
 	docker run --rm -v $(CURDIR)/build:/build crystal-fpm /bin/sh -c "\
@@ -184,7 +193,9 @@ $(OUTPUT_DIR)/$(RPM_NAME32): docker-fpm $(OUTPUT_BASENAME32).tar
            --architecture i386 $(PACKAGE_BRANDING_ARGS) \
            --depends gcc --depends pkgconfig --depends pcre-devel --depends libevent-devel \
            --force --package $(OUTPUT_DIR)/$(RPM_NAME32) \
-	   $(FPM_FLAGS)"
+	   --prefix /usr \
+	   --chdir /tmp/crystal/crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION) \
+	   $(FPM_FLAGS) bin lib share"
 
 .PHONY: clean
 clean: ## Clean up build directory
