@@ -64,7 +64,7 @@ PACKAGE_BRANDING_ARGS = --maintainer \"$(PACKAGE_MAINTAINER)\" --url \"https://c
 FPM_FLAGS = --name crystal \
             --version $(CRYSTAL_VERSION) \
             --iteration $(PACKAGE_ITERATION) \
-	    --vendor \"$(PACKAGE_MAINTAINER)\" \
+            --vendor \"$(PACKAGE_MAINTAINER)\" \
             --license APACHE-2.0
 
 .PHONY: all
