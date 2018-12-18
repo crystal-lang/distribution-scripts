@@ -76,7 +76,7 @@ RUN git clone https://github.com/ivmai/bdwgc \
  && ./configure --disable-debug --disable-shared --enable-large-config \
  && make -j$(nproc) CFLAGS=-DNO_GETCONTEXT
 
-ENV LIBRARY_PATH=/bdwgc/.libs/:/libevent/.libs/
+ENV LIBRARY_PATH=/bdwgc/.libs/
 ENV PATH=/usr/lib/llvm4/bin:$PATH
 RUN llvm-config --version
 
