@@ -27,7 +27,7 @@ build do
   command "#{install_dir}/bin/crystal" \
           " build" \
           " -o #{install_dir}/embedded/bin/shards" \
-          " src/shards.cr" \
+          " src/cli.cr" \
           " --no-debug" \
           " --release ", env: env
 end

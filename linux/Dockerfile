@@ -106,7 +106,7 @@ RUN git clone https://github.com/crystal-lang/shards \
  && git checkout ${shards_version} \
  \
  # Hack to make shards not segfault
- && echo 'require "llvm/lib_llvm"; require "llvm/enums"; require "./src/shards"' > hack.cr \
+ && echo 'require "llvm/lib_llvm"; require "llvm/enums"; require "./src/cli"' > hack.cr \
  && /crystal/bin/crystal build --stats --target ${musl_target} \
     hack.cr -o shards --static ${release:+--release}
 
