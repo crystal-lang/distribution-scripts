@@ -93,7 +93,6 @@ RUN git clone https://github.com/crystal-lang/crystal \
  && mkdir .build \
  && cc '/crystal-musl.o' -o '.build/crystal' -rdynamic src/llvm/ext/llvm_ext.o `llvm-config --libs --system-libs --ldflags` -lstdc++ -lpcre -lm -lgc -lpthread src/ext/libcrystal.a -levent -lrt \
  \
- && make docs \
  && touch src/compiler/crystal.cr \
  && make crystal stats=true static=true ${release:+release=true} \
                  CRYSTAL_CONFIG_TARGET=${gnu_target}
@@ -137,9 +136,8 @@ RUN \
  && mkdir -p /output/share/crystal/ \
  && cp -r /crystal/src /output/share/crystal/src \
  \
- # Copy html docs and samples
+ # Copy samples
  && mkdir -p /output/share/doc/crystal/ \
- && cp -r /crystal/docs /output/share/doc/crystal/api \
  && cp -r /crystal/samples /output/share/doc/crystal/examples \
  \
  # Copy and compress manpages
