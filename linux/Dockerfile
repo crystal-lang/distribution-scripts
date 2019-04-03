@@ -24,14 +24,14 @@ ENV CFLAGS="-fPIC -pipe ${release:+-O2}"
 # Build libgc
 ARG gc_version
 ARG libatomic_ops_version
-COPY files/fix-gcf-memory-allocation.patch /tmp/
+COPY files/feature-thread-stackbottom.patch /tmp/
 RUN git clone https://github.com/ivmai/bdwgc \
  && cd bdwgc \
  && git checkout ${gc_version} \
  && git clone https://github.com/ivmai/libatomic_ops \
  && (cd libatomic_ops && git checkout ${libatomic_ops_version}) \
  \
- && patch -p1 < /tmp/fix-gcf-memory-allocation.patch \
+ && patch -p1 < /tmp/feature-thread-stackbottom.patch \
  \
  && ./autogen.sh \
  && ./configure --disable-debug --disable-shared --enable-large-config \

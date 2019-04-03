@@ -100,5 +100,6 @@ ROOT_DIR="$SCRIPT_DIR/.."
 export CRYSTAL_PATH="${CRYSTAL_PATH:-"$ROOT_DIR/share/crystal/src:lib"}"
 export PATH="$ROOT_DIR/lib/crystal/bin:$PATH"
 export LIBRARY_PATH="$ROOT_DIR/lib/crystal/lib${LIBRARY_PATH:+:$LIBRARY_PATH}"
+export CRYSTAL_LIBRARY_PATH="${CRYSTAL_LIBRARY_PATH:+$CRYSTAL_LIBRARY_PATH:}$ROOT_DIR/lib/crystal/lib"
 
 exec "$ROOT_DIR/lib/crystal/bin/crystal" "${@}"

@@ -18,7 +18,8 @@ dependency "llvm_bin" unless FIRST_RUN
 dependency "libevent"
 
 env = with_standard_compiler_flags(with_embedded_path(
-  "LIBRARY_PATH" => "#{install_dir}/embedded/lib"
+  "LIBRARY_PATH" => "#{install_dir}/embedded/lib",
+  "CRYSTAL_LIBRARY_PATH" => "#{install_dir}/embedded/lib"
 ))
 env["CFLAGS"] << " -fPIC"
 
