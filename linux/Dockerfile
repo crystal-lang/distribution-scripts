@@ -147,9 +147,10 @@ RUN \
  && cp /shards/man/shard.yml.5 /output/share/man/man5/shard.yml.5 \
  && gzip -9 /output/share/man/man1/crystal.1 /output/share/man/man1/shards.1 /output/share/man/man5/shard.yml.5 \
  \
- # Copy license
+ # Copy license & version
  && mkdir -p /output/share/licenses/crystal/ \
  && cp /crystal/LICENSE /output/share/licenses/crystal/LICENSE \
+ && cp /crystal/VERSION /output/share/crystal/VERSION \
  \
  # Create tarball
  && mv /output /crystal-${crystal_version}-${package_iteration} \

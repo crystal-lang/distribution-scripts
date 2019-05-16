@@ -65,6 +65,7 @@ build do
   sync "#{project_dir}/src", "#{install_dir}/src"
   sync "#{project_dir}/etc", "#{install_dir}/etc"
   sync "#{project_dir}/samples", "#{install_dir}/samples"
+  copy "#{project_dir}/VERSION", "#{install_dir}/VERSION"
   mkdir "#{install_dir}/bin"
 
   erb source: "crystal.erb",
