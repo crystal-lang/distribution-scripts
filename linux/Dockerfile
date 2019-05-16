@@ -156,3 +156,7 @@ RUN \
  && mv /output /crystal-${crystal_version}-${package_iteration} \
  && mkdir /output \
  && tar -cvf /output/crystal-${crystal_version}-${package_iteration}.tar /crystal-${crystal_version}-${package_iteration}
+
+# Check binary dependencies
+RUN ldd /crystal-${crystal_version}-${package_iteration}/lib/crystal/bin/crystal
+RUN ldd /crystal-${crystal_version}-${package_iteration}/lib/crystal/bin/shards
