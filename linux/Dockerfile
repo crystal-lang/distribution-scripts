@@ -96,7 +96,7 @@ RUN git clone https://github.com/crystal-lang/crystal \
  \
  && make crystal stats=true static=true ${release:+release=true} \
                  CRYSTAL_CONFIG_TARGET=${gnu_target} \
- && ldd .build/crystal
+ && (if [[ $(ldd .build/crystal | wc -l) -gt "1" ]]; then echo './build/crystal is not statically linked'; ldd .build/crystal; exit 1; fi)
 
 # Build shards
 ARG shards_version
