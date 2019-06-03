@@ -90,12 +90,13 @@ RUN git clone https://github.com/crystal-lang/crystal \
  && git checkout ${crystal_sha1} \
  \
  && make deps \
- && mkdir .build \
- && cc '/crystal-musl.o' -o '.build/crystal' -rdynamic src/llvm/ext/llvm_ext.o `llvm-config --libs --system-libs --ldflags` -lstdc++ -lpcre -lm -lgc -lpthread src/ext/libcrystal.a -levent -lrt \
+ && mkdir -p .build/crystal-musl \
+ && cc '/crystal-musl.o' -o '.build/crystal-musl/crystal' -rdynamic src/llvm/ext/llvm_ext.o `llvm-config --libs --system-libs --ldflags` -lstdc++ -lpcre -lm -lgc -lpthread src/ext/libcrystal.a -levent -lrt \
+ && export PATH=.build/crystal-musl/:$PATH \
  \
- && touch src/compiler/crystal.cr \
  && make crystal stats=true static=true ${release:+release=true} \
-                 CRYSTAL_CONFIG_TARGET=${gnu_target}
+                 CRYSTAL_CONFIG_TARGET=${gnu_target} \
+ && ([ "$(ldd .build/crystal | wc -l)" -eq "1" ] || { echo './build/crystal is not statically linked'; ldd .build/crystal; exit 1; })
 
 # Build shards
 ARG shards_version
