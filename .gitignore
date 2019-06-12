@@ -6,3 +6,6 @@ omnibus/crystal-darwin-x86_64
 docs/build/
 
 darwin/build/
+
+snapcraft/snap/snapcraft.yaml
+snapcraft/*.snap
