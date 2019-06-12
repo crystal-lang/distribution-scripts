@@ -1,6 +1,10 @@
+OUTPUT_DIR = build
+
 .PHONY: all
 all: snap/snapcraft.yaml
+	mkdir -p $(OUTPUT_DIR)
 	snapcraft
+	mv *.snap $(OUTPUT_DIR)
 
 .PHONY: snap/snapcraft.yaml
 snap/snapcraft.yaml:
@@ -8,3 +12,4 @@ snap/snapcraft.yaml:
 
 clean:
 	rm snap/snapcraft.yaml
+	rm -Rf $(OUTPUT_DIR)

@@ -9,3 +9,4 @@ darwin/build/
 
 snapcraft/snap/snapcraft.yaml
 snapcraft/*.snap
+snapcraft/build/
