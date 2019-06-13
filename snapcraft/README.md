@@ -1,5 +1,7 @@
 # snap for Crystal
 
+https://snapcraft.io/crystal
+
 ## Dependencies
 
 - [`snapcraft`](https://docs.snapcraft.io/snapcraft-overview)
@@ -31,8 +33,7 @@ $ SNAP_GRADE=devel CRYSTAL_RELEASE_LINUX64_TARGZ="https://github.com/crystal-lan
 
 2.
     ```
-    $ sudo snap install --classic crystal
-    $ sudo snap alias crystal.shards shards
+    $ sudo snap install crystal --classic
     ```
 
 ## Post-Install
