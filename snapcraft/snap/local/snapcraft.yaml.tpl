@@ -17,7 +17,7 @@ environment:
 
 apps:
   crystal:
-    command: bin/crystal
+    command: crystal-snap-wrapper
   shards:
     command: bin/shards
 
@@ -28,3 +28,9 @@ parts:
     override-pull: |
       snapcraftctl pull
       snapcraftctl set-version "$(cat $SNAPCRAFT_PART_SRC/share/crystal/src/VERSION | head -n 1)"
+
+  snap-wrapper:
+    plugin: dump
+    source: .
+    stage:
+      - crystal-snap-wrapper

@@ -1,0 +1,30 @@
+#!/bin/sh
+
+if [ ! -f $SNAP_USER_COMMON/env-check-success ]; then
+  # check if a simple program can be compiled
+  # if something fails show a banner to the user
+
+  $SNAP/bin/crystal eval 'puts "1"' >/dev/null 2>/dev/null
+  if [ $? -eq 0 ]; then
+    touch $SNAP_USER_COMMON/env-check-success
+  else
+    cat <<EOF
+
+  It seems that some libraries are missing in your host.
+  The following are the suggested packages to be able to use the whole standard library capabilities.
+
+    $ sudo apt-get install gcc pkg-config git tzdata \\
+                           libpcre3-dev libevent-dev libyaml-dev \\
+                           libgmp-dev libssl-dev libxml2-dev
+
+  You can find more detailed information in:
+
+    * https://crystal-lang.org/reference/installation/on_debian_and_ubuntu.html
+    * https://github.com/crystal-lang/crystal/wiki/All-required-libraries
+
+EOF
+
+  fi
+fi
+
+exec $SNAP/bin/crystal "$@"
