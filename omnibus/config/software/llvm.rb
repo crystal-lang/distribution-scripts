@@ -1,8 +1,16 @@
 name "llvm"
-default_version "3.9.1"
+LLVM_VERSION = (ENV['LLVM_VERSION'] || "3.9.1").strip
+default_version LLVM_VERSION
 
-source :url => "http://releases.llvm.org/3.9.1/llvm-3.9.1.src.tar.xz",
-       :md5 => "3259018a7437e157f3642df80f1983ea"
+source url: "http://releases.llvm.org/#{version}/llvm-#{version}.src.tar.xz"
+
+version "3.9.1" do
+  source md5: "3259018a7437e157f3642df80f1983ea"
+end
+
+version "6.0.1" do
+  source md5: "c88c98709300ce2c285391f387fecce0"
+end
 
 relative_path "llvm-#{version}.src"
 
