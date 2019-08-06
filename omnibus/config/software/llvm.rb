@@ -30,14 +30,12 @@ build do
     " -DLLVM_ENABLE_TERMINFO=OFF" \
     " -DLLVM_ENABLE_FFI=OFF" \
     " -DLLVM_ENABLE_ZLIB=OFF" \
-    " -DLLVM_ENABLE_LIBCXX=ON" \
-    " -DLLVM_ENABLE_RTTI=ON" \
     " -DLLVM_BUILD_DOCS=OFF" \
     " -DLLVM_INCLUDE_DOCS=OFF" \
     " -DLLVM_BINARY_DIR=#{install_dir}" \
     " -DBUILD_SHARED_LIBS=OFF" \
     " -DLLVM_OPTIMIZED_TABLEGEN=ON" \
-    " -DLLVM_ENABLE_ASSERTIONS=ON" \
+    " -DLLVM_ENABLE_ASSERTIONS=OFF" \
     "#{' -DPYTHON_EXECUTABLE=$(which python2.7)' if centos? }"\
     " #{project_dir}", env: env, cwd: llvm_build_dir
   command "cmake --build .", env: env, cwd: llvm_build_dir
