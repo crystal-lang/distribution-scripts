@@ -30,6 +30,8 @@ build do
     " -DLLVM_ENABLE_TERMINFO=OFF" \
     " -DLLVM_ENABLE_FFI=OFF" \
     " -DLLVM_ENABLE_ZLIB=OFF" \
+    " -DLLVM_ENABLE_LIBCXX=ON" \
+    " -DLLVM_ENABLE_RTTI=ON" \
     " -DLLVM_BUILD_DOCS=OFF" \
     " -DLLVM_INCLUDE_DOCS=OFF" \
     " -DLLVM_BINARY_DIR=#{install_dir}" \
