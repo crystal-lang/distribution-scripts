@@ -96,6 +96,7 @@ RUN git clone https://github.com/crystal-lang/crystal \
  \
  && make crystal stats=true static=true ${release:+release=true} \
                  CRYSTAL_CONFIG_TARGET=${gnu_target} \
+                 FLAGS="--no-debug" \
  && ([ "$(ldd .build/crystal | wc -l)" -eq "1" ] || { echo './build/crystal is not statically linked'; ldd .build/crystal; exit 1; })
 
 # Build shards
@@ -108,7 +109,7 @@ RUN git clone https://github.com/crystal-lang/shards \
  # Hack to make shards not segfault
  && echo 'require "llvm/lib_llvm"; require "llvm/enums"; require "./src/shards"' > hack.cr \
  && /crystal/bin/crystal build --stats --target ${musl_target} \
-    hack.cr -o shards --static ${release:+--release}
+    hack.cr -o shards --static --no-debug ${release:+--release}
 
 COPY files/crystal-wrapper /output/bin/crystal
 COPY --from=debian /bdwgc/.libs/libgc.a /libgc-debian.a
