@@ -20,7 +20,7 @@ PREVIOUS_CRYSTAL_RELEASE_LINUX64_TARGZ ?=  ## url to crystal-{version}-{package}
 PREVIOUS_CRYSTAL_RELEASE_LINUX32_TARGZ ?=  ## url to crystal-{version}-{package}-linux-i686.tar.gz
 
 SHARDS_VERSION = v0.8.1
-GC_VERSION = v7.6.12
+GC_VERSION = v8.0.4
 LIBATOMIC_OPS_VERSION = v7.6.10
 
 OUTPUT_DIR = build

@@ -1,5 +1,5 @@
 name "bdw-gc"
-default_version "7.6.12"
+default_version "8.0.4"
 
 source :url => "https://github.com/ivmai/bdwgc/releases/download/v#{version}/gc-#{version}.tar.gz"
 
@@ -13,6 +13,10 @@ end
 
 version "7.6.12" do
   source md5: "8175e1be00c6cd6eac2e8d67bdf451df"
+end
+
+version "8.0.4" do
+  source md5: "67a5093e2f9f381bd550aa891d00b54b"
 end
 
 dependency "libatomic_ops"
