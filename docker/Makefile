@@ -1,7 +1,7 @@
 CRYSTAL_VERSION ?=   ## How the binaries should be branded
 CRYSTAL_DEB ?=       ## which crystal.deb file to install in the docker images
-DOCKER_TAG ?=        ## How to tag the docker image. a -build will be appended for -build image
-DOCKER_REPOSITORY ?= ## Docker hub repository to commit image
+DOCKER_TAG ?= latest## How to tag the docker image. a -build will be appended for -build image
+DOCKER_REPOSITORY ?= crystal## Docker hub repository to commit image
 
 OUTPUT_DIR = build
 BUILD_ARGS = --build-arg crystal_deb=./tmp/crystal.deb
