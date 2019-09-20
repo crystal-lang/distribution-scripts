@@ -5,5 +5,5 @@ git_source(:github) do |repo_name|
   "https://github.com/#{repo_name}.git"
 end
 
-gem 'omnibus', '~> 5.5.0'
-gem 'omnibus-software', github: 'chef/omnibus-software', ref: '91d716b2f88127e0b1f742b98c63e18119498af3'
+gem 'omnibus', '~> 6.1.4'
+gem 'omnibus-software', github: 'chef/omnibus-software', ref: 'ae2a2f1cae3e8d80197a1cac5311b910300a53ff'

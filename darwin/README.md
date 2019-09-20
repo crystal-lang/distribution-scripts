@@ -5,7 +5,7 @@ The whole process is automated using a `Makefile`.
 
 # Dependencies
 
-* Ruby 2.4.2 and `bundle install --binstubs` in `./omnibus`
+* Ruby 2.5.6 and `bundle install --binstubs` in `./omnibus`
 * `pkgconfig`, `libtool` (Can be installed by `$ brew install pkgconfig libtool`)
 * Own `/opt/crystal`, `/var/cache`.
 
