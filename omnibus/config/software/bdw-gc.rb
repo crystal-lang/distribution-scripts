@@ -27,7 +27,7 @@ env = with_standard_compiler_flags(with_embedded_path)
 env["CFLAGS"] << " -fPIC"
 
 build do
-  patch source: 'feature-thread-stackbottom.patch', plevel: 1
+  patch source: 'feature-thread-stackbottom-upstream.patch', plevel: 1
 
   command "./configure" \
           " --disable-debug" \
