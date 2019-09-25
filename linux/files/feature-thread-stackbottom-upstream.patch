@@ -1,0 +1,338 @@
+From 5668de71107022a316ee967162bc16c10754b9ce Mon Sep 17 00:00:00 2001
+From: "Brian J. Cardiff" <bcardiff@gmail.com>
+Date: Mon, 6 May 2019 12:06:12 +0300
+Subject: [PATCH] Add API functions to get and set the stack bottom of each
+ thread
+
+Issue #277 (bdwgc).
+
+This API is useful to support coroutines.
+
+* include/gc.h (GC_get_my_stackbottom, GC_set_stackbottom): New API
+function declaration.
+* misc.c [!THREADS] (GC_set_stackbottom, GC_get_my_stackbottom): New
+function definition.
+* pthread_support.c [GC_PTHREADS && !GC_WIN32_THREADS]
+(GC_set_stackbottom, GC_get_my_stackbottom): Likewise.
+* win32_threads.c [GC_WIN32_THREADS] (GC_set_stackbottom,
+GC_get_my_stackbottom): Likewise.
+* tests/test.c (struct thr_hndl_sb_s): Define.
+* tests/test.c (set_stackbottom): New function (which calls
+GC_set_stackbottom).
+* tests/test.c (run_one_test): Define thr_hndl_sb local variable;
+call GC_get_my_stackbottom() and set_stackbottom().
+* win32_threads.c [GC_WIN32_THREADS && I386] (struct GC_Thread_Rep):
+Add initial_stack_base field.
+* win32_threads.c [GC_WIN32_THREADS && I386] (GC_record_stack_base,
+GC_call_with_gc_active): Set initial_stack_base field.
+* win32_threads.c [GC_WIN32_THREADS && I386] (GC_push_stack_for): Handle
+the case when GetThreadContext() might return stale register values,
+thread stack_base != initial_stack_base but the stack is not inside
+the TIB stack (use context.Esp but call WARN); add TODO.
+---
+ include/gc.h      | 24 +++++++++++++++
+ misc.c            | 24 +++++++++++++++
+ pthread_support.c | 56 +++++++++++++++++++++++++++++++++++
+ tests/test.c      | 16 ++++++++++
+ win32_threads.c   | 74 ++++++++++++++++++++++++++++++++++++++++++++++-
+ 5 files changed, 193 insertions(+), 1 deletion(-)
+
+diff --git a/include/gc.h b/include/gc.h
+index d318cf3f..a7164c34 100644
+--- a/include/gc.h
++++ b/include/gc.h
+@@ -1578,6 +1578,30 @@ GC_API void * GC_CALL GC_call_with_gc_active(GC_fn_type /* fn */,
+ GC_API int GC_CALL GC_get_stack_base(struct GC_stack_base *)
+                                                         GC_ATTR_NONNULL(1);
+ 
++/* Fill in the GC_stack_base structure with the cold end (bottom) of    */
++/* the stack of the current thread (or coroutine).                      */
++/* Unlike GC_get_stack_base, it retrieves the value stored in the       */
++/* collector (which is initially set by the collector upon the thread   */
++/* is started or registered manually but it could be later updated by   */
++/* client using GC_set_stackbottom).  Returns the GC-internal non-NULL  */
++/* handle of the thread which could be passed to GC_set_stackbottom     */
++/* later.  It is assumed that the collector is already initialized and  */
++/* the thread is registered.  Acquires the GC lock to avoid data races. */
++GC_API void * GC_CALL GC_get_my_stackbottom(struct GC_stack_base *)
++                                                        GC_ATTR_NONNULL(1);
++
++/* Set the cool end of the user (coroutine) stack of the specified      */
++/* thread.  The GC thread handle is either the one returned by          */
++/* GC_get_my_stackbottom or NULL (the latter designates the current     */
++/* thread).  The caller should hold the GC lock (e.g. using             */
++/* GC_call_with_alloc_lock).  Also, the function could be used for      */
++/* setting GC_stackbottom value (the bottom of the primordial thread)   */
++/* before the collector is initialized (the GC lock is not needed to be */
++/* acquired in this case).                                              */
++GC_API void GC_CALL GC_set_stackbottom(void * /* gc_thread_handle */,
++                                       const struct GC_stack_base *)
++                                                        GC_ATTR_NONNULL(2);
++
+ /* The following routines are primarily intended for use with a         */
+ /* preprocessor which inserts calls to check C pointer arithmetic.      */
+ /* They indicate failure by invoking the corresponding _print_proc.     */
+diff --git a/misc.c b/misc.c
+index 5b473569..322422fb 100644
+--- a/misc.c
++++ b/misc.c
+@@ -2200,6 +2200,30 @@ STATIC void GC_do_blocking_inner(ptr_t data, void * context GC_ATTR_UNUSED)
+     GC_blocked_sp = NULL;
+ }
+ 
++  GC_API void GC_CALL GC_set_stackbottom(void *gc_thread_handle,
++                                         const struct GC_stack_base *sb)
++  {
++    GC_ASSERT(sb -> mem_base != NULL);
++    GC_ASSERT(NULL == gc_thread_handle || &GC_stackbottom == gc_thread_handle);
++    GC_ASSERT(NULL == GC_blocked_sp
++              && NULL == GC_traced_stack_sect); /* for now */
++    (void)gc_thread_handle;
++
++    GC_stackbottom = (char *)sb->mem_base;
++#   ifdef IA64
++      GC_register_stackbottom = (ptr_t)sb->reg_base;
++#   endif
++  }
++
++  GC_API void * GC_CALL GC_get_my_stackbottom(struct GC_stack_base *sb)
++  {
++    GC_ASSERT(GC_is_initialized);
++    sb -> mem_base = GC_stackbottom;
++#   ifdef IA64
++      sb -> reg_base = GC_register_stackbottom;
++#   endif
++    return &GC_stackbottom; /* gc_thread_handle */
++  }
+ #endif /* !THREADS */
+ 
+ GC_API void * GC_CALL GC_do_blocking(GC_fn_type fn, void * client_data)
+diff --git a/pthread_support.c b/pthread_support.c
+index 6c138c1c..0b2af4ac 100644
+--- a/pthread_support.c
++++ b/pthread_support.c
+@@ -1403,6 +1403,62 @@ GC_INNER void GC_do_blocking_inner(ptr_t data, void * context GC_ATTR_UNUSED)
+     UNLOCK();
+ }
+ 
++GC_API void GC_CALL GC_set_stackbottom(void *gc_thread_handle,
++                                       const struct GC_stack_base *sb)
++{
++    GC_thread t = (GC_thread)gc_thread_handle;
++
++    GC_ASSERT(sb -> mem_base != NULL);
++    if (!EXPECT(GC_is_initialized, TRUE)) {
++        GC_ASSERT(NULL == t);
++    } else {
++        GC_ASSERT(I_HOLD_LOCK());
++        if (NULL == t) /* current thread? */
++            t = GC_lookup_thread(pthread_self());
++        GC_ASSERT((t -> flags & FINISHED) == 0);
++        GC_ASSERT(!(t -> thread_blocked)
++                  && NULL == t -> traced_stack_sect); /* for now */
++
++        if ((t -> flags & MAIN_THREAD) == 0) {
++            t -> stack_end = (ptr_t)sb->mem_base;
++#           ifdef IA64
++                t -> backing_store_end = (ptr_t)sb->reg_base;
++#           endif
++            return;
++        }
++        /* Otherwise alter the stack bottom of the primordial thread.   */
++    }
++
++    GC_stackbottom = (char*)sb->mem_base;
++#   ifdef IA64
++        GC_register_stackbottom = (ptr_t)sb->reg_base;
++#   endif
++}
++
++GC_API void * GC_CALL GC_get_my_stackbottom(struct GC_stack_base *sb)
++{
++    pthread_t self = pthread_self();
++    GC_thread me;
++    DCL_LOCK_STATE;
++
++    LOCK();
++    me = GC_lookup_thread(self);
++    /* The thread is assumed to be registered.  */
++    if ((me -> flags & MAIN_THREAD) == 0) {
++        sb -> mem_base = me -> stack_end;
++#       ifdef IA64
++            sb -> reg_base = me -> backing_store_end;
++#       endif
++    } else {
++        sb -> mem_base = GC_stackbottom;
++#       ifdef IA64
++            sb -> reg_base = GC_register_stackbottom;
++#       endif
++    }
++    UNLOCK();
++    return (void *)me; /* gc_thread_handle */
++}
++
+ /* GC_call_with_gc_active() has the opposite to GC_do_blocking()        */
+ /* functionality.  It might be called from a user function invoked by   */
+ /* GC_do_blocking() to temporarily back allow calling any GC function   */
+diff --git a/tests/test.c b/tests/test.c
+index f7db8495..c5338005 100644
+--- a/tests/test.c
++++ b/tests/test.c
+@@ -1312,6 +1312,18 @@ void * GC_CALLBACK inc_int_counter(void *pcounter)
+  return NULL;
+ }
+ 
++struct thr_hndl_sb_s {
++  void *gc_thread_handle;
++  struct GC_stack_base sb;
++};
++
++void * GC_CALLBACK set_stackbottom(void *cd)
++{
++  GC_set_stackbottom(((struct thr_hndl_sb_s *)cd)->gc_thread_handle,
++                     &((struct thr_hndl_sb_s *)cd)->sb);
++  return NULL;
++}
++
+ #ifndef MIN_WORDS
+ # define MIN_WORDS 2
+ #endif
+@@ -1332,6 +1344,7 @@ void run_one_test(void)
+       pid_t pid;
+       int wstatus;
+ #   endif
++    struct thr_hndl_sb_s thr_hndl_sb;
+ 
+     GC_FREE(0);
+ #   ifdef THREADS
+@@ -1476,6 +1489,7 @@ void run_one_test(void)
+              GC_FREE(GC_MALLOC_IGNORE_OFF_PAGE(2));
+            }
+          }
++    thr_hndl_sb.gc_thread_handle = GC_get_my_stackbottom(&thr_hndl_sb.sb);
+ #   ifdef GC_GCJ_SUPPORT
+       GC_REGISTER_DISPLACEMENT(sizeof(struct fake_vtable *));
+       GC_init_gcj_malloc(0, (void *)(GC_word)fake_gcj_mark_proc);
+@@ -1545,6 +1559,8 @@ void run_one_test(void)
+           exit(0);
+         }
+ #   endif
++    (void)GC_call_with_alloc_lock(set_stackbottom, &thr_hndl_sb);
++
+     /* Repeated list reversal test. */
+ #   ifndef NO_CLOCK
+         GET_TIME(start_time);
+diff --git a/win32_threads.c b/win32_threads.c
+index 2e9f37fb..f45e8c04 100644
+--- a/win32_threads.c
++++ b/win32_threads.c
+@@ -214,6 +214,11 @@ struct GC_Thread_Rep {
+ # ifdef IA64
+     ptr_t backing_store_end;
+     ptr_t backing_store_ptr;
++# elif defined(I386)
++    ptr_t initial_stack_base;
++                        /* The cold end of the stack saved by   */
++                        /* GC_record_stack_base (never modified */
++                        /* by GC_set_stackbottom).              */
+ # endif
+ 
+   ptr_t thread_blocked_sp;      /* Protected by GC lock.                */
+@@ -374,6 +379,8 @@ GC_INLINE void GC_record_stack_base(GC_vthread me,
+   me -> stack_base = (ptr_t)sb->mem_base;
+ # ifdef IA64
+     me -> backing_store_end = (ptr_t)sb->reg_base;
++# elif defined(I386)
++    me -> initial_stack_base = (ptr_t)sb->mem_base;
+ # endif
+   if (me -> stack_base == NULL)
+     ABORT("Bad stack base in GC_register_my_thread");
+@@ -913,8 +920,12 @@ GC_API void * GC_CALL GC_call_with_gc_active(GC_fn_type fn,
+   /* Adjust our stack bottom pointer (this could happen unless  */
+   /* GC_get_stack_base() was used which returned GC_SUCCESS).   */
+   GC_ASSERT(me -> stack_base != NULL);
+-  if ((word)me->stack_base < (word)(&stacksect))
++  if ((word)me->stack_base < (word)(&stacksect)) {
+     me -> stack_base = (ptr_t)(&stacksect);
++#   if defined(I386)
++      me -> initial_stack_base = me -> stack_base;
++#   endif
++  }
+ 
+   if (me -> thread_blocked_sp == NULL) {
+     /* We are not inside GC_do_blocking() - do nothing more.    */
+@@ -958,6 +969,53 @@ GC_API void * GC_CALL GC_call_with_gc_active(GC_fn_type fn,
+   return client_data; /* result */
+ }
+ 
++GC_API void GC_CALL GC_set_stackbottom(void *gc_thread_handle,
++                                       const struct GC_stack_base *sb)
++{
++  GC_thread t = (GC_thread)gc_thread_handle;
++
++  GC_ASSERT(sb -> mem_base != NULL);
++  if (!EXPECT(GC_is_initialized, TRUE)) {
++    GC_ASSERT(NULL == t);
++    GC_stackbottom = (char *)sb->mem_base;
++#   ifdef IA64
++      GC_register_stackbottom = (ptr_t)sb->reg_base;
++#   endif
++    return;
++  }
++
++  GC_ASSERT(I_HOLD_LOCK());
++  if (NULL == t) { /* current thread? */
++    t = GC_lookup_thread_inner(GetCurrentThreadId());
++    CHECK_LOOKUP_MY_THREAD(t);
++  }
++  GC_ASSERT(!KNOWN_FINISHED(t));
++  GC_ASSERT(NULL == t -> thread_blocked_sp
++            && NULL == t -> traced_stack_sect); /* for now */
++  t -> stack_base = (ptr_t)sb->mem_base;
++  t -> last_stack_min = ADDR_LIMIT; /* reset the known minimum */
++# ifdef IA64
++    t -> backing_store_end = (ptr_t)sb->reg_base;
++# endif
++}
++
++GC_API void * GC_CALL GC_get_my_stackbottom(struct GC_stack_base *sb)
++{
++  DWORD thread_id = GetCurrentThreadId();
++  GC_thread me;
++  DCL_LOCK_STATE;
++
++  LOCK();
++  me = GC_lookup_thread_inner(thread_id);
++  CHECK_LOOKUP_MY_THREAD(me); /* the thread is assumed to be registered */
++  sb -> mem_base = me -> stack_base;
++# ifdef IA64
++    sb -> reg_base = me -> backing_store_end;
++# endif
++  UNLOCK();
++  return (void *)me; /* gc_thread_handle */
++}
++
+ #ifdef GC_PTHREADS
+ 
+   /* A quick-and-dirty cache of the mapping between pthread_t   */
+@@ -1454,6 +1512,20 @@ STATIC word GC_push_stack_for(GC_thread thread, DWORD me)
+ #       endif
+         GC_ASSERT(!((word)thread->stack_base
+                     COOLER_THAN (word)tib->StackBase));
++        if (thread->stack_base != thread->initial_stack_base) {
++          /* We are in a coroutine.     */
++          if ((word)thread->stack_base <= (word)sp /* StackLimit */
++              || (word)tib->StackBase < (word)thread->stack_base) {
++            /* The coroutine stack is not within TIB stack.     */
++            sp = (ptr_t)context.Esp;
++            WARN("GetThreadContext might return stale register values"
++                 " including ESP=%p\n", sp);
++            /* TODO: Because of WoW64 bug, there is no guarantee that   */
++            /* sp really points to the stack top but, for now, we do    */
++            /* our best as the TIB stack limit/base cannot be used      */
++            /* while we are inside a coroutine.                         */
++          }
++        }
+       } else {
+ #       ifdef DEBUG_THREADS
+           {

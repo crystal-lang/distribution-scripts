@@ -1,5 +1,5 @@
 name "bdw-gc"
-default_version "7.6.12"
+default_version "8.0.4"
 
 source :url => "https://github.com/ivmai/bdwgc/releases/download/v#{version}/gc-#{version}.tar.gz"
 
@@ -15,6 +15,10 @@ version "7.6.12" do
   source md5: "8175e1be00c6cd6eac2e8d67bdf451df"
 end
 
+version "8.0.4" do
+  source md5: "67a5093e2f9f381bd550aa891d00b54b"
+end
+
 dependency "libatomic_ops"
 
 relative_path "gc-#{version}"
@@ -23,7 +27,7 @@ env = with_standard_compiler_flags(with_embedded_path)
 env["CFLAGS"] << " -fPIC"
 
 build do
-  patch source: 'feature-thread-stackbottom.patch', plevel: 1
+  patch source: 'feature-thread-stackbottom-upstream.patch', plevel: 1
 
   command "./configure" \
           " --disable-debug" \
