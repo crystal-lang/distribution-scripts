@@ -1,4 +1,5 @@
-FROM ubuntu:xenial as runtime
+ARG base_docker_image
+FROM ${base_docker_image} as runtime
 
 RUN \
   apt-get update && \
