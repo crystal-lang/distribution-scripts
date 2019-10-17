@@ -13,9 +13,6 @@ CRYSTAL_TARGZ ?=     ## Which crystal.tar.gz file to install in docker images (a
 DOCKER_TAG ?=	     ## How to tag the docker image (examples: `0.27.2`, `nightly20190307`). `-build` will be appended for build images.
 DOCKER_REPOSITORY ?= ## Docker hub repository to commit image
 
-GC_VERSION = v7.6.8
-LIBATOMIC_OPS_VERSION = v7.6.6
-
 OUTPUT_DIR = build
 BUILD_CONTEXT_UBUNTU = $(CURDIR)/build-context-ubuntu
 BUILD_CONTEXT_ALPINE = $(CURDIR)/build-context-alpine
