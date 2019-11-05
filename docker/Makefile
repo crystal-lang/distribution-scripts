@@ -4,8 +4,8 @@ DOCKER_TAG ?=        ## How to tag the docker image. a -build will be appended f
 DOCKER_REPOSITORY ?= ## Docker hub repository to commit image
 
 OUTPUT_DIR = build
-BUILD_ARGS64 = --build-arg crystal_deb=./tmp/crystal.deb --build-arg base_docker_image=ubuntu:xenial
-BUILD_ARGS32 = --build-arg crystal_deb=./tmp/crystal.deb --build-arg base_docker_image=i386/ubuntu:xenial
+BUILD_ARGS64 = --build-arg crystal_deb=./tmp/crystal.deb --build-arg base_docker_image=ubuntu:bionic
+BUILD_ARGS32 = --build-arg crystal_deb=./tmp/crystal.deb --build-arg base_docker_image=i386/ubuntu:bionic
 
 .PHONY: all64
 all64: $(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION).tar.gz $(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-build.tar.gz
