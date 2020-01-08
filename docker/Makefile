@@ -15,9 +15,9 @@ DOCKER_REPOSITORY ?= ## Docker hub repository to commit image
 
 OUTPUT_DIR := build
 BUILD_CONTEXT := $(CURDIR)/build-context
-BUILD_ARGS_UBUNTU64 := -f ubuntu.Dockerfile --build-arg crystal_deb=crystal.deb $(BUILD_CONTEXT)/ubuntu64 --build-arg base_docker_image=ubuntu:bionic
-BUILD_ARGS_UBUNTU32 := -f ubuntu.Dockerfile --build-arg crystal_deb=crystal.deb $(BUILD_CONTEXT)/ubuntu32 --build-arg base_docker_image=i386/ubuntu:bionic
-BUILD_ARGS_ALPINE := -f alpine.Dockerfile --build-arg crystal_targz=crystal.tar.gz $(BUILD_CONTEXT)/alpine
+BUILD_ARGS_UBUNTU64 := --build-arg crystal_deb=crystal.deb $(BUILD_CONTEXT)/ubuntu64 --build-arg base_docker_image=ubuntu:bionic
+BUILD_ARGS_UBUNTU32 := --build-arg crystal_deb=crystal.deb $(BUILD_CONTEXT)/ubuntu32 --build-arg base_docker_image=i386/ubuntu:bionic
+BUILD_ARGS_ALPINE := --build-arg crystal_targz=crystal.tar.gz $(BUILD_CONTEXT)/alpine
 DOCKER_TAG_UBUNTU := $(DOCKER_REPOSITORY):$(DOCKER_TAG)
 DOCKER_TAG_ALPINE := $(DOCKER_REPOSITORY):$(DOCKER_TAG)-alpine
 
@@ -46,13 +46,17 @@ alpine: $(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-alpine.tar.gz
 alpine: $(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-alpine-build.tar.gz
 
 $(BUILD_CONTEXT)/ubuntu32: $(BUILD_CONTEXT)/ubuntu32/crystal.deb
+	cp ubuntu.Dockerfile $@/Dockerfile
+
 $(BUILD_CONTEXT)/ubuntu64: $(BUILD_CONTEXT)/ubuntu64/crystal.deb
+	cp ubuntu.Dockerfile $@/Dockerfile
+
+$(BUILD_CONTEXT)/alpine: $(BUILD_CONTEXT)/alpine/crystal.tar.gz
+	cp alpine.Dockerfile $@/Dockerfile
 
 %/crystal.deb:
 	mkdir -p $(shell dirname $@)
 	cp $(CRYSTAL_DEB) $@
-
-$(BUILD_CONTEXT)/alpine: $(BUILD_CONTEXT)/alpine/crystal.tar.gz
 
 %/crystal.tar.gz:
 	mkdir -p $(shell dirname $@)
