@@ -20,7 +20,7 @@ BUILD_ARGS_UBUNTU64 = -f ubuntu.Dockerfile --build-arg crystal_deb=crystal.deb $
 BUILD_ARGS_UBUNTU32 = -f ubuntu.Dockerfile --build-arg crystal_deb=crystal.deb $(BUILD_CONTEXT_UBUNTU) --build-arg base_docker_image=i386/ubuntu:bionic
 BUILD_ARGS_ALPINE = -f alpine.Dockerfile --build-arg crystal_targz=crystal.tar.gz $(BUILD_CONTEXT_ALPINE)
 DOCKER_TAG_UBUNTU = $(DOCKER_REPOSITORY):$(DOCKER_TAG)
-DOCKER_TAG_ALPINE = $(DOCKER_REPOSITORY)-alpine:$(DOCKER_TAG)
+DOCKER_TAG_ALPINE = $(DOCKER_REPOSITORY):$(DOCKER_TAG)-alpine
 
 .PHONY: all64
 all64: ubuntu64 alpine ## Build all x86_64 images
