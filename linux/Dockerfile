@@ -123,7 +123,7 @@ RUN \
  \
  # Copy stdlib to /share/crystal/src/
  && mkdir -p /output/share/crystal/ \
- && cp -r /crystal/src /crystal/Makefile /output/share/crystal/ \
+ && cp -r /crystal/src /output/share/crystal/ \
  \
  # Copy samples
  && mkdir -p /output/share/doc/crystal/ \

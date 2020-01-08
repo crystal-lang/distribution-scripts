@@ -7,24 +7,23 @@ RUN \
     # stdlib dependencies
     libxml2-dev openssl-dev readline-dev tzdata yaml-dev zlib-dev \
     # dev tools
-    make git \
-    # temporary for building deps
-    llvm-dev build-base
+    make git
 
 ARG crystal_targz
 COPY ${crystal_targz} /tmp/crystal.tar.gz
 
 RUN \
-  tar -xz -C /usr --strip-component=1 --exclude */share/doc -f /tmp/crystal.tar.gz && \
+  tar -xz -C /usr --strip-component=1  -f /tmp/crystal.tar.gz \
+    --exclude */lib/crystal/lib \
+    --exclude */share/crystal/src/llvm/ext/llvm_ext.o \
+    --exclude */share/crystal/src/ext/libcrystal.a && \
   rm /tmp/crystal.tar.gz
 
-# Build dependencies
+# Build libcrystal
 RUN \
-  # FIXME: This is only a workaround because Crystal's Makefile lokks for files in ./spec
-  mkdir /usr/share/crystal/spec && \
-  make -C /usr/share/crystal clean deps && \
-  # Remove temporary dependencies
-  apk del llvm-dev build-base
+  cd /usr/share/crystal && \
+  cc -fPIC -c -o src/ext/sigfault.o src/ext/sigfault.c && \
+  ar -rcs src/ext/libcrystal.a src/ext/sigfault.o
 
 CMD ["/bin/sh"]
 
