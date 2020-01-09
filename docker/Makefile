@@ -68,34 +68,34 @@ $(OUTPUT_DIR):
 # Ubuntu x86_64
 $(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-ubuntu-x86_64.tar.gz: $(BUILD_CONTEXT)/ubuntu64 $(OUTPUT_DIR)
 	docker build -t $(DOCKER_TAG_UBUNTU) --target runtime $(BUILD_ARGS_UBUNTU64)
-	docker save $(DOCKER_TAG_UBUNTU) | gzip > $(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-ubuntu.tar.gz
+	docker save $(DOCKER_TAG_UBUNTU) | gzip > $@
 
 $(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-ubuntu-x86_64-build.tar.gz: $(BUILD_CONTEXT)/ubuntu64 $(OUTPUT_DIR)
 	docker build -t $(DOCKER_TAG_UBUNTU)-build --target build  $(BUILD_ARGS_UBUNTU64)
-	docker save $(DOCKER_TAG_UBUNTU)-build | gzip > $(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-ubuntu-build.tar.gz
+	docker save $(DOCKER_TAG_UBUNTU)-build | gzip > $@
 
 # Ubuntu i386
 $(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-ubuntu-i386.tar.gz: $(BUILD_CONTEXT)/ubuntu32 $(OUTPUT_DIR)
-	docker build -t $(DOCKER_REPOSITORY):$(DOCKER_TAG)-i386 --target runtime $(BUILD_ARGS_UBUNTU32)
-	docker save $(DOCKER_REPOSITORY):$(DOCKER_TAG)-i386 | gzip > $(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-i386.tar.gz
+	docker build -t $(DOCKER_TAG_UBUNTU)-i386 --target runtime $(BUILD_ARGS_UBUNTU32)
+	docker save $(DOCKER_TAG_UBUNTU)-i386 | gzip > $@
 
-$(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-ubuntu-i386-build.tar.gz: $(BUILD_CONTEXT)/ubuntu32 $(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-ubuntu-i386.tar.gz
-	docker build -t $(DOCKER_REPOSITORY):$(DOCKER_TAG)-i386-build --target build  $(BUILD_ARGS_UBUNTU32)
-	docker save $(DOCKER_REPOSITORY):$(DOCKER_TAG)-i386-build | gzip > $(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-i386-build.tar.gz
+$(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-ubuntu-i386-build.tar.gz: $(BUILD_CONTEXT)/ubuntu32 $(OUTPUT_DIR)
+	docker build -t $(DOCKER_TAG_UBUNTU)-i386-build --target build  $(BUILD_ARGS_UBUNTU32)
+	docker save $(DOCKER_TAG_UBUNTU)-i386-build | gzip > $@
 
 # Alpine x86_64
 $(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-alpine.tar.gz: $(BUILD_CONTEXT)/alpine $(OUTPUT_DIR)
 	docker build -t $(DOCKER_TAG_ALPINE) --target runtime $(BUILD_ARGS_ALPINE)
-	docker save $(DOCKER_TAG_ALPINE) | gzip > $(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-alpine.tar.gz
+	docker save $(DOCKER_TAG_ALPINE) | gzip > $@
 
 $(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-alpine-build.tar.gz: $(BUILD_CONTEXT)/alpine $(OUTPUT_DIR)
 	docker build -t $(DOCKER_TAG_ALPINE)-build --target build $(BUILD_ARGS_ALPINE)
-	docker save $(DOCKER_TAG_ALPINE)-build | gzip > $(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-alpine-build.tar.gz
+	docker save $(DOCKER_TAG_ALPINE)-build | gzip > $@
 
 .PHONY: clean
 clean: ## Clean up build and output directories
 	rm -Rf $(OUTPUT_DIR)
-	rm -Rf $(CURDIR)/build-context
+	rm -Rf $(BUILD_CONTEXT)
 
 .PHONY: help
 help: ## Show this help
