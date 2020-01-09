@@ -31,7 +31,7 @@ FROM runtime as build
 
 RUN \
   apk add --update --no-cache --force-overwrite \
-    llvm-dev llvm-static
+    llvm-dev llvm-static g++
 
 ENV LIBRARY_PATH=/usr/lib/crystal/lib/
 
