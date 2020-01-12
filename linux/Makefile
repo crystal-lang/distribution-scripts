@@ -100,24 +100,24 @@ $(OUTPUT_BASENAME64).tar: Dockerfile $(FILES)
 	mkdir -p $(OUTPUT_DIR)
 	docker build $(BUILD_ARGS64) -t crystal-build-temp .
 	container_id="$$(docker create crystal-build-temp)" \
-	  && docker cp "$$container_id":/output/crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION).tar $(OUTPUT_BASENAME64).tar \
+	  && docker cp "$$container_id":/output/crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION).tar $@ \
 	  && docker rm -v "$$container_id"
 
 .PHONY: compress64
 compress64: $(OUTPUT_BASENAME64).tar.gz $(OUTPUT_BASENAME64).tar.xz ## Build compressed tarballs
 
-$(OUTPUT_BASENAME64).tar.gz: $(OUTPUT_BASENAME64).tar
-	gzip -c $(OUTPUT_BASENAME64).tar > $(OUTPUT_BASENAME64).tar.gz
+$(OUTPUT_BASENAME64).tar.gz $(OUTPUT_BASENAME32).tar.gz: %.gz: %
+	gzip -c $^ > $@
 
-$(OUTPUT_BASENAME64).tar.xz: $(OUTPUT_BASENAME64).tar
-	xz -T 0 -c $(OUTPUT_BASENAME64).tar > $(OUTPUT_BASENAME64).tar.xz
+$(OUTPUT_BASENAME64).tar.xz $(OUTPUT_BASENAME32).tar.xz: %.xz: %
+	xz -T 0 -c $^ > $@
 
 .PHONY: package64
 package64: $(OUTPUT_DIR)/$(DEB_NAME64) $(OUTPUT_DIR)/$(RPM_NAME64) ## Build distribution packages from the tarballs
 
 .PHONY: docker-fpm
 docker-fpm: Dockerfile-fpm
-	docker build $(DOCKER_BUILD_ARGS) -t crystal-fpm -f Dockerfile-fpm .
+	docker build $(DOCKER_BUILD_ARGS) -t crystal-fpm -f $^ .
 
 $(OUTPUT_DIR)/$(DEB_NAME64): docker-fpm $(OUTPUT_BASENAME64).tar
 	docker run --rm -v $(CURDIR)/build:/build crystal-fpm /bin/sh -c "\
@@ -130,7 +130,7 @@ $(OUTPUT_DIR)/$(DEB_NAME64): docker-fpm $(OUTPUT_BASENAME64).tar
            --depends gcc --depends pkg-config --depends libpcre3-dev --depends libevent-dev \
            --deb-recommends git --deb-recommends libssl-dev --deb-recommends libz-dev \
            --deb-suggests libxml2-dev --deb-suggests libgmp-dev --deb-suggests libyaml-dev --deb-suggests libreadline-dev \
-           --force --package $(OUTPUT_DIR)/$(DEB_NAME64) \
+           --force --package $@ \
            --prefix /usr \
            --chdir /tmp/crystal/crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION) \
            $(FPM_FLAGS) bin lib share"
@@ -142,7 +142,7 @@ $(OUTPUT_DIR)/$(RPM_NAME64): docker-fpm $(OUTPUT_BASENAME64).tar
     && fpm --input-type dir --output-type rpm \
            --architecture x86_64 $(PACKAGE_BRANDING_ARGS) \
            --depends gcc --depends pkgconfig --depends pcre-devel --depends libevent-devel \
-           --force --package $(OUTPUT_DIR)/$(RPM_NAME64) \
+           --force --package $@ \
            --prefix /usr \
            --chdir /tmp/crystal/crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION) \
            $(FPM_FLAGS) bin lib share"
@@ -154,17 +154,11 @@ $(OUTPUT_BASENAME32).tar: Dockerfile $(FILES)
 	mkdir -p $(OUTPUT_DIR)
 	docker build $(BUILD_ARGS32) -t crystal-build32-temp .
 	container_id="$$(docker create crystal-build32-temp)" \
-	  && docker cp "$$container_id":/output/crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION).tar $(OUTPUT_BASENAME32).tar \
+	  && docker cp "$$container_id":/output/crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION).tar $@ \
 	  && docker rm -v "$$container_id"
 
 .PHONY: compress32
 compress32: $(OUTPUT_BASENAME32).tar.gz $(OUTPUT_BASENAME32).tar.xz ## Build compressed tarballs
-
-$(OUTPUT_BASENAME32).tar.gz: $(OUTPUT_BASENAME32).tar
-	gzip -c $(OUTPUT_BASENAME32).tar > $(OUTPUT_BASENAME32).tar.gz
-
-$(OUTPUT_BASENAME32).tar.xz: $(OUTPUT_BASENAME32).tar
-	xz -T 0 -c $(OUTPUT_BASENAME32).tar > $(OUTPUT_BASENAME32).tar.xz
 
 .PHONY: package32
 package32: $(OUTPUT_DIR)/$(DEB_NAME32) $(OUTPUT_DIR)/$(RPM_NAME32) ## Build distribution packages from the tarballs
@@ -180,7 +174,7 @@ $(OUTPUT_DIR)/$(DEB_NAME32): docker-fpm $(OUTPUT_BASENAME32).tar
            --depends gcc --depends pkg-config --depends libpcre3-dev --depends libevent-dev \
            --deb-recommends git --deb-recommends libssl-dev --deb-recommends libz-dev \
            --deb-suggests libxml2-dev --deb-suggests libgmp-dev --deb-suggests libyaml-dev --deb-suggests libreadline-dev \
-           --force --package $(OUTPUT_DIR)/$(DEB_NAME32) \
+           --force --package $@ \
            --prefix /usr \
            --chdir /tmp/crystal/crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION) \
            $(FPM_FLAGS) bin lib share"
@@ -192,7 +186,7 @@ $(OUTPUT_DIR)/$(RPM_NAME32): docker-fpm $(OUTPUT_BASENAME32).tar
     && fpm --input-type dir --output-type rpm \
            --architecture i386 $(PACKAGE_BRANDING_ARGS) \
            --depends gcc --depends pkgconfig --depends pcre-devel --depends libevent-devel \
-           --force --package $(OUTPUT_DIR)/$(RPM_NAME32) \
+           --force --package $@ \
            --prefix /usr \
            --chdir /tmp/crystal/crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION) \
            $(FPM_FLAGS) bin lib share"
