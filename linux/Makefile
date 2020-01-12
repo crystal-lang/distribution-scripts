@@ -92,7 +92,7 @@ $(OUTPUT_BASENAME64).tar: Dockerfile $(FILES)
 	mkdir -p $(OUTPUT_DIR)
 	docker build $(BUILD_ARGS64) -t crystal-build-temp .
 	container_id="$$(docker create crystal-build-temp)" \
-	  && docker cp "$$container_id":/output/crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION).tar $(OUTPUT_BASENAME64).tar \
+	  && docker cp "$$container_id":/output/crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION).tar $@ \
 	  && docker rm -v "$$container_id"
 
 $(OUTPUT_BASENAME64)-bundled.tar: $(OUTPUT_BASENAME64).tar $(OUTPUT_DIR)/bundled-libs.tar
@@ -116,7 +116,7 @@ $(OUTPUT_BASENAME32).tar: Dockerfile $(FILES)
 	mkdir -p $(OUTPUT_DIR)
 	docker build $(BUILD_ARGS32) -t crystal-build32-temp .
 	container_id="$$(docker create crystal-build32-temp)" \
-	  && docker cp "$$container_id":/output/crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION).tar $(OUTPUT_BASENAME32).tar \
+	  && docker cp "$$container_id":/output/crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION).tar $@ \
 	  && docker rm -v "$$container_id"
 
 .PHONY: compress32
