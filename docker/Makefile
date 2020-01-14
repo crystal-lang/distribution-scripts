@@ -15,27 +15,27 @@ all32: $(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-i386.tar.gz $(OUTPUT_DIR)/docker-
 
 $(CURDIR)/tmp/crystal.deb:
 	mkdir -p $(CURDIR)/tmp
-	cp $(CRYSTAL_DEB) $(CURDIR)/tmp/crystal.deb
+	cp $(CRYSTAL_DEB) $@
 
 $(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION).tar.gz: $(CURDIR)/tmp/crystal.deb
 	mkdir -p $(OUTPUT_DIR)
 	docker build $(BUILD_ARGS64) --target runtime -t $(DOCKER_REPOSITORY):$(DOCKER_TAG) .
-	docker save $(DOCKER_REPOSITORY):$(DOCKER_TAG) | gzip > $(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION).tar.gz
+	docker save $(DOCKER_REPOSITORY):$(DOCKER_TAG) | gzip > $@
 
 $(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-build.tar.gz: $(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION).tar.gz
 	mkdir -p $(OUTPUT_DIR)
 	docker build $(BUILD_ARGS64) --target build -t $(DOCKER_REPOSITORY):$(DOCKER_TAG)-build .
-	docker save $(DOCKER_REPOSITORY):$(DOCKER_TAG)-build | gzip > $(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-build.tar.gz
+	docker save $(DOCKER_REPOSITORY):$(DOCKER_TAG)-build | gzip > $@
 
 $(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-i386.tar.gz: $(CURDIR)/tmp/crystal.deb
 	mkdir -p $(OUTPUT_DIR)
 	docker build $(BUILD_ARGS32) --target runtime -t $(DOCKER_REPOSITORY):$(DOCKER_TAG)-i386 .
-	docker save $(DOCKER_REPOSITORY):$(DOCKER_TAG)-i386 | gzip > $(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-i386.tar.gz
+	docker save $(DOCKER_REPOSITORY):$(DOCKER_TAG)-i386 | gzip > $@
 
 $(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-i386-build.tar.gz: $(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-i386.tar.gz
 	mkdir -p $(OUTPUT_DIR)
 	docker build $(BUILD_ARGS32) --target build -t $(DOCKER_REPOSITORY):$(DOCKER_TAG)-i386-build .
-	docker save $(DOCKER_REPOSITORY):$(DOCKER_TAG)-i386-build | gzip > $(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-i386-build.tar.gz
+	docker save $(DOCKER_REPOSITORY):$(DOCKER_TAG)-i386-build | gzip > $@
 
 .PHONY: clean
 clean: ## Clean up build directory
