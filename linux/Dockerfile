@@ -14,11 +14,10 @@ ENV CFLAGS="-fPIC -pipe ${release:+-O2}"
 ARG gc_version
 ARG libatomic_ops_version
 COPY files/feature-thread-stackbottom-upstream.patch /tmp/
-RUN git clone https://github.com/ivmai/bdwgc \
+RUN git clone --branch ${gc_version} --depth 1 https://github.com/ivmai/bdwgc \
  && cd bdwgc \
- && git checkout ${gc_version} \
- && git clone https://github.com/ivmai/libatomic_ops \
- && (cd libatomic_ops && git checkout ${libatomic_ops_version}) \
+ && git clone --branch ${libatomic_ops_version} --depth 1 https://github.com/ivmai/libatomic_ops \
+ && cd libatomic_ops \
  \
  && patch -p1 < /tmp/feature-thread-stackbottom-upstream.patch \
  \
@@ -29,9 +28,8 @@ RUN git clone https://github.com/ivmai/bdwgc \
 # Cross-compile crystal and build libcrystal.a
 ARG crystal_sha1
 ARG musl_target
-RUN git clone https://github.com/crystal-lang/crystal \
+RUN git clone --branch ${crystal_sha1} --depth 1 https://github.com/crystal-lang/crystal \
  && cd crystal \
- && git checkout ${crystal_sha1} \
  \
  && make deps
 
@@ -54,11 +52,10 @@ ENV CFLAGS="-fPIC -pipe ${release:+-O2}"
 # Build libgc (again, this time for musl)
 ARG gc_version
 ARG libatomic_ops_version
-RUN git clone https://github.com/ivmai/bdwgc \
+RUN git clone --branch ${gc_version} --depth 1 https://github.com/ivmai/bdwgc \
  && cd bdwgc \
- && git checkout ${gc_version} \
- && git clone https://github.com/ivmai/libatomic_ops \
- && (cd libatomic_ops && git checkout ${libatomic_ops_version}) \
+ && git clone --branch ${libatomic_ops_version} --depth 1 https://github.com/ivmai/libatomic_ops \
+ && cd libatomic_ops \
  \
  && ./autogen.sh \
  && ./configure --disable-debug --disable-shared --enable-large-config \
@@ -78,9 +75,8 @@ RUN mkdir -p /tmp/crystal \
 ARG crystal_version
 ARG crystal_sha1
 ARG gnu_target
-RUN git clone https://github.com/crystal-lang/crystal \
+RUN git clone --branch ${crystal_sha1} --depth 1 https://github.com/crystal-lang/crystal \
  && cd crystal \
- && git checkout ${crystal_sha1} \
  \
  && make crystal stats=true static=true ${release:+release=true} \
                  CRYSTAL_CONFIG_TARGET=${gnu_target} \
@@ -89,9 +85,8 @@ RUN git clone https://github.com/crystal-lang/crystal \
 # Build shards
 ARG shards_version
 ARG musl_target
-RUN git clone https://github.com/crystal-lang/shards \
+RUN git clone --branch ${shards_version} --depth 1 https://github.com/crystal-lang/shards \
  && cd shards \
- && git checkout ${shards_version} \
  \
  # Hack to make shards not segfault
  && echo 'require "llvm/lib_llvm"; require "llvm/enums"; require "./src/shards"' > hack.cr \

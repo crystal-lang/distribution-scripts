@@ -49,9 +49,8 @@ $(CURDIR)/../omnibus/crystal-darwin-x86_64:
 $(OUTPUT_DIR)/$(DARWIN_NAME) $(OUTPUT_DIR)/$(DARWIN_PKG_NAME): ## Build omnibus crystal project
 ifeq ($(FORCE_GIT_TAGGED), 0)
 	rm -Rf $(CURDIR)/tmp && mkdir -p $(CURDIR)/tmp && cd $(CURDIR)/tmp \
-	&& git clone https://github.com/crystal-lang/crystal \
+	&& git clone --branch $(CRYSTAL_SHA1) --depth 1 https://github.com/crystal-lang/crystal \
 	&& cd crystal \
-	&& git checkout $(CRYSTAL_SHA1) \
 	&& git checkout -b $(CRYSTAL_VERSION)
 endif
 
