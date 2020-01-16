@@ -1,43 +1,115 @@
+# Recipies for this Makefile
+
+## Build all docker images
+##   $ make DOCKER_REPOSITORY=crystal-lang/crystal DOCKER_TAG=nightly CRYSTAL_VERSION=0.xy.z CRYSTAL_DEB=... CRYSTAL_TARGZ=...
+## Build ubuntu64 docker images
+##   $ make ubuntu64 DOCKER_REPOSITORY=crystal-lang/crystal DOCKER_TAG=nightly CRYSTAL_VERSION=0.xy.z CRYSTAL_DEB=...
+## Build alpine docker images
+##   $ make alpine DOCKER_REPOSITORY=crystal-lang/crystal DOCKER_TAG=nightly CRYSTAL_VERSION=0.xy.z CRYSTAL_TARGZ=...
+
 CRYSTAL_VERSION ?=   ## How the binaries should be branded
-CRYSTAL_DEB ?=       ## which crystal.deb file to install in the docker images
-DOCKER_TAG ?=        ## How to tag the docker image. a -build will be appended for -build image
+CRYSTAL_DEB ?=       ## Which crystal.deb file to install in debian based docker images (ubuntu)
+CRYSTAL_TARGZ ?=     ## Which crystal.tar.gz file to install in docker images (alpine)
+DOCKER_TAG ?=	     ## How to tag the docker image (examples: `0.27.2`, `nightly20190307`). `-build` will be appended for build images.
 DOCKER_REPOSITORY ?= ## Docker hub repository to commit image
 
-OUTPUT_DIR = build
-BUILD_ARGS64 = --build-arg crystal_deb=./tmp/crystal.deb --build-arg base_docker_image=ubuntu:bionic
-BUILD_ARGS32 = --build-arg crystal_deb=./tmp/crystal.deb --build-arg base_docker_image=i386/ubuntu:bionic
+OUTPUT_DIR := build
+BUILD_CONTEXT := $(CURDIR)/build-context
+BUILD_ARGS_UBUNTU64 := --build-arg crystal_deb=crystal.deb $(BUILD_CONTEXT)/ubuntu64 --build-arg base_docker_image=ubuntu:bionic
+BUILD_ARGS_UBUNTU32 := --build-arg crystal_deb=crystal.deb $(BUILD_CONTEXT)/ubuntu32 --build-arg base_docker_image=i386/ubuntu:bionic
+BUILD_ARGS_ALPINE := --build-arg crystal_targz=crystal.tar.gz $(BUILD_CONTEXT)/alpine
+DOCKER_TAG_UBUNTU := $(DOCKER_REPOSITORY):$(DOCKER_TAG)
+DOCKER_TAG_ALPINE := $(DOCKER_REPOSITORY):$(DOCKER_TAG)-alpine
 
 .PHONY: all64
-all64: $(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION).tar.gz $(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-build.tar.gz
+all64: ubuntu64 alpine ## Build all x86_64 images
 
 .PHONY: all32
-all32: $(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-i386.tar.gz $(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-i386-build.tar.gz
+all32: ubuntu32 ## Build all i386 images
 
-$(CURDIR)/tmp/crystal.deb:
-	mkdir -p $(CURDIR)/tmp
-	cp $(CRYSTAL_DEB) $(CURDIR)/tmp/crystal.deb
+.PHONY: all_ubuntu
+all_ubuntu: ubuntu64 ubuntu32  ## Build all ubuntu images
 
-$(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION).tar.gz: $(CURDIR)/tmp/crystal.deb
+.PHONY: ubuntu64
+ubuntu64: ## Build ubuntu x86_64 images
+ubuntu64: $(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-ubuntu-x86_64.tar.gz
+ubuntu64: $(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-ubuntu-x86_64-build.tar.gz
+
+.PHONY: ubuntu32
+ubuntu32: ## Build ubuntu i386 images
+ubuntu32: $(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-ubuntu-i386.tar.gz
+ubuntu32: $(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-ubuntu-i386-build.tar.gz
+
+.PHONY: alpine
+alpine: ## Build alpine images
+alpine: $(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-alpine.tar.gz
+alpine: $(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-alpine-build.tar.gz
+
+$(BUILD_CONTEXT)/ubuntu32: $(BUILD_CONTEXT)/ubuntu32/crystal.deb
+	cp ubuntu.Dockerfile $@/Dockerfile
+
+$(BUILD_CONTEXT)/ubuntu64: $(BUILD_CONTEXT)/ubuntu64/crystal.deb
+	cp ubuntu.Dockerfile $@/Dockerfile
+
+$(BUILD_CONTEXT)/alpine: $(BUILD_CONTEXT)/alpine/crystal.tar.gz
+	cp alpine.Dockerfile $@/Dockerfile
+
+%/crystal.deb:
+	mkdir -p $(shell dirname $@)
+	cp $(CRYSTAL_DEB) $@
+
+%/crystal.tar.gz:
+	mkdir -p $(shell dirname $@)
+	cp $(CRYSTAL_TARGZ) $@
+
+$(OUTPUT_DIR):
 	mkdir -p $(OUTPUT_DIR)
-	docker build $(BUILD_ARGS64) --target runtime -t $(DOCKER_REPOSITORY):$(DOCKER_TAG) .
-	docker save $(DOCKER_REPOSITORY):$(DOCKER_TAG) | gzip > $(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION).tar.gz
 
-$(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-build.tar.gz: $(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION).tar.gz
-	mkdir -p $(OUTPUT_DIR)
-	docker build $(BUILD_ARGS64) --target build -t $(DOCKER_REPOSITORY):$(DOCKER_TAG)-build .
-	docker save $(DOCKER_REPOSITORY):$(DOCKER_TAG)-build | gzip > $(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-build.tar.gz
+# Ubuntu x86_64
+$(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-ubuntu-x86_64.tar.gz: $(BUILD_CONTEXT)/ubuntu64 $(OUTPUT_DIR)
+	docker build -t $(DOCKER_TAG_UBUNTU) --target runtime $(BUILD_ARGS_UBUNTU64)
+	docker save $(DOCKER_TAG_UBUNTU) | gzip > $@
 
-$(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-i386.tar.gz: $(CURDIR)/tmp/crystal.deb
-	mkdir -p $(OUTPUT_DIR)
-	docker build $(BUILD_ARGS32) --target runtime -t $(DOCKER_REPOSITORY):$(DOCKER_TAG)-i386 .
-	docker save $(DOCKER_REPOSITORY):$(DOCKER_TAG)-i386 | gzip > $(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-i386.tar.gz
+$(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-ubuntu-x86_64-build.tar.gz: $(BUILD_CONTEXT)/ubuntu64 $(OUTPUT_DIR)
+	docker build -t $(DOCKER_TAG_UBUNTU)-build --target build  $(BUILD_ARGS_UBUNTU64)
+	docker save $(DOCKER_TAG_UBUNTU)-build | gzip > $@
 
-$(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-i386-build.tar.gz: $(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-i386.tar.gz
-	mkdir -p $(OUTPUT_DIR)
-	docker build $(BUILD_ARGS32) --target build -t $(DOCKER_REPOSITORY):$(DOCKER_TAG)-i386-build .
-	docker save $(DOCKER_REPOSITORY):$(DOCKER_TAG)-i386-build | gzip > $(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-i386-build.tar.gz
+# Ubuntu i386
+$(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-ubuntu-i386.tar.gz: $(BUILD_CONTEXT)/ubuntu32 $(OUTPUT_DIR)
+	docker build -t $(DOCKER_TAG_UBUNTU)-i386 --target runtime $(BUILD_ARGS_UBUNTU32)
+	docker save $(DOCKER_TAG_UBUNTU)-i386 | gzip > $@
+
+$(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-ubuntu-i386-build.tar.gz: $(BUILD_CONTEXT)/ubuntu32 $(OUTPUT_DIR)
+	docker build -t $(DOCKER_TAG_UBUNTU)-i386-build --target build  $(BUILD_ARGS_UBUNTU32)
+	docker save $(DOCKER_TAG_UBUNTU)-i386-build | gzip > $@
+
+# Alpine x86_64
+$(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-alpine.tar.gz: $(BUILD_CONTEXT)/alpine $(OUTPUT_DIR)
+	docker build -t $(DOCKER_TAG_ALPINE) --target runtime $(BUILD_ARGS_ALPINE)
+	docker save $(DOCKER_TAG_ALPINE) | gzip > $@
+
+$(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-alpine-build.tar.gz: $(BUILD_CONTEXT)/alpine $(OUTPUT_DIR)
+	docker build -t $(DOCKER_TAG_ALPINE)-build --target build $(BUILD_ARGS_ALPINE)
+	docker save $(DOCKER_TAG_ALPINE)-build | gzip > $@
 
 .PHONY: clean
-clean: ## Clean up build directory
+clean: ## Clean up build and output directories
 	rm -Rf $(OUTPUT_DIR)
-	rm -Rf $(CURDIR)/tmp
+	rm -Rf $(BUILD_CONTEXT)
+
+.PHONY: help
+help: ## Show this help
+	@echo
+	@printf '\033[34mtargets:\033[0m\n'
+	@grep -hE '^[a-zA-Z0-9_-]+:.*?## .*$$' $(MAKEFILE_LIST) |\
+		sort |\
+		awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2}'
+	@echo
+	@printf '\033[34mconfiguration variables:\033[0m\n'
+	@grep -hE '^[a-zA-Z0-9_-]+ \?=.*?## .*$$' $(MAKEFILE_LIST) |\
+		sort |\
+		awk 'BEGIN {FS = " \\?=.*?## "}; {printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2}'
+	@echo
+	@printf '\033[34mrecipes:\033[0m\n'
+	@grep -hE '^##.*$$' $(MAKEFILE_LIST) |\
+awk 'BEGIN {FS = "## "}; /^## [a-zA-Z_-]/ {printf "  \033[36m%s\033[0m\n", $$2}; /^##  / {printf "  %s\n", $$2}'
