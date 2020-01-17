@@ -28,8 +28,9 @@ RUN git clone --branch ${gc_version} --depth 1 https://github.com/ivmai/bdwgc \
 # Cross-compile crystal and build libcrystal.a
 ARG crystal_sha1
 ARG musl_target
-RUN git clone --branch ${crystal_sha1} --depth 1 https://github.com/crystal-lang/crystal \
+RUN git clone https://github.com/crystal-lang/crystal \
  && cd crystal \
+ && git checkout ${crystal_sha1} \
  \
  && make deps
 
@@ -75,8 +76,9 @@ RUN mkdir -p /tmp/crystal \
 ARG crystal_version
 ARG crystal_sha1
 ARG gnu_target
-RUN git clone --branch ${crystal_sha1} --depth 1 https://github.com/crystal-lang/crystal \
+RUN git clone https://github.com/crystal-lang/crystal \
  && cd crystal \
+ && git checkout ${crystal_sha1} \
  \
  && make crystal stats=true static=true ${release:+release=true} \
                  CRYSTAL_CONFIG_TARGET=${gnu_target} \
