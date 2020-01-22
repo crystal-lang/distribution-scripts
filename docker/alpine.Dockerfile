@@ -3,9 +3,9 @@ FROM alpine:3.11 as runtime
 RUN \
   apk add --update --no-cache --force-overwrite \
     # core dependencies
-    gc-dev gcc gmp-dev libatomic_ops libevent-dev musl-dev pcre-dev \
+    gc-dev gcc gmp-dev libatomic_ops libevent-static musl-dev pcre-dev \
     # stdlib dependencies
-    libxml2-dev openssl-dev tzdata yaml-dev zlib-dev \
+    libxml2-dev openssl-libs-static tzdata yaml-dev zlib-static \
     # dev tools
     make git
 
