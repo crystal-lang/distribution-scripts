@@ -5,7 +5,7 @@ RUN \
     # core dependencies
     gc-dev gcc gmp-dev libatomic_ops libevent-static musl-dev pcre-dev \
     # stdlib dependencies
-    libxml2-dev openssl-dev openssl-libs-static readline-dev tzdata yaml-dev zlib-static \
+    libxml2-dev openssl-dev openssl-libs-static tzdata yaml-dev zlib-static \
     # dev tools
     make git
 
