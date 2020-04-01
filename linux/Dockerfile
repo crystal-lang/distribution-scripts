@@ -73,7 +73,8 @@ ADD ${previous_crystal_release} /tmp/crystal.tar.gz
 ENV PATH=${PATH}:/tmp/crystal/lib/crystal/bin/
 RUN mkdir -p /tmp/crystal \
   && tar xz -f /tmp/crystal.tar.gz -C /tmp/crystal --strip-component=1 \
-  && crystal --version
+  && crystal --version \
+  && shards --version
 
 # Build crystal
 ARG crystal_version
@@ -93,11 +94,13 @@ ARG musl_target
 RUN git clone https://github.com/crystal-lang/shards \
  && cd shards \
  && git checkout ${shards_version} \
+ && shards install --production \
  \
  # Hack to make shards not segfault
  && echo 'require "llvm/lib_llvm"; require "llvm/enums"; require "./src/shards"' > hack.cr \
  && /crystal/bin/crystal build --stats --target ${musl_target} \
-    hack.cr -o shards --static ${release:+--release}
+    hack.cr -o shards --static ${release:+--release} \
+ && ([ "$(ldd shards | wc -l)" -eq "1" ] || { echo 'shards is not statically linked'; ldd shards; exit 1; })
 
 COPY files/crystal-wrapper /output/bin/crystal
 COPY --from=debian /bdwgc/.libs/libgc.a /libgc-debian.a

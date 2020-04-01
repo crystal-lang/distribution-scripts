@@ -21,8 +21,10 @@ FROM runtime as build
 
 RUN \
   apt-get update && \
-  apt-get install -y build-essential llvm-8 libedit-dev gdb && \
+  apt-get install -y build-essential llvm-8 lld-8 libedit-dev gdb && \
   apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+RUN ln -sf /usr/bin/ld.lld-8 /usr/bin/ld.lld
 
 ENV LIBRARY_PATH=/usr/lib/crystal/lib/
 
