@@ -43,8 +43,10 @@ darwin-previous: $(CURDIR)/../omnibus/crystal-darwin-x86_64 ## download previous
 $(CURDIR)/../omnibus/crystal-darwin-x86_64:
 	curl -L -o /tmp/crystal-darwin-x86_64.tar.gz $(PREVIOUS_CRYSTAL_RELEASE_DARWIN_TARGZ) \
 	&& tar xfz /tmp/crystal-darwin-x86_64.tar.gz -O "crystal-*/embedded/bin/crystal" > $(CURDIR)/../omnibus/crystal-darwin-x86_64 \
+	&& tar xfz /tmp/crystal-darwin-x86_64.tar.gz -O "crystal-*/embedded/bin/shards" > $(CURDIR)/../omnibus/shards-darwin-x86_64 \
 	&& rm /tmp/crystal-darwin-x86_64.tar.gz \
-	&& chmod +x $(CURDIR)/../omnibus/crystal-darwin-x86_64
+	&& chmod +x $(CURDIR)/../omnibus/crystal-darwin-x86_64 \
+	&& chmod +x $(CURDIR)/../omnibus/shards-darwin-x86_64
 
 $(OUTPUT_DIR)/$(DARWIN_NAME) $(OUTPUT_DIR)/$(DARWIN_PKG_NAME): ## Build omnibus crystal project
 ifeq ($(FORCE_GIT_TAGGED), 0)
