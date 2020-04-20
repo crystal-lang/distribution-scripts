@@ -57,9 +57,9 @@ ARG gc_version
 ARG libatomic_ops_version
 RUN git clone https://github.com/ivmai/bdwgc \
  && cd bdwgc \
- && git checkout ${gc_version} \
+ && git checkout --force ${gc_version} \
  && git clone https://github.com/ivmai/libatomic_ops \
- && (cd libatomic_ops && git checkout ${libatomic_ops_version}) \
+ && (cd libatomic_ops && git checkout --force ${libatomic_ops_version}) \
  \
  && ./autogen.sh \
  && ./configure --disable-debug --disable-shared --enable-large-config \
