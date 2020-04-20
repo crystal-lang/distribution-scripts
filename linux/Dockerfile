@@ -15,11 +15,9 @@ ENV CC="clang-8"
 ARG gc_version
 ARG libatomic_ops_version
 COPY files/feature-thread-stackbottom-upstream.patch /tmp/
-RUN git clone https://github.com/ivmai/bdwgc \
+RUN git clone https://github.com/ivmai/bdwgc --branch=${gc_version} \
  && cd bdwgc \
- && git checkout ${gc_version} \
- && git clone https://github.com/ivmai/libatomic_ops \
- && (cd libatomic_ops && git checkout ${libatomic_ops_version}) \
+ && git clone https://github.com/ivmai/libatomic_ops --branch=${libatomic_ops_version} \
  \
  && patch -p1 < /tmp/feature-thread-stackbottom-upstream.patch \
  \
@@ -55,11 +53,9 @@ ENV CFLAGS="-fPIC -pipe ${release:+-O2}"
 # Build libgc (again, this time for musl)
 ARG gc_version
 ARG libatomic_ops_version
-RUN git clone https://github.com/ivmai/bdwgc \
+RUN git clone https://github.com/ivmai/bdwgc --branch=${gc_version} \
  && cd bdwgc \
- && git checkout --force ${gc_version} \
- && git clone https://github.com/ivmai/libatomic_ops \
- && (cd libatomic_ops && git checkout --force ${libatomic_ops_version}) \
+ && git clone https://github.com/ivmai/libatomic_ops --branch=${libatomic_ops_version} \
  \
  && ./autogen.sh \
  && ./configure --disable-debug --disable-shared --enable-large-config \
