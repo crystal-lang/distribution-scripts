@@ -1,0 +1,9 @@
+FROM ruby:2.5
+
+RUN apt-get update \
+ && apt-get install -y rpm \
+ # cleanup
+ && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+ENV PATH="/usr/local/bundle/bin/:${PATH}"
+RUN gem install --no-document fpm -v 1.10.2
