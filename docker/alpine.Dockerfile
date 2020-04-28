@@ -3,11 +3,28 @@ FROM alpine:3.11 as runtime
 RUN \
   apk add --update --no-cache --force-overwrite \
     # core dependencies
-    gc-dev gcc gmp-dev libatomic_ops libevent-static musl-dev pcre-dev \
+    gcc gmp-dev libevent-static musl-dev pcre-dev \
     # stdlib dependencies
     libxml2-dev openssl-dev openssl-libs-static tzdata yaml-dev zlib-static \
     # dev tools
-    make git
+    make git \
+    # build libgc dependencies
+    autoconf automake libtool
+
+# Build libgc
+ARG gc_version
+ARG libatomic_ops_version
+RUN git clone https://github.com/ivmai/bdwgc \
+ && cd bdwgc \
+ && git checkout ${gc_version} \
+ && git clone https://github.com/ivmai/libatomic_ops \
+ && (cd libatomic_ops && git checkout ${libatomic_ops_version}) \
+ \
+ && ./autogen.sh \
+ && ./configure --disable-debug --disable-shared --enable-large-config \
+ && make -j$(nproc) CFLAGS=-DNO_GETCONTEXT
+
+ENV LIBRARY_PATH=/bdwgc/.libs/
 
 ARG crystal_targz
 COPY ${crystal_targz} /tmp/crystal.tar.gz
