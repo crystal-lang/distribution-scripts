@@ -96,10 +96,8 @@ RUN git clone https://github.com/crystal-lang/shards \
  && git checkout ${shards_version} \
  && shards install --production \
  \
- # Hack to make shards not segfault
- && echo 'require "llvm/lib_llvm"; require "llvm/enums"; require "./src/shards"' > hack.cr \
  && /crystal/bin/crystal build --stats --target ${musl_target} \
-    hack.cr -o shards --static ${release:+--release} \
+    ./src/shards.cr -o shards --static ${release:+--release} \
  && ([ "$(ldd shards | wc -l)" -eq "1" ] || { echo 'shards is not statically linked'; ldd shards; exit 1; })
 
 COPY files/crystal-wrapper /output/bin/crystal
