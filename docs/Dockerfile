@@ -9,7 +9,7 @@ RUN git clone https://github.com/crystal-lang/crystal \
  && cd crystal \
  && git checkout ${crystal_sha1} \
  \
- && make docs \
+ && make docs DOCS_OPTIONS='--json-config-url=/api/versions.json'\
  && git describe --tags --long --always 2>/dev/null > ./docs/revision.txt \
  && mv ./docs ./${output_docs_base_name} \
  \
