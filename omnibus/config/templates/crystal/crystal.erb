@@ -96,7 +96,7 @@ _canonicalize_file_path() {
 
 SCRIPT_PATH="$(dirname "$(realpath "$0" || echo $0)")"
 INSTALL_DIR="$(realpath "$SCRIPT_PATH/..")"
-export CRYSTAL_PATH=${CRYSTAL_PATH:-"lib:$INSTALL_DIR/src"}
+export CRYSTAL_PATH=${CRYSTAL_PATH:-".crystal/shards:lib:$INSTALL_DIR/src"}
 export PATH="$INSTALL_DIR/embedded/bin:$PATH"
 export LIBRARY_PATH="$INSTALL_DIR/embedded/lib${LIBRARY_PATH:+:$LIBRARY_PATH}"
 export CRYSTAL_LIBRARY_PATH="${CRYSTAL_LIBRARY_PATH:+$CRYSTAL_LIBRARY_PATH:}$INSTALL_DIR/embedded/lib"
