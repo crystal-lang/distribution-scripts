@@ -27,7 +27,8 @@ unless FIRST_RUN
   llvm_bin = Omnibus::Software.load(project, "llvm_bin", nil)
 end
 
-output_bin = "#{install_dir}/embedded/bin/crystal"
+output_path = "#{install_dir}/embedded/bin"
+output_bin = "#{output_path}/crystal"
 
 if FIRST_RUN
   env["PATH"] = "#{project_dir}/deps:#{env["PATH"]}"
@@ -49,7 +50,7 @@ build do
   command "mkdir .build", env: env
   command "echo #{Dir.pwd}", env: env
   command "cp #{Dir.pwd}/crystal-#{ohai['os']}-#{ohai['kernel']['machine']} .build/crystal", env: env
-  command "bin/crystal build src/compiler/crystal.cr --release --no-debug -o #{output_bin} -D without_openssl -D without_zlib", env: env
+  command "make crystal stats=true release=true FLAGS=--no-debug CRYSTAL_CONFIG_LIBRARY_PATH= O=#{output_path}", env: env
 
   block do
     raise "Could not build crystal" unless File.exists?(output_bin)
