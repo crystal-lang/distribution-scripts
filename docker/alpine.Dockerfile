@@ -9,22 +9,24 @@ RUN \
     # dev tools
     make git \
     # build libgc dependencies
-    autoconf automake libtool
+    autoconf automake libtool patch
 
 # Build libgc
 ARG gc_version
 ARG libatomic_ops_version
+COPY files/feature-thread-stackbottom-upstream.patch /tmp/
 RUN git clone https://github.com/ivmai/bdwgc \
  && cd bdwgc \
  && git checkout ${gc_version} \
  && git clone https://github.com/ivmai/libatomic_ops \
  && (cd libatomic_ops && git checkout ${libatomic_ops_version}) \
  \
+ && patch -p1 < /tmp/feature-thread-stackbottom-upstream.patch \
+ \
  && ./autogen.sh \
  && ./configure --disable-debug --disable-shared --enable-large-config \
- && make -j$(nproc) CFLAGS=-DNO_GETCONTEXT
-
-ENV LIBRARY_PATH=/bdwgc/.libs/
+ && make -j$(nproc) CFLAGS=-DNO_GETCONTEXT \
+ && make install
 
 ARG crystal_targz
 COPY ${crystal_targz} /tmp/crystal.tar.gz

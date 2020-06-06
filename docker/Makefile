@@ -13,13 +13,13 @@ CRYSTAL_TARGZ ?=     ## Which crystal.tar.gz file to install in docker images (a
 DOCKER_TAG ?=	     ## How to tag the docker image (examples: `0.27.2`, `nightly20190307`). `-build` will be appended for build images.
 DOCKER_REPOSITORY ?= ## Docker hub repository to commit image
 
-GC_VERSION = b26e281bcac33444f523862b97f81e2a74bc2b4d
+GC_VERSION = v8.0.4
 LIBATOMIC_OPS_VERSION = v7.6.10
 
 OUTPUT_DIR := build
 BUILD_CONTEXT := $(CURDIR)/build-context
-BUILD_ARGS_UBUNTU64 := --build-arg crystal_deb=crystal.deb $(BUILD_CONTEXT)/ubuntu64 --build-arg base_docker_image=ubuntu:bionic
-BUILD_ARGS_UBUNTU32 := --build-arg crystal_deb=crystal.deb $(BUILD_CONTEXT)/ubuntu32 --build-arg base_docker_image=i386/ubuntu:bionic
+BUILD_ARGS_UBUNTU64 := --build-arg crystal_deb=crystal.deb $(BUILD_CONTEXT)/ubuntu64 --build-arg base_docker_image=ubuntu:bionic --build-arg gc_version=$(GC_VERSION) --build-arg libatomic_ops_version=$(LIBATOMIC_OPS_VERSION)
+BUILD_ARGS_UBUNTU32 := --build-arg crystal_deb=crystal.deb $(BUILD_CONTEXT)/ubuntu32 --build-arg base_docker_image=i386/ubuntu:bionic --build-arg gc_version=$(GC_VERSION) --build-arg libatomic_ops_version=$(LIBATOMIC_OPS_VERSION)
 BUILD_ARGS_ALPINE := --build-arg crystal_targz=crystal.tar.gz $(BUILD_CONTEXT)/alpine --build-arg gc_version=$(GC_VERSION) --build-arg libatomic_ops_version=$(LIBATOMIC_OPS_VERSION)
 DOCKER_TAG_UBUNTU := $(DOCKER_REPOSITORY):$(DOCKER_TAG)
 DOCKER_TAG_ALPINE := $(DOCKER_REPOSITORY):$(DOCKER_TAG)-alpine
@@ -50,12 +50,18 @@ alpine: $(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-alpine-build.tar.gz
 
 $(BUILD_CONTEXT)/ubuntu32: $(BUILD_CONTEXT)/ubuntu32/crystal.deb
 	cp ubuntu.Dockerfile $@/Dockerfile
+	mkdir $@/files/
+	cp ../linux/files/feature-thread-stackbottom-upstream.patch $@/files/feature-thread-stackbottom-upstream.patch
 
 $(BUILD_CONTEXT)/ubuntu64: $(BUILD_CONTEXT)/ubuntu64/crystal.deb
 	cp ubuntu.Dockerfile $@/Dockerfile
+	mkdir $@/files/
+	cp ../linux/files/feature-thread-stackbottom-upstream.patch $@/files/feature-thread-stackbottom-upstream.patch
 
 $(BUILD_CONTEXT)/alpine: $(BUILD_CONTEXT)/alpine/crystal.tar.gz
 	cp alpine.Dockerfile $@/Dockerfile
+	mkdir $@/files/
+	cp ../linux/files/feature-thread-stackbottom-upstream.patch $@/files/feature-thread-stackbottom-upstream.patch
 
 %/crystal.deb:
 	mkdir -p $(shell dirname $@)
