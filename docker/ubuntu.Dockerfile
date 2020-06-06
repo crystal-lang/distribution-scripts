@@ -7,8 +7,7 @@ RUN \
   apt-get update && \
   DEBIAN_FRONTEND=noninteractive \
   apt-get install -y tzdata gcc pkg-config libssl-dev libxml2-dev libyaml-dev libgmp-dev git make \
-                     libpcre3-dev libevent-dev autoconf automake libtool && \
-  apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+                     libpcre3-dev libevent-dev autoconf automake libtool
 
 # Build libgc
 ARG gc_version
@@ -26,6 +25,10 @@ RUN git clone https://github.com/ivmai/bdwgc \
  && ./configure --disable-debug --disable-shared --enable-large-config \
  && make -j$(nproc) \
  && make install
+
+# Remove build tools from image now that libgc is built
+RUN apt-get purge -y autoconf automake libtool && apt-get autoremove -y && \
+  apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 ARG crystal_deb
 COPY ${crystal_deb} /tmp/crystal.deb
