@@ -36,7 +36,7 @@ relative_path "shards-#{version}"
 env = with_standard_compiler_flags(with_embedded_path)
 
 build do
-  command "#{Dir.pwd}/shards-#{ohai['os']}-#{ohai['kernel']['machine']} install --production", env: env
+  command "make lib", env: env
 
   command "#{install_dir}/bin/crystal" \
           " build" \

@@ -94,7 +94,7 @@ ARG musl_target
 RUN git clone https://github.com/crystal-lang/shards \
  && cd shards \
  && git checkout ${shards_version} \
- && shards install --production \
+ && make lib \
  \
  && /crystal/bin/crystal build --stats --target ${musl_target} \
     ./src/shards.cr -o shards --static ${release:+--release} \
