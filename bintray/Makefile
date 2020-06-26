@@ -1,20 +1,5 @@
 -include Makefile.local # for local options BINTRAY_USERNAME, BINTRAY_API_KEY
 
-# bintray repo configuration
-#
-# apt
-#   * Sign using: User's / Organization's GPG private key
-#   * Content: All files
-#
-# rpm
-#   * YUM metadata folder depth: 1
-#   * Sign using: User's / Organization's GPG private key
-#   * Content: All files
-#
-# create crystal package on both
-#   * Website: http://crystal-lang.org/
-#   * Version control: https://github.com/crystal-lang/crystal
-
 # Secrets configuration
 BINTRAY_USERNAME ?=
 BINTRAY_API_KEY ?=
@@ -38,6 +23,21 @@ CRYSTAL_VERSION   ?=   ## How the binaries should be branded
 PACKAGE_ITERATION ?= 1
 PACKAGE_MAINTAINER ?= Crystal Team <crystal@manas.tech>
 
+OUTPUT_TARGZ = $(OUTPUT_DIR)/targz
+OUTPUT_UNSIGNED = $(OUTPUT_DIR)/unsigned
+OUTPUT_LINUX64_TARGZ = $(OUTPUT_TARGZ)/crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION)-linux-x86_64.tar.gz
+OUTPUT_LINUX32_TARGZ = $(OUTPUT_TARGZ)/crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION)-linux-i686.tar.gz
+DEB_NAME64 = crystal_$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION)_amd64.deb
+DEB_NAME32 = crystal_$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION)_i386.deb
+OUTPUT_UNSIGNED_DEB_NAME64 = $(OUTPUT_UNSIGNED)/$(DEB_NAME64)
+OUTPUT_UNSIGNED_DEB_NAME32 = $(OUTPUT_UNSIGNED)/$(DEB_NAME32)
+
+DEB_DISTROS = jessie,stretch,buster,trusty,xenial,bionic,eoan
+PUBLISH_FLAGS = publish=1$(if $(force),;override=1)
+
+CURL_BINTRAY_AUTH = -u$(BINTRAY_USERNAME):$(BINTRAY_API_KEY)
+CURL_BINTRAY_PASSPHRASE = $(if $(BINTRAY_SINGING_PASSPHRASE),-H "X-GPG-PASSPHRASE: $(BINTRAY_SINGING_PASSPHRASE)")
+
 FPM_FLAGS = --name $(BINTRAY_PACKAGE) \
             --version $(CRYSTAL_VERSION) \
             --iteration $(PACKAGE_ITERATION) \
@@ -56,27 +56,25 @@ SHELL := /bin/bash
 clean:
 	rm -Rf $(OUTPUT_DIR)
 
+clean_targz:
+	rm -Rf $(OUTPUT_TARGZ)
+
 clean_deb:
-	rm -Rf $(OUTPUT_DIR)/*.deb
+	rm -Rf $(OUTPUT_DIR)/unsigned/*.deb
 
 clean_rpm:
-	rm -Rf $(OUTPUT_DIR)/*.deb
+	rm -Rf $(OUTPUT_DIR)/unsigned/*.rpm
+
+clean_signed:
+	rm -Rf $(OUTPUT_DIR)/signed/*.deb
+	rm -Rf $(OUTPUT_DIR)/signed/*.rpm
 
 .PHONY: docker-fpm
 docker-fpm: Dockerfile-fpm
 	docker build $(DOCKER_BUILD_ARGS) -t crystal-fpm -f Dockerfile-fpm .
 
-LINUX64_TARGZ = crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION)-linux-x86_64.tar.gz
-LINUX32_TARGZ = crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION)-linux-i686.tar.gz
-DEB_NAME64 = crystal_$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION)_amd64.deb
-DEB_NAME32 = crystal_$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION)_i386.deb
-DEB_DISTROS = jessie,stretch,buster,trusty,xenial,bionic,eoan
 ALL_RPM_OUTPUTS =
 ALL_RPM_PUBLISH =
-PUBLISH_FLAGS = publish=1$(if $(force),;override=1)
-
-CURL_BINTRAY_AUTH = -u$(BINTRAY_USERNAME):$(BINTRAY_API_KEY)
-CURL_BINTRAY_PASSPHRASE = $(if $(BINTRAY_SINGING_PASSPHRASE),-H "X-GPG-PASSPHRASE: $(BINTRAY_SINGING_PASSPHRASE)")
 
 .PHONY: all
 all: targz deb rpm
@@ -85,7 +83,7 @@ all: targz deb rpm
 publish: rpm_publish deb_publish
 
 define download_or_copy
-	mkdir -p $(OUTPUT_DIR)
+	mkdir -p $(OUTPUT_TARGZ)
 	if [[ "$(1)" =~ ^http(s?):\/\/ ]]; \
 	then curl -L -o $(2) "$(1)"; \
 	else cp "$(1)" $(2); \
@@ -93,26 +91,27 @@ define download_or_copy
 endef
 
 .PHONY: targz
-targz: $(OUTPUT_DIR)/$(LINUX64_TARGZ) $(OUTPUT_DIR)/$(LINUX32_TARGZ)
+targz: $(OUTPUT_LINUX64_TARGZ) $(OUTPUT_LINUX32_TARGZ)
 
-$(OUTPUT_DIR)/$(LINUX64_TARGZ):
-	$(call download_or_copy,$(CRYSTAL_LINUX64_TARGZ),$(OUTPUT_DIR)/$(LINUX64_TARGZ))
+$(OUTPUT_LINUX64_TARGZ):
+	$(call download_or_copy,$(CRYSTAL_LINUX64_TARGZ),$(OUTPUT_LINUX64_TARGZ))
 
-$(OUTPUT_DIR)/$(LINUX32_TARGZ):
-	$(call download_or_copy,$(CRYSTAL_LINUX32_TARGZ),$(OUTPUT_DIR)/$(LINUX32_TARGZ))
+$(OUTPUT_LINUX32_TARGZ):
+	$(call download_or_copy,$(CRYSTAL_LINUX32_TARGZ),$(OUTPUT_LINUX32_TARGZ))
 
 .PHONY: deb
-deb: $(OUTPUT_DIR)/$(DEB_NAME64) $(OUTPUT_DIR)/$(DEB_NAME32)
+deb: $(OUTPUT_UNSIGNED_DEB_NAME64) $(OUTPUT_UNSIGNED_DEB_NAME32)
 
 .PHONY: deb_publish
 deb_publish:
-	curl -T $(OUTPUT_DIR)/$(DEB_NAME64) $(CURL_BINTRAY_AUTH) $(CURL_BINTRAY_PASSPHRASE) "https://api.bintray.com/content/$(BINTRAY_SUBJECT)/$(BINTRAY_APT_REPO)/$(BINTRAY_PACKAGE)/$(CRYSTAL_VERSION)/$(DEB_NAME64);deb_distribution=$(DEB_DISTROS);deb_component=main;deb_architecture=amd64;$(PUBLISH_FLAGS)"
-	curl -T $(OUTPUT_DIR)/$(DEB_NAME32) $(CURL_BINTRAY_AUTH) $(CURL_BINTRAY_PASSPHRASE) "https://api.bintray.com/content/$(BINTRAY_SUBJECT)/$(BINTRAY_APT_REPO)/$(BINTRAY_PACKAGE)/$(CRYSTAL_VERSION)/$(DEB_NAME32);deb_distribution=$(DEB_DISTROS);deb_component=main;deb_architecture=i386;$(PUBLISH_FLAGS)"
+	curl -T $(OUTPUT_UNSIGNED_DEB_NAME64) $(CURL_BINTRAY_AUTH) $(CURL_BINTRAY_PASSPHRASE) "https://api.bintray.com/content/$(BINTRAY_SUBJECT)/$(BINTRAY_APT_REPO)/$(BINTRAY_PACKAGE)/$(CRYSTAL_VERSION)/$(DEB_NAME64);deb_distribution=$(DEB_DISTROS);deb_component=main;deb_architecture=amd64;$(PUBLISH_FLAGS)"
+	curl -T $(OUTPUT_UNSIGNED_DEB_NAME32) $(CURL_BINTRAY_AUTH) $(CURL_BINTRAY_PASSPHRASE) "https://api.bintray.com/content/$(BINTRAY_SUBJECT)/$(BINTRAY_APT_REPO)/$(BINTRAY_PACKAGE)/$(CRYSTAL_VERSION)/$(DEB_NAME32);deb_distribution=$(DEB_DISTROS);deb_component=main;deb_architecture=i386;$(PUBLISH_FLAGS)"
 
-$(OUTPUT_DIR)/$(DEB_NAME64): docker-fpm $(OUTPUT_DIR)/$(LINUX64_TARGZ)
+$(OUTPUT_UNSIGNED_DEB_NAME64): docker-fpm $(OUTPUT_LINUX64_TARGZ)
+	mkdir -p $(OUTPUT_UNSIGNED)
 	docker run --rm -v $(CURDIR)/build:/build crystal-fpm /bin/sh -c "\
     mkdir -p /tmp/crystal \
-    && tar -C /tmp/crystal -xf $(OUTPUT_DIR)/$(LINUX64_TARGZ) \
+    && tar -C /tmp/crystal -xf $(OUTPUT_LINUX64_TARGZ) \
     && mv /tmp/crystal/crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION)/share/licenses/crystal/LICENSE /tmp/crystal/crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION)/share/doc/crystal/copyright \
     && rm -Rf /tmp/crystal/crystal-*/share/licenses \
     && fpm --input-type dir --output-type deb \
@@ -120,15 +119,16 @@ $(OUTPUT_DIR)/$(DEB_NAME64): docker-fpm $(OUTPUT_DIR)/$(LINUX64_TARGZ)
            --depends gcc --depends pkg-config --depends libpcre3-dev --depends libevent-dev \
            --deb-recommends git --deb-recommends libssl-dev --deb-recommends libz-dev \
            --deb-suggests libxml2-dev --deb-suggests libgmp-dev --deb-suggests libyaml-dev --deb-suggests libreadline-dev \
-           --force --package $(OUTPUT_DIR)/$(DEB_NAME64) \
+           --force --package $(OUTPUT_UNSIGNED_DEB_NAME64) \
            --prefix /usr \
            --chdir /tmp/crystal/crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION) \
            $(FPM_FLAGS) bin lib share"
 
-$(OUTPUT_DIR)/$(DEB_NAME32): docker-fpm $(OUTPUT_DIR)/$(LINUX32_TARGZ)
+$(OUTPUT_UNSIGNED_DEB_NAME32): docker-fpm $(OUTPUT_LINUX32_TARGZ)
+	mkdir -p $(OUTPUT_UNSIGNED)
 	docker run --rm -v $(CURDIR)/build:/build crystal-fpm /bin/sh -c "\
     mkdir -p /tmp/crystal \
-    && tar -C /tmp/crystal -xf $(OUTPUT_DIR)/$(LINUX32_TARGZ) \
+    && tar -C /tmp/crystal -xf $(OUTPUT_LINUX32_TARGZ) \
     && mv /tmp/crystal/crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION)/share/licenses/crystal/LICENSE /tmp/crystal/crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION)/share/doc/crystal/copyright \
     && rm -Rf /tmp/crystal/crystal-*/share/licenses \
     && fpm --input-type dir --output-type deb \
@@ -136,22 +136,23 @@ $(OUTPUT_DIR)/$(DEB_NAME32): docker-fpm $(OUTPUT_DIR)/$(LINUX32_TARGZ)
            --depends gcc --depends pkg-config --depends libpcre3-dev --depends libevent-dev \
            --deb-recommends git --deb-recommends libssl-dev --deb-recommends libz-dev \
            --deb-suggests libxml2-dev --deb-suggests libgmp-dev --deb-suggests libyaml-dev --deb-suggests libreadline-dev \
-           --force --package $(OUTPUT_DIR)/$(DEB_NAME32) \
+           --force --package $(OUTPUT_UNSIGNED_DEB_NAME32) \
            --prefix /usr \
            --chdir /tmp/crystal/crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION) \
            $(FPM_FLAGS) bin lib share"
 
 define rpm_template # (distro,extra-fpm-flags)
 $(eval this_rpm_output_name = crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION).$(1).x86_64.rpm)
-$(eval this_rpm_output = $(OUTPUT_DIR)/$(this_rpm_output_name))
+$(eval this_rpm_output = $(OUTPUT_UNSIGNED)/$(this_rpm_output_name))
 
 $(eval ALL_RPM_OUTPUTS += $(this_rpm_output))
 $(eval ALL_RPM_PUBLISH += rpm_publish_$(1))
 
-$(this_rpm_output): docker-fpm $(OUTPUT_DIR)/$(LINUX64_TARGZ)
+$(this_rpm_output): docker-fpm $(OUTPUT_LINUX64_TARGZ)
+	mkdir -p $(OUTPUT_UNSIGNED)
 	docker run --rm -v $(CURDIR)/build:/build crystal-fpm /bin/sh -c "\
     mkdir -p /tmp/crystal \
-    && tar -C /tmp/crystal -xf $(OUTPUT_DIR)/$(LINUX64_TARGZ) \
+    && tar -C /tmp/crystal -xf $(OUTPUT_LINUX64_TARGZ) \
     && fpm --input-type dir --output-type rpm \
            --architecture x86_64 $(PACKAGE_BRANDING_ARGS) \
            --rpm-dist $(1) $(2) \
