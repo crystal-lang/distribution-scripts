@@ -18,13 +18,15 @@
 # Secrets configuration
 BINTRAY_USERNAME ?=
 BINTRAY_API_KEY ?=
-BINTRAY_SINGING_PASSPHRASE ?=
+BINTRAY_SINGING_PASSPHRASE ?= # Optional signing passphrase
 
 # Public configuration
-BINTRAY_ORG      ?= crystal
+BINTRAY_SUBJECT  ?= crystal
 BINTRAY_PACKAGE  ?= crystal
 BINTRAY_APT_REPO ?= apt
 BINTRAY_RPM_REPO ?= rpm
+BINTRAY_PACKAGE_VCS ?= https://github.com/crystal-lang/crystal.git
+BINTRAY_PACKAGE_WEBSITE ?= http://crystal-lang.org/
 
 # Package build configuration
 force ?=                   ## Force publish of existing file
@@ -74,7 +76,7 @@ ALL_RPM_PUBLISH =
 PUBLISH_FLAGS = publish=1$(if $(force),;override=1)
 
 CURL_BINTRAY_AUTH = -u$(BINTRAY_USERNAME):$(BINTRAY_API_KEY)
-CURL_BINTRAY_PASSPHRASE = -H "X-GPG-PASSPHRASE: $(BINTRAY_SINGING_PASSPHRASE)"
+CURL_BINTRAY_PASSPHRASE = $(if $(BINTRAY_SINGING_PASSPHRASE),-H "X-GPG-PASSPHRASE: $(BINTRAY_SINGING_PASSPHRASE)")
 
 .PHONY: all
 all: targz deb rpm
@@ -104,14 +106,8 @@ deb: $(OUTPUT_DIR)/$(DEB_NAME64) $(OUTPUT_DIR)/$(DEB_NAME32)
 
 .PHONY: deb_publish
 deb_publish:
-	curl -T $(OUTPUT_DIR)/$(DEB_NAME64) $(CURL_BINTRAY_AUTH) $(CURL_BINTRAY_PASSPHRASE) "https://api.bintray.com/content/$(BINTRAY_ORG)/$(BINTRAY_APT_REPO)/$(BINTRAY_PACKAGE)/$(CRYSTAL_VERSION)/$(DEB_NAME64);deb_distribution=$(DEB_DISTROS);deb_component=main;deb_architecture=amd64;$(PUBLISH_FLAGS)"
-	curl -T $(OUTPUT_DIR)/$(DEB_NAME32) $(CURL_BINTRAY_AUTH) $(CURL_BINTRAY_PASSPHRASE) "https://api.bintray.com/content/$(BINTRAY_ORG)/$(BINTRAY_APT_REPO)/$(BINTRAY_PACKAGE)/$(CRYSTAL_VERSION)/$(DEB_NAME32);deb_distribution=$(DEB_DISTROS);deb_component=main;deb_architecture=i386;$(PUBLISH_FLAGS)"
-
-# $ make set_version_date CRYSTAL_VERSION=0.33.0 CRYSTAL_VERSION_DATE=2020-02-14
-.PHONY: set_version_date
-set_version_date:
-	curl -v --data '{"released": "$(CRYSTAL_VERSION_DATE)T12:00:00.000Z"}' -H "Content-Type: application/json" -X PATCH $(CURL_BINTRAY_AUTH) "https://api.bintray.com/packages/$(BINTRAY_ORG)/$(BINTRAY_APT_REPO)/$(BINTRAY_PACKAGE)/versions/$(CRYSTAL_VERSION)"
-	curl -v --data '{"released": "$(CRYSTAL_VERSION_DATE)T12:00:00.000Z"}' -H "Content-Type: application/json" -X PATCH $(CURL_BINTRAY_AUTH) "https://api.bintray.com/packages/$(BINTRAY_ORG)/$(BINTRAY_RPM_REPO)/$(BINTRAY_PACKAGE)/versions/$(CRYSTAL_VERSION)"
+	curl -T $(OUTPUT_DIR)/$(DEB_NAME64) $(CURL_BINTRAY_AUTH) $(CURL_BINTRAY_PASSPHRASE) "https://api.bintray.com/content/$(BINTRAY_SUBJECT)/$(BINTRAY_APT_REPO)/$(BINTRAY_PACKAGE)/$(CRYSTAL_VERSION)/$(DEB_NAME64);deb_distribution=$(DEB_DISTROS);deb_component=main;deb_architecture=amd64;$(PUBLISH_FLAGS)"
+	curl -T $(OUTPUT_DIR)/$(DEB_NAME32) $(CURL_BINTRAY_AUTH) $(CURL_BINTRAY_PASSPHRASE) "https://api.bintray.com/content/$(BINTRAY_SUBJECT)/$(BINTRAY_APT_REPO)/$(BINTRAY_PACKAGE)/$(CRYSTAL_VERSION)/$(DEB_NAME32);deb_distribution=$(DEB_DISTROS);deb_component=main;deb_architecture=i386;$(PUBLISH_FLAGS)"
 
 $(OUTPUT_DIR)/$(DEB_NAME64): docker-fpm $(OUTPUT_DIR)/$(LINUX64_TARGZ)
 	docker run --rm -v $(CURDIR)/build:/build crystal-fpm /bin/sh -c "\
@@ -166,7 +162,7 @@ $(this_rpm_output): docker-fpm $(OUTPUT_DIR)/$(LINUX64_TARGZ)
 
 .PHONY: rpm_publish_$(1)
 rpm_publish_$(1):
-	curl -T $(this_rpm_output) $(CURL_BINTRAY_AUTH) $(CURL_BINTRAY_PASSPHRASE) "https://api.bintray.com/content/$(BINTRAY_ORG)/$(BINTRAY_RPM_REPO)/$(BINTRAY_PACKAGE)/$(CRYSTAL_VERSION)/$(1)/$(this_rpm_output_name);$(PUBLISH_FLAGS)"
+	curl -T $(this_rpm_output) $(CURL_BINTRAY_AUTH) $(CURL_BINTRAY_PASSPHRASE) "https://api.bintray.com/content/$(BINTRAY_SUBJECT)/$(BINTRAY_RPM_REPO)/$(BINTRAY_PACKAGE)/$(CRYSTAL_VERSION)/$(1)/$(this_rpm_output_name);$(PUBLISH_FLAGS)"
 endef
 
 $(eval $(call rpm_template,el6,--depends gcc --depends pkgconfig --depends pcre-devel --depends libevent2-devel))
@@ -177,3 +173,21 @@ rpm: $(ALL_RPM_OUTPUTS)
 
 .PHONY: rpm_publish
 rpm_publish: $(ALL_RPM_PUBLISH)
+
+# Other Bintray API
+
+.PHONY: create_bintray_apt_repo
+create_bintray_apt_repo:
+	curl --data '{"type":"debian","gpg_sign_metadata":true,"gpg_sign_files":false,"gpg_use_owner_key":false}' -H "Content-Type: application/json" -X POST $(CURL_BINTRAY_AUTH) "https://api.bintray.com/repos/$(BINTRAY_SUBJECT)/$(BINTRAY_APT_REPO)"
+	curl --data '{"name":"$(BINTRAY_PACKAGE)","licenses": ["Apache-2.0"],"vcs_url":"$(BINTRAY_PACKAGE_VCS)","website_url":"$(BINTRAY_PACKAGE_WEBSITE)"}' -H "Content-Type: application/json" -X POST $(CURL_BINTRAY_AUTH) "https://api.bintray.com/packages/$(BINTRAY_SUBJECT)/$(BINTRAY_APT_REPO)"
+
+.PHONY: create_bintray_rpm_repo
+create_bintray_rpm_repo:
+	curl --data '{"type":"rpm","yum_metadata_depth":1,"gpg_sign_metadata":true,"gpg_sign_files":false,"gpg_use_owner_key":false}' -H "Content-Type: application/json" -X POST $(CURL_BINTRAY_AUTH) "https://api.bintray.com/repos/$(BINTRAY_SUBJECT)/$(BINTRAY_RPM_REPO)"
+	curl --data '{"name":"$(BINTRAY_PACKAGE)","licenses": ["Apache-2.0"],"vcs_url":"$(BINTRAY_PACKAGE_VCS)","website_url":"$(BINTRAY_PACKAGE_WEBSITE)"}' -H "Content-Type: application/json" -X POST $(CURL_BINTRAY_AUTH) "https://api.bintray.com/packages/$(BINTRAY_SUBJECT)/$(BINTRAY_RPM_REPO)"
+
+# $ make set_version_date CRYSTAL_VERSION=0.33.0 CRYSTAL_VERSION_DATE=2020-02-14
+.PHONY: set_version_date
+set_version_date:
+	curl -v --data '{"released": "$(CRYSTAL_VERSION_DATE)T12:00:00.000Z"}' -H "Content-Type: application/json" -X PATCH $(CURL_BINTRAY_AUTH) "https://api.bintray.com/packages/$(BINTRAY_SUBJECT)/$(BINTRAY_APT_REPO)/$(BINTRAY_PACKAGE)/versions/$(CRYSTAL_VERSION)"
+	curl -v --data '{"released": "$(CRYSTAL_VERSION_DATE)T12:00:00.000Z"}' -H "Content-Type: application/json" -X PATCH $(CURL_BINTRAY_AUTH) "https://api.bintray.com/packages/$(BINTRAY_SUBJECT)/$(BINTRAY_RPM_REPO)/$(BINTRAY_PACKAGE)/versions/$(CRYSTAL_VERSION)"
