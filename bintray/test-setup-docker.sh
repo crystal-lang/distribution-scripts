@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-docker run --rm -it -v $(pwd)/setup.sh:/setup.sh $1
+docker run --rm -it -v $(pwd)/scripts:/scripts $1
 
 # $ ./test-setup-docker.sh debian:8 # jessie
 # $ ./test-setup-docker.sh i386/debian:8 # jessie
@@ -13,5 +13,5 @@ docker run --rm -it -v $(pwd)/setup.sh:/setup.sh $1
 # $ ./test-setup-docker.sh ubuntu:bionic
 # $ ./test-setup-docker.sh ubuntu:eoan
 #
-#   # apt-get update && apt-get install -y gnupg ca-certificates apt-transport-https
-#   # /setup.sh
+#   # apt-get update && apt-get install -y curl gnupg ca-certificates apt-transport-https
+#   # /scripts/apt/setup.sh
