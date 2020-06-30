@@ -14,6 +14,7 @@ BINTRAY_PACKAGE_VCS ?= https://github.com/crystal-lang/crystal.git
 BINTRAY_PACKAGE_WEBSITE ?= http://crystal-lang.org/
 
 # Package build configuration
+sign ?= true               ## Sign the .deb and .rpm files using ./sign.sh
 force ?=                   ## Force publish of existing file
 CRYSTAL_LINUX64_TARGZ   ?= ## url or path to crystal-{version}-{package}-linux-x86_64.tar.gz
 CRYSTAL_LINUX32_TARGZ   ?= ## url or path to crystal-{version}-{package}-linux-i686.tar.gz
@@ -25,12 +26,15 @@ PACKAGE_MAINTAINER ?= Crystal Team <crystal@manas.tech>
 
 OUTPUT_TARGZ = $(OUTPUT_DIR)/targz
 OUTPUT_UNSIGNED = $(OUTPUT_DIR)/unsigned
+OUTPUT_SIGNED = $(OUTPUT_DIR)/signed
 OUTPUT_LINUX64_TARGZ = $(OUTPUT_TARGZ)/crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION)-linux-x86_64.tar.gz
 OUTPUT_LINUX32_TARGZ = $(OUTPUT_TARGZ)/crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION)-linux-i686.tar.gz
 DEB_NAME64 = crystal_$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION)_amd64.deb
 DEB_NAME32 = crystal_$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION)_i386.deb
 OUTPUT_UNSIGNED_DEB_NAME64 = $(OUTPUT_UNSIGNED)/$(DEB_NAME64)
 OUTPUT_UNSIGNED_DEB_NAME32 = $(OUTPUT_UNSIGNED)/$(DEB_NAME32)
+OUTPUT_SIGNED_DEB_NAME64 = $(OUTPUT_SIGNED)/$(DEB_NAME64)
+OUTPUT_SIGNED_DEB_NAME32 = $(OUTPUT_SIGNED)/$(DEB_NAME32)
 
 DEB_DISTROS = jessie,stretch,buster,trusty,xenial,bionic,eoan
 PUBLISH_FLAGS = publish=1$(if $(force),;override=1)
@@ -90,6 +94,13 @@ define download_or_copy
 	fi
 endef
 
+define create_signed # (rpm|deb, path/to/unsigned.[rpm|deb])
+    if [[ "$(strip $(sign))" == "true" ]]; \
+    then ./sign.sh sign-"$(1)" $(2); \
+    else ./sign.sh skip-sign $(2); \
+    fi
+endef
+
 .PHONY: targz
 targz: $(OUTPUT_LINUX64_TARGZ) $(OUTPUT_LINUX32_TARGZ)
 
@@ -99,13 +110,19 @@ $(OUTPUT_LINUX64_TARGZ):
 $(OUTPUT_LINUX32_TARGZ):
 	$(call download_or_copy,$(CRYSTAL_LINUX32_TARGZ),$(OUTPUT_LINUX32_TARGZ))
 
+$(OUTPUT_SIGNED_DEB_NAME64): $(OUTPUT_UNSIGNED_DEB_NAME64)
+	$(call create_signed,deb,$(OUTPUT_UNSIGNED_DEB_NAME64))
+
+$(OUTPUT_SIGNED_DEB_NAME32): $(OUTPUT_UNSIGNED_DEB_NAME32)
+	$(call create_signed,deb,$(OUTPUT_UNSIGNED_DEB_NAME32))
+
 .PHONY: deb
-deb: $(OUTPUT_UNSIGNED_DEB_NAME64) $(OUTPUT_UNSIGNED_DEB_NAME32)
+deb: $(OUTPUT_SIGNED_DEB_NAME64) $(OUTPUT_SIGNED_DEB_NAME32)
 
 .PHONY: deb_publish
 deb_publish:
-	curl -T $(OUTPUT_UNSIGNED_DEB_NAME64) $(CURL_BINTRAY_AUTH) $(CURL_BINTRAY_PASSPHRASE) "https://api.bintray.com/content/$(BINTRAY_SUBJECT)/$(BINTRAY_APT_REPO)/$(BINTRAY_PACKAGE)/$(CRYSTAL_VERSION)/$(DEB_NAME64);deb_distribution=$(DEB_DISTROS);deb_component=main;deb_architecture=amd64;$(PUBLISH_FLAGS)"
-	curl -T $(OUTPUT_UNSIGNED_DEB_NAME32) $(CURL_BINTRAY_AUTH) $(CURL_BINTRAY_PASSPHRASE) "https://api.bintray.com/content/$(BINTRAY_SUBJECT)/$(BINTRAY_APT_REPO)/$(BINTRAY_PACKAGE)/$(CRYSTAL_VERSION)/$(DEB_NAME32);deb_distribution=$(DEB_DISTROS);deb_component=main;deb_architecture=i386;$(PUBLISH_FLAGS)"
+	curl -T $(OUTPUT_SIGNED_DEB_NAME64) $(CURL_BINTRAY_AUTH) $(CURL_BINTRAY_PASSPHRASE) "https://api.bintray.com/content/$(BINTRAY_SUBJECT)/$(BINTRAY_APT_REPO)/$(BINTRAY_PACKAGE)/$(CRYSTAL_VERSION)/$(DEB_NAME64);deb_distribution=$(DEB_DISTROS);deb_component=main;deb_architecture=amd64;$(PUBLISH_FLAGS)"
+	curl -T $(OUTPUT_SIGNED_DEB_NAME32) $(CURL_BINTRAY_AUTH) $(CURL_BINTRAY_PASSPHRASE) "https://api.bintray.com/content/$(BINTRAY_SUBJECT)/$(BINTRAY_APT_REPO)/$(BINTRAY_PACKAGE)/$(CRYSTAL_VERSION)/$(DEB_NAME32);deb_distribution=$(DEB_DISTROS);deb_component=main;deb_architecture=i386;$(PUBLISH_FLAGS)"
 
 $(OUTPUT_UNSIGNED_DEB_NAME64): docker-fpm $(OUTPUT_LINUX64_TARGZ)
 	mkdir -p $(OUTPUT_UNSIGNED)
@@ -143,12 +160,13 @@ $(OUTPUT_UNSIGNED_DEB_NAME32): docker-fpm $(OUTPUT_LINUX32_TARGZ)
 
 define rpm_template # (distro,extra-fpm-flags)
 $(eval this_rpm_output_name = crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION).$(1).x86_64.rpm)
-$(eval this_rpm_output = $(OUTPUT_UNSIGNED)/$(this_rpm_output_name))
+$(eval this_unsigned_rpm_output = $(OUTPUT_UNSIGNED)/$(this_rpm_output_name))
+$(eval this_signed_rpm_output = $(OUTPUT_SIGNED)/$(this_rpm_output_name))
 
-$(eval ALL_RPM_OUTPUTS += $(this_rpm_output))
+$(eval ALL_RPM_OUTPUTS += $(this_signed_rpm_output))
 $(eval ALL_RPM_PUBLISH += rpm_publish_$(1))
 
-$(this_rpm_output): docker-fpm $(OUTPUT_LINUX64_TARGZ)
+$(this_unsigned_rpm_output): docker-fpm $(OUTPUT_LINUX64_TARGZ)
 	mkdir -p $(OUTPUT_UNSIGNED)
 	docker run --rm -v $(CURDIR)/build:/build crystal-fpm /bin/sh -c "\
     mkdir -p /tmp/crystal \
@@ -156,14 +174,17 @@ $(this_rpm_output): docker-fpm $(OUTPUT_LINUX64_TARGZ)
     && fpm --input-type dir --output-type rpm \
            --architecture x86_64 $(PACKAGE_BRANDING_ARGS) \
            --rpm-dist $(1) $(2) \
-           --force --package $(this_rpm_output) \
+           --force --package $(this_unsigned_rpm_output) \
            --prefix /usr \
            --chdir /tmp/crystal/crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION) \
            $(FPM_FLAGS) bin lib share"
 
+$(this_signed_rpm_output): $(this_unsigned_rpm_output)
+	$(call create_signed,rpm,$(this_unsigned_rpm_output))
+
 .PHONY: rpm_publish_$(1)
 rpm_publish_$(1):
-	curl -T $(this_rpm_output) $(CURL_BINTRAY_AUTH) $(CURL_BINTRAY_PASSPHRASE) "https://api.bintray.com/content/$(BINTRAY_SUBJECT)/$(BINTRAY_RPM_REPO)/$(BINTRAY_PACKAGE)/$(CRYSTAL_VERSION)/$(1)/$(this_rpm_output_name);$(PUBLISH_FLAGS)"
+	curl -T $(this_signed_rpm_output) $(CURL_BINTRAY_AUTH) $(CURL_BINTRAY_PASSPHRASE) "https://api.bintray.com/content/$(BINTRAY_SUBJECT)/$(BINTRAY_RPM_REPO)/$(BINTRAY_PACKAGE)/$(CRYSTAL_VERSION)/$(1)/$(this_rpm_output_name);$(PUBLISH_FLAGS)"
 endef
 
 $(eval $(call rpm_template,el6,--depends gcc --depends pkgconfig --depends pcre-devel --depends libevent2-devel))

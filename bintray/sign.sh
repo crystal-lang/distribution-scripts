@@ -4,7 +4,7 @@ set -e
 # # Environment
 #
 # - `$CRYSTAL_SIGNING_KEY` Path to the private signing key file
-# - `$CRYSTAL_SIGNING_PASSPHRASE` signing key passphrase
+# - `$CRYSTAL_SIGNING_PASSPHRASE_FILE` Path to signing key passphrase
 #
 # # Steps
 #
@@ -71,4 +71,13 @@ case $1 in
     centos "rpm --checksig /build/signed/$(basename $2)"
     ;;
 
+  skip-sign)
+    mkdir -p build/signed
+    cp $2 build/signed/$(basename $2)
+    ;;
+
+  *)
+    echo "Invalid option"
+    exit 1
+    ;;
 esac
