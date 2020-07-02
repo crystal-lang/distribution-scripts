@@ -117,11 +117,23 @@ $(OUTPUT_SIGNED_DEB_NAME32): $(OUTPUT_UNSIGNED_DEB_NAME32)
 	$(call create_signed,deb,$(OUTPUT_UNSIGNED_DEB_NAME32))
 
 .PHONY: deb
-deb: $(OUTPUT_SIGNED_DEB_NAME64) $(OUTPUT_SIGNED_DEB_NAME32)
+deb: deb64 deb32
+
+.PHONY: deb64
+deb64: $(OUTPUT_SIGNED_DEB_NAME64)
+
+.PHONY: deb32
+deb32: $(OUTPUT_SIGNED_DEB_NAME32)
 
 .PHONY: deb_publish
-deb_publish:
+deb_publish: deb64_publish deb32_publish
+
+.PHONY: deb64_publish
+deb64_publish:
 	curl -T $(OUTPUT_SIGNED_DEB_NAME64) $(CURL_BINTRAY_AUTH) $(CURL_BINTRAY_PASSPHRASE) "https://api.bintray.com/content/$(BINTRAY_SUBJECT)/$(BINTRAY_APT_REPO)/$(BINTRAY_PACKAGE)/$(CRYSTAL_VERSION)/$(DEB_NAME64);deb_distribution=$(DEB_DISTROS);deb_component=main;deb_architecture=amd64;$(PUBLISH_FLAGS)"
+
+.PHONY: deb32_publish
+deb32_publish:
 	curl -T $(OUTPUT_SIGNED_DEB_NAME32) $(CURL_BINTRAY_AUTH) $(CURL_BINTRAY_PASSPHRASE) "https://api.bintray.com/content/$(BINTRAY_SUBJECT)/$(BINTRAY_APT_REPO)/$(BINTRAY_PACKAGE)/$(CRYSTAL_VERSION)/$(DEB_NAME32);deb_distribution=$(DEB_DISTROS);deb_component=main;deb_architecture=i386;$(PUBLISH_FLAGS)"
 
 $(OUTPUT_UNSIGNED_DEB_NAME64): docker-fpm $(OUTPUT_LINUX64_TARGZ)
@@ -132,7 +144,7 @@ $(OUTPUT_UNSIGNED_DEB_NAME64): docker-fpm $(OUTPUT_LINUX64_TARGZ)
     && mv /tmp/crystal/crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION)/share/licenses/crystal/LICENSE /tmp/crystal/crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION)/share/doc/crystal/copyright \
     && rm -Rf /tmp/crystal/crystal-*/share/licenses \
     && fpm --input-type dir --output-type deb \
-           --architecture x86_64 $(PACKAGE_BRANDING_ARGS) \
+           --architecture x86_64 \
            --depends gcc --depends pkg-config --depends libpcre3-dev --depends libevent-dev \
            --deb-recommends git --deb-recommends libssl-dev --deb-recommends libz-dev \
            --deb-suggests libxml2-dev --deb-suggests libgmp-dev --deb-suggests libyaml-dev --deb-suggests libreadline-dev \
@@ -149,7 +161,7 @@ $(OUTPUT_UNSIGNED_DEB_NAME32): docker-fpm $(OUTPUT_LINUX32_TARGZ)
     && mv /tmp/crystal/crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION)/share/licenses/crystal/LICENSE /tmp/crystal/crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION)/share/doc/crystal/copyright \
     && rm -Rf /tmp/crystal/crystal-*/share/licenses \
     && fpm --input-type dir --output-type deb \
-           --architecture i386 $(PACKAGE_BRANDING_ARGS) \
+           --architecture i386 \
            --depends gcc --depends pkg-config --depends libpcre3-dev --depends libevent-dev \
            --deb-recommends git --deb-recommends libssl-dev --deb-recommends libz-dev \
            --deb-suggests libxml2-dev --deb-suggests libgmp-dev --deb-suggests libyaml-dev --deb-suggests libreadline-dev \
@@ -172,7 +184,7 @@ $(this_unsigned_rpm_output): docker-fpm $(OUTPUT_LINUX64_TARGZ)
     mkdir -p /tmp/crystal \
     && tar -C /tmp/crystal -xf $(OUTPUT_LINUX64_TARGZ) \
     && fpm --input-type dir --output-type rpm \
-           --architecture x86_64 $(PACKAGE_BRANDING_ARGS) \
+           --architecture x86_64 \
            --rpm-dist $(1) $(2) \
            --force --package $(this_unsigned_rpm_output) \
            --prefix /usr \
