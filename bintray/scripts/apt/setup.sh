@@ -4,7 +4,7 @@
 #
 # ./setup.sh [--crystal=<crystal-version>] [--distro=<distro-version-name>]
 #
-# - crystal-version: latest, 0.34.0, 0.33.0, etc. If package iteration iteration is not present -1 will be used.
+# - crystal-version: latest, 0.35, 0.34.0, 0.33.0, etc.
 # - distro-version-name: jessie, stretch, buster, trusty, xenial, bionic, eoan
 #
 # Requirements:
@@ -29,10 +29,6 @@ do
 case $i in
     --crystal=*)
     CRYSTAL_VERSION="${i#*=}"
-    if [[ $CRYSTAL_VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-      # If package iteration iteration is not present -1 will be used.
-      CRYSTAL_VERSION="$CRYSTAL_VERSION-1"
-    fi
     shift
     ;;
     --distro=*)
@@ -76,6 +72,7 @@ case "$CRYSTAL_VERSION" in
     apt-get install -y crystal
     ;;
   * )
-    apt-get install -y crystal=$CRYSTAL_VERSION
+    # Appending * allows --crystal=x.y and resolution of package-iteration https://askubuntu.com/a/824926/1101493
+    apt-get install -y crystal="$CRYSTAL_VERSION*"
     ;;
 esac

@@ -1,6 +1,6 @@
 #!/bin/sh
 
-set -eux
+set -euxo
 
 # Requirements
 export DEBIAN_FRONTEND=noninteractive
@@ -31,6 +31,11 @@ crystal eval 'puts "Hello World!"'
 
 apt -y remove crystal
 ../scripts/apt/setup.sh --crystal=0.34.0
+crystal --version
+shards --version
+crystal eval 'puts "Hello World!"'
+
+../scripts/apt/setup.sh --crystal=0.35
 crystal --version
 shards --version
 crystal eval 'puts "Hello World!"'
