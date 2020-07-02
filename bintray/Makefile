@@ -140,9 +140,9 @@ $(OUTPUT_UNSIGNED_DEB_NAME64): docker-fpm $(OUTPUT_LINUX64_TARGZ)
 	mkdir -p $(OUTPUT_UNSIGNED)
 	docker run --rm -v $(CURDIR)/build:/build crystal-fpm /bin/sh -c "\
     mkdir -p /tmp/crystal \
-    && tar -C /tmp/crystal -xf $(OUTPUT_LINUX64_TARGZ) \
-    && mv /tmp/crystal/crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION)/share/licenses/crystal/LICENSE /tmp/crystal/crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION)/share/doc/crystal/copyright \
-    && rm -Rf /tmp/crystal/crystal-*/share/licenses \
+    && tar -C /tmp/crystal --strip-components 1 -xf $(OUTPUT_LINUX64_TARGZ) \
+    && mv /tmp/crystal/share/licenses/crystal/LICENSE /tmp/crystal/share/doc/crystal/copyright \
+    && rm -Rf /tmp/crystal/share/licenses \
     && fpm --input-type dir --output-type deb \
            --architecture x86_64 \
            --depends gcc --depends pkg-config --depends libpcre3-dev --depends libevent-dev \
@@ -150,16 +150,16 @@ $(OUTPUT_UNSIGNED_DEB_NAME64): docker-fpm $(OUTPUT_LINUX64_TARGZ)
            --deb-suggests libxml2-dev --deb-suggests libgmp-dev --deb-suggests libyaml-dev --deb-suggests libreadline-dev \
            --force --package $(OUTPUT_UNSIGNED_DEB_NAME64) \
            --prefix /usr \
-           --chdir /tmp/crystal/crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION) \
+           --chdir /tmp/crystal \
            $(FPM_FLAGS) bin lib share"
 
 $(OUTPUT_UNSIGNED_DEB_NAME32): docker-fpm $(OUTPUT_LINUX32_TARGZ)
 	mkdir -p $(OUTPUT_UNSIGNED)
 	docker run --rm -v $(CURDIR)/build:/build crystal-fpm /bin/sh -c "\
     mkdir -p /tmp/crystal \
-    && tar -C /tmp/crystal -xf $(OUTPUT_LINUX32_TARGZ) \
-    && mv /tmp/crystal/crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION)/share/licenses/crystal/LICENSE /tmp/crystal/crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION)/share/doc/crystal/copyright \
-    && rm -Rf /tmp/crystal/crystal-*/share/licenses \
+    && tar -C /tmp/crystal --strip-components 1 -xf $(OUTPUT_LINUX32_TARGZ) \
+    && mv /tmp/crystal/share/licenses/crystal/LICENSE /tmp/crystal/share/doc/crystal/copyright \
+    && rm -Rf /tmp/crystal/share/licenses \
     && fpm --input-type dir --output-type deb \
            --architecture i386 \
            --depends gcc --depends pkg-config --depends libpcre3-dev --depends libevent-dev \
@@ -167,7 +167,7 @@ $(OUTPUT_UNSIGNED_DEB_NAME32): docker-fpm $(OUTPUT_LINUX32_TARGZ)
            --deb-suggests libxml2-dev --deb-suggests libgmp-dev --deb-suggests libyaml-dev --deb-suggests libreadline-dev \
            --force --package $(OUTPUT_UNSIGNED_DEB_NAME32) \
            --prefix /usr \
-           --chdir /tmp/crystal/crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION) \
+           --chdir /tmp/crystal \
            $(FPM_FLAGS) bin lib share"
 
 define rpm_template # (distro,extra-fpm-flags)
@@ -182,13 +182,13 @@ $(this_unsigned_rpm_output): docker-fpm $(OUTPUT_LINUX64_TARGZ)
 	mkdir -p $(OUTPUT_UNSIGNED)
 	docker run --rm -v $(CURDIR)/build:/build crystal-fpm /bin/sh -c "\
     mkdir -p /tmp/crystal \
-    && tar -C /tmp/crystal -xf $(OUTPUT_LINUX64_TARGZ) \
+    && tar -C /tmp/crystal --strip-components 1 -xf $(OUTPUT_LINUX64_TARGZ) \
     && fpm --input-type dir --output-type rpm \
            --architecture x86_64 \
            --rpm-dist $(1) $(2) \
            --force --package $(this_unsigned_rpm_output) \
            --prefix /usr \
-           --chdir /tmp/crystal/crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION) \
+           --chdir /tmp/crystal \
            $(FPM_FLAGS) bin lib share"
 
 $(this_signed_rpm_output): $(this_unsigned_rpm_output)
