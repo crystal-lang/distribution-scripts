@@ -2,10 +2,11 @@
 
 # Usage:
 #
-# ./setup.sh [--crystal=<crystal-version>] [--distro=<distro-version-name>]
+# ./setup.sh [--crystal=<crystal-version>] [--channel=stable|unstable] [--distro=<distro-version-name>]
 #
-# - crystal-version: latest, 0.35, 0.34.0, 0.33.0, etc.
-# - distro-version-name: jessie, stretch, buster, trusty, xenial, bionic, eoan
+# - crystal-version: latest, 0.35, 0.34.0, 0.33.0, etc. (Default: latest)
+# - distro-version-name: jessie, stretch, buster, trusty, xenial, bionic, eoan. (Default: detect using lsb-release)
+# - channel: stable, unstable. (Default: stable)
 #
 # Requirements:
 #
@@ -23,6 +24,7 @@ fi
 
 CRYSTAL_VERSION="latest"
 DISTRO_VERSION_NAME="__detect__"
+CHANNEL="stable"
 
 for i in "$@"
 do
@@ -33,6 +35,10 @@ case $i in
     ;;
     --distro=*)
     DISTRO_VERSION_NAME="${i#*=}"
+    shift
+    ;;
+    --channel=*)
+    CHANNEL="${i#*=}"
     shift
     ;;
     *)
@@ -54,7 +60,19 @@ case $DISTRO_VERSION_NAME in
     ;;
 esac
 
-CRYSTAL_REPO="deb https://dl.bintray.com/crystal/apt $DISTRO_VERSION_NAME main"
+case $CHANNEL in
+  stable)
+    CRYSTAL_REPO="deb https://dl.bintray.com/crystal/apt $DISTRO_VERSION_NAME main"
+    ;;
+  unstable)
+    CRYSTAL_REPO="deb https://dl.bintray.com/crystal/apt-unstable $DISTRO_VERSION_NAME main"
+    ;;
+  *)
+    echo "ERROR: $CHANNEL channel is not supported"
+    exit 1
+    ;;
+esac
+
 
 # Add repo metadata signign key (shared bintray signing key)
 apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 379CE192D401AB61
