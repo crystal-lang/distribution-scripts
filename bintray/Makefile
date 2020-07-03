@@ -79,6 +79,7 @@ docker-fpm: Dockerfile-fpm
 
 ALL_RPM_OUTPUTS =
 ALL_RPM_PUBLISH =
+ALL_RPM_CALC_METADATA =
 
 .PHONY: all
 all: targz deb rpm
@@ -170,13 +171,14 @@ $(OUTPUT_UNSIGNED_DEB_NAME32): docker-fpm $(OUTPUT_LINUX32_TARGZ)
            --chdir /tmp/crystal \
            $(FPM_FLAGS) bin lib share"
 
-define rpm_template # (distro,extra-fpm-flags)
-$(eval this_rpm_output_name = crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION).$(1).x86_64.rpm)
+define rpm_template # (distro,arch,extra-fpm-flags)
+$(eval this_rpm_output_name = crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION).$(1).$(2).rpm)
 $(eval this_unsigned_rpm_output = $(OUTPUT_UNSIGNED)/$(this_rpm_output_name))
 $(eval this_signed_rpm_output = $(OUTPUT_SIGNED)/$(this_rpm_output_name))
 
 $(eval ALL_RPM_OUTPUTS += $(this_signed_rpm_output))
-$(eval ALL_RPM_PUBLISH += rpm_publish_$(1))
+$(eval ALL_RPM_PUBLISH += rpm_publish_$(1)_$(2))
+$(eval ALL_RPM_CALC_METADATA += rpm_calc_metadata_$(1)_$(2))
 
 $(this_unsigned_rpm_output): docker-fpm $(OUTPUT_LINUX64_TARGZ)
 	mkdir -p $(OUTPUT_UNSIGNED)
@@ -184,8 +186,8 @@ $(this_unsigned_rpm_output): docker-fpm $(OUTPUT_LINUX64_TARGZ)
     mkdir -p /tmp/crystal \
     && tar -C /tmp/crystal --strip-components 1 -xf $(OUTPUT_LINUX64_TARGZ) \
     && fpm --input-type dir --output-type rpm \
-           --architecture x86_64 \
-           --rpm-dist $(1) $(2) \
+           --architecture $(2) \
+           $(3) \
            --force --package $(this_unsigned_rpm_output) \
            --prefix /usr \
            --chdir /tmp/crystal \
@@ -194,19 +196,29 @@ $(this_unsigned_rpm_output): docker-fpm $(OUTPUT_LINUX64_TARGZ)
 $(this_signed_rpm_output): $(this_unsigned_rpm_output)
 	$(call create_signed,rpm,$(this_unsigned_rpm_output))
 
-.PHONY: rpm_publish_$(1)
-rpm_publish_$(1):
-	curl -T $(this_signed_rpm_output) $(CURL_BINTRAY_AUTH) $(CURL_BINTRAY_PASSPHRASE) "https://api.bintray.com/content/$(BINTRAY_SUBJECT)/$(BINTRAY_RPM_REPO)/$(BINTRAY_PACKAGE)/$(CRYSTAL_VERSION)/$(1)/$(this_rpm_output_name);$(PUBLISH_FLAGS)"
+.PHONY: rpm_publish_$(1)_$(2)
+rpm_publish_$(1)_$(2):
+	curl -T $(this_signed_rpm_output) $(CURL_BINTRAY_AUTH) $(CURL_BINTRAY_PASSPHRASE) "https://api.bintray.com/content/$(BINTRAY_SUBJECT)/$(BINTRAY_RPM_REPO)/$(BINTRAY_PACKAGE)/$(CRYSTAL_VERSION)/$(1)/$(2)/$(this_rpm_output_name);$(PUBLISH_FLAGS)"
+
+.PHONY: rpm_calc_metadata_$(1)_$(2)
+rpm_calc_metadata_$(1)_$(2):
+	curl -X POST -u $(CURL_BINTRAY_AUTH) "https://api.bintray.com/calc_metadata/crystal/rpm/$(1)/$(2)"
 endef
 
-$(eval $(call rpm_template,el6,--depends gcc --depends pkgconfig --depends pcre-devel --depends libevent2-devel))
-$(eval $(call rpm_template,fc30,--depends gcc --depends pkgconfig --depends pcre-devel --depends libevent-devel))
+# It would be great to use --depends 'libevent-devel >= 2.0 or libevent2-devel', but
+# * CentOS 6/7 have rpm <= 4.13 which does not support expressions https://rpm.org/user_doc/boolean_dependencies.html
+# * CentOS 7/8 does not have libevent2-devel. Only CentOS 6 uses libevent2-devel.
+$(eval $(call rpm_template,el6,x86_64,--depends gcc --depends pkgconfig --depends pcre-devel --depends libevent2-devel))
+$(eval $(call rpm_template,all,x86_64,--depends gcc --depends pkgconfig --depends pcre-devel --depends libevent-devel))
 
 .PHONY: rpm
 rpm: $(ALL_RPM_OUTPUTS)
 
 .PHONY: rpm_publish
 rpm_publish: $(ALL_RPM_PUBLISH)
+
+.PHONY: rpm_calc_metadata
+rpm_calc_metadata: $(ALL_RPM_CALC_METADATA)
 
 # Other Bintray API
 
@@ -217,7 +229,7 @@ create_bintray_apt_repo:
 
 .PHONY: create_bintray_rpm_repo
 create_bintray_rpm_repo:
-	curl --data '{"type":"rpm","yum_metadata_depth":1,"gpg_sign_metadata":true,"gpg_sign_files":false,"gpg_use_owner_key":false}' -H "Content-Type: application/json" -X POST $(CURL_BINTRAY_AUTH) "https://api.bintray.com/repos/$(BINTRAY_SUBJECT)/$(BINTRAY_RPM_REPO)"
+	curl --data '{"type":"rpm","yum_metadata_depth":2,"gpg_sign_metadata":true,"gpg_sign_files":false,"gpg_use_owner_key":false}' -H "Content-Type: application/json" -X POST $(CURL_BINTRAY_AUTH) "https://api.bintray.com/repos/$(BINTRAY_SUBJECT)/$(BINTRAY_RPM_REPO)"
 	curl --data '{"name":"$(BINTRAY_PACKAGE)","licenses": ["Apache-2.0"],"vcs_url":"$(BINTRAY_PACKAGE_VCS)","website_url":"$(BINTRAY_PACKAGE_WEBSITE)"}' -H "Content-Type: application/json" -X POST $(CURL_BINTRAY_AUTH) "https://api.bintray.com/packages/$(BINTRAY_SUBJECT)/$(BINTRAY_RPM_REPO)"
 
 # $ make set_version_date CRYSTAL_VERSION=0.33.0 CRYSTAL_VERSION_DATE=2020-02-14

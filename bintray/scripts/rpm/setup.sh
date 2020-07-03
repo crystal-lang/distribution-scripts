@@ -1,17 +1,5 @@
 #!/usr/bin/env bash
 
-# Usage:
-#
-# ./setup.sh [crystal-version] [distro]
-#
-# crystal-version: latest, 0.34.0, 0.33.0, etc.
-# distro: el6, fc30
-#
-# Requirements
-#
-# * Run as root
-#
-
 set -eu
 
 if [[ $EUID -ne 0 ]]; then
@@ -21,6 +9,8 @@ fi
 
 CRYSTAL_VERSION="latest"
 CHANNEL="stable"
+DISTRO="all"
+[[ $(rpm -E %{rhel}) == "6" ]] && DISTRO="el6"
 
 for i in "$@"
 do
@@ -42,7 +32,7 @@ done
 cat > /etc/yum.repos.d/crystal.repo <<END
 [crystal]
 name=Crystal
-baseurl=https://dl.bintray.com/crystal/rpm/el6
+baseurl=https://dl.bintray.com/crystal/rpm/$DISTRO/x86_64
 gpgcheck=0
 repo_gpgcheck=1
 gpgkey=http://bintray.com/user/downloadSubjectPublicKey?username=bintray
