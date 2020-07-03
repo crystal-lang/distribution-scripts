@@ -8,7 +8,7 @@ The following environment variables need to be defined
 - `CRYSTAL_SIGNING_KEY` Path to the private signing key file
 - `CRYSTAL_SIGNING_PASSPHRASE_FILE` Path to  signing key passphrase
 
-On Bintray the apt and rpm packages are defined with automatic metadata signing by bintray.
+On Bintray the deb and rpm repositories are defined with automatic metadata signing by bintray.
 The .deb and .rpm files are uploaded already signed.
 
 ## To create the Bintray repositories

@@ -32,7 +32,7 @@ done
 cat > /etc/yum.repos.d/crystal.repo <<END
 [crystal]
 name=Crystal
-baseurl=https://dl.bintray.com/crystal/rpm/$DISTRO/x86_64
+baseurl=https://dl.bintray.com/crystal/rpm/$DISTRO/x86_64/$CHANNEL
 gpgcheck=0
 repo_gpgcheck=1
 gpgkey=http://bintray.com/user/downloadSubjectPublicKey?username=bintray

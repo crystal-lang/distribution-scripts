@@ -2,17 +2,16 @@
 
 # Usage:
 #
-# ./setup.sh [--crystal=<crystal-version>] [--channel=stable|unstable] [--distro=<distro-version-name>]
+# ./setup.sh [--crystal=<crystal-version>] [--channel=stable|unstable|nightly]
 #
 # - crystal-version: latest, 0.35, 0.34.0, 0.33.0, etc. (Default: latest)
-# - distro-version-name: jessie, stretch, buster, trusty, xenial, bionic, eoan. (Default: detect using lsb-release)
-# - channel: stable, unstable. (Default: stable)
+# - channel: stable, unstable, nightly. (Default: stable)
 #
 # Requirements:
 #
 # - Run as root
 # - The following packages need to be installed already:
-#   - curl lsb-release gnupg ca-certificates apt-transport-https
+#   - curl gnupg ca-certificates apt-transport-https
 #
 
 set -eu
@@ -23,7 +22,6 @@ if [[ $EUID -ne 0 ]]; then
 fi
 
 CRYSTAL_VERSION="latest"
-DISTRO_VERSION_NAME="__detect__"
 CHANNEL="stable"
 
 for i in "$@"
@@ -31,10 +29,6 @@ do
 case $i in
     --crystal=*)
     CRYSTAL_VERSION="${i#*=}"
-    shift
-    ;;
-    --distro=*)
-    DISTRO_VERSION_NAME="${i#*=}"
     shift
     ;;
     --channel=*)
@@ -47,33 +41,6 @@ case $i in
 esac
 done
 
-if [[ $DISTRO_VERSION_NAME == "__detect__" ]]; then
-  DISTRO_VERSION_NAME=$(lsb_release -sc)
-fi
-
-case $DISTRO_VERSION_NAME in
-  jessie|stretch|buster|trusty|xenial|bionic|eoan)
-    # all good
-    ;;
-  *)
-    echo "WARNING: $DISTRO_VERSION_NAME might not be supported"
-    ;;
-esac
-
-case $CHANNEL in
-  stable)
-    CRYSTAL_REPO="deb https://dl.bintray.com/crystal/apt $DISTRO_VERSION_NAME main"
-    ;;
-  unstable)
-    CRYSTAL_REPO="deb https://dl.bintray.com/crystal/apt-unstable $DISTRO_VERSION_NAME main"
-    ;;
-  *)
-    echo "ERROR: $CHANNEL channel is not supported"
-    exit 1
-    ;;
-esac
-
-
 # Add repo metadata signign key (shared bintray signing key)
 apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 379CE192D401AB61
 
@@ -81,7 +48,7 @@ apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 379CE192D401AB
 # curl -sL "https://keybase.io/crystal/pgp_keys.asc" | apt-key add -
 
 # Add repo
-echo $CRYSTAL_REPO | tee /etc/apt/sources.list.d/crystal.list
+echo "deb https://dl.bintray.com/crystal/deb all $CHANNEL" | tee /etc/apt/sources.list.d/crystal.list
 apt-get update
 
 # Install Crystal
@@ -89,7 +56,7 @@ case "$CRYSTAL_VERSION" in
   latest)
     apt-get install -y crystal
     ;;
-  * )
+  *)
     # Appending * allows --crystal=x.y and resolution of package-iteration https://askubuntu.com/a/824926/1101493
     apt-get install -y crystal="$CRYSTAL_VERSION*"
     ;;
