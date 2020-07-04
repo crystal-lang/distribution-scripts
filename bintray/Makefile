@@ -3,7 +3,7 @@
 # Secrets configuration
 BINTRAY_USERNAME ?=
 BINTRAY_API_KEY ?=
-BINTRAY_SINGING_PASSPHRASE ?= # Optional signing passphrase
+BINTRAY_SIGNING_PASSPHRASE ?= # Optional signing passphrase
 
 # Public configuration
 BINTRAY_SUBJECT  ?= crystal
@@ -47,7 +47,7 @@ DEB_DISTROS = all
 PUBLISH_FLAGS = publish=1$(if $(force),;override=1)
 
 CURL_BINTRAY_AUTH = -u$(BINTRAY_USERNAME):$(BINTRAY_API_KEY)
-CURL_BINTRAY_PASSPHRASE = $(if $(BINTRAY_SINGING_PASSPHRASE),-H "X-GPG-PASSPHRASE: $(BINTRAY_SINGING_PASSPHRASE)")
+CURL_BINTRAY_PASSPHRASE = $(if $(BINTRAY_SIGNING_PASSPHRASE),-H "X-GPG-PASSPHRASE: $(BINTRAY_SIGNING_PASSPHRASE)")
 
 FPM_FLAGS = --name $(BINTRAY_PACKAGE) \
             --version $(CRYSTAL_VERSION) \
@@ -102,7 +102,7 @@ endef
 
 define create_signed # (rpm|deb, path/to/unsigned.[rpm|deb])
     if [[ "$(strip $(sign))" == "true" ]]; \
-    then ./sign.sh sign-"$(1)" $(2); \
+    then ./sign.sh sign-$(1) $(2); \
     else ./sign.sh skip-sign $(2); \
     fi
 endef
