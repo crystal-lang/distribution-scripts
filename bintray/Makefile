@@ -72,12 +72,10 @@ clean_targz:
 
 clean_deb:
 	rm -Rf $(OUTPUT_DIR)/unsigned/*.deb
+	rm -Rf $(OUTPUT_DIR)/signed/*.deb
 
 clean_rpm:
 	rm -Rf $(OUTPUT_DIR)/unsigned/*.rpm
-
-clean_signed:
-	rm -Rf $(OUTPUT_DIR)/signed/*.deb
 	rm -Rf $(OUTPUT_DIR)/signed/*.rpm
 
 .PHONY: docker-fpm
