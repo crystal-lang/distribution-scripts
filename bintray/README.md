@@ -33,7 +33,7 @@ $ ./publish-stable VERSION YYYY-MM-DD CRYSTAL_LINUX64_TARGZ CRYSTAL_LINUX32_TARG
 Under the hood the following targets will be executed:
 
 ```terminal-session
-$ make deb rpm publish set_version_date rpm_calc_metadata \
+$ make deb rpm publish set_version_date deb_calc_metadata rpm_calc_metadata \
     CRYSTAL_VERSION=$crystal_version \
     CRYSTAL_LINUX64_TARGZ=https://github.com/crystal-lang/crystal/releases/download/$crystal_version/crystal-$crystal_version-1-linux-x86_64.tar.gz \
     CRYSTAL_LINUX32_TARGZ=https://github.com/crystal-lang/crystal/releases/download/$crystal_version/crystal-$crystal_version-1-linux-i686.tar.gz

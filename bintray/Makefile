@@ -142,6 +142,10 @@ deb64_publish:
 deb32_publish:
 	curl -T $(OUTPUT_SIGNED_DEB_NAME32) $(CURL_BINTRAY_AUTH) $(CURL_BINTRAY_PASSPHRASE) "https://api.bintray.com/content/$(BINTRAY_SUBJECT)/$(BINTRAY_DEB_REPO)/$(BINTRAY_PACKAGE)/$(CRYSTAL_VERSION)/$(DEB_NAME32);deb_distribution=$(DEB_DISTROS);deb_component=$(CHANNEL);deb_architecture=i386;$(PUBLISH_FLAGS)"
 
+.PHONY: deb_calc_metadata
+deb_calc_metadata:
+	curl -X POST $(CURL_BINTRAY_AUTH) "https://api.bintray.com/calc_metadata/crystal/deb"
+
 $(OUTPUT_UNSIGNED_DEB_NAME64): docker-fpm $(OUTPUT_LINUX64_TARGZ)
 	mkdir -p $(OUTPUT_UNSIGNED)
 	docker run --rm -v $(CURDIR)/build:/build crystal-fpm /bin/sh -c "\

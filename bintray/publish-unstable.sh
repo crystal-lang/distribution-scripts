@@ -16,6 +16,6 @@ make deb rpm \
   CRYSTAL_LINUX64_TARGZ=$3 \
   CRYSTAL_LINUX32_TARGZ=$4
 
-make publish set_version_date rpm_calc_metadata force=1 CHANNEL=unstable \
+make publish set_version_date deb_calc_metadata rpm_calc_metadata force=1 CHANNEL=unstable \
   CRYSTAL_VERSION=$1 \
   CRYSTAL_VERSION_DATE=$2
