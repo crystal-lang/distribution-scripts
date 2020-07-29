@@ -9,7 +9,8 @@ The following environment variables need to be defined
 - `CRYSTAL_SIGNING_PASSPHRASE_FILE` Path to  signing key passphrase
 
 On Bintray the deb and rpm repositories are defined with automatic metadata signing by bintray.
-The .deb and .rpm files are uploaded already signed.
+The .deb and .rpm files for the stable and unstable channels are uploaded already signed.
+The .deb and .rpm files for the nightly channel are uploaded without signing.
 
 ## To create the Bintray repositories
 

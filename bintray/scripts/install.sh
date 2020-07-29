@@ -27,6 +27,10 @@ NOTES
 
   - yum-utils (on CentOS/Fedora when using --crystal=x.y.z)
 
+  This script source and issue-tracker can be found at:
+
+  - https://github.com/crystal-lang/distribution-scripts/tree/master/bintray/scripts/install.sh
+
 END
 }
 

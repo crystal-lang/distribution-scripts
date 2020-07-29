@@ -22,10 +22,12 @@ rebuild 0.34.0 2020-04-06
 rebuild 0.35.0 2020-06-09
 rebuild 0.35.1 2020-06-19
 
-./publish-unstable.sh 0.35.2-dev 2020-07-03 \
-  https://github.com/crystal-lang/crystal/releases/download/0.35.1/crystal-0.35.1-1-linux-x86_64.tar.gz \
-  https://github.com/crystal-lang/crystal/releases/download/0.35.1/crystal-0.35.1-1-linux-i686.tar.gz
+# Sample run
+#
+# ./publish-unstable.sh 0.35.2-dev 2020-07-03 \
+#   https://github.com/crystal-lang/crystal/releases/download/0.35.1/crystal-0.35.1-1-linux-x86_64.tar.gz \
+#   https://github.com/crystal-lang/crystal/releases/download/0.35.1/crystal-0.35.1-1-linux-i686.tar.gz
 
-./publish-nightly.sh 1.0.0-dev 2020-07-03 \
-  https://49924-6887813-gh.circle-artifacts.com/0/dist_packages/crystal-nightly-20200703-1-linux-x86_64.tar.gz \
-  https://49924-6887813-gh.circle-artifacts.com/0/dist_packages/crystal-nightly-20200703-1-linux-i686.tar.gz
+./publish-nightly.sh 1.0.0-dev 2020-07-22 \
+  https://50831-6887813-gh.circle-artifacts.com/0/dist_packages/crystal-nightly-20200722-1-linux-x86_64.tar.gz \
+  https://50831-6887813-gh.circle-artifacts.com/0/dist_packages/crystal-nightly-20200722-1-linux-i686.tar.gz
