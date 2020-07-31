@@ -20,11 +20,11 @@ set -e
 # ./sign.sh clean
 # ```
 
-function debian() {
+debian() {
   docker-compose exec debian /bin/sh -c "$@"
 }
 
-function centos() {
+centos() {
   docker-compose exec centos /bin/sh -c "$@"
 }
 

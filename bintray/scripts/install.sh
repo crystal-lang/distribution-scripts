@@ -63,16 +63,15 @@ _discover_distro_type() {
 
   [[ -z "$DISTRO_TYPE" ]] || return
 
-  [[ -x "/usr/bin/apt-get" ]] && DISTRO_TYPE="deb" && return
-  [[ -x "/usr/bin/yum" ]]     && DISTRO_TYPE="rpm" && return
-
-  if [[ -z "$DISTRO_TYPE" ]]; then
+  if hash apt-get 2>/dev/null; then
+    DISTRO_TYPE="deb"
+  elif hash yum 2>/dev/null; then
+    DISTRO_TYPE="rpm"
+  else
     _error "Unable to identify distribution. Please, report to https://forum.crystal-lang.org/c/help-support/11"
     exit 1
   fi
 }
-
-set -eu
 
 if [[ $EUID -ne 0 ]]; then
   _error "This script must be run as root"

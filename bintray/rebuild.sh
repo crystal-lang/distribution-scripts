@@ -2,7 +2,7 @@
 
 make create_bintray_deb_repo create_bintray_rpm_repo
 
-function rebuild () {
+rebuild() {
   crystal_version=$1
   crystal_version_date=$2
   crystal_linux64_targz=https://github.com/crystal-lang/crystal/releases/download/$crystal_version/crystal-$crystal_version-1-linux-x86_64.tar.gz \
