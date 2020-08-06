@@ -1,4 +1,4 @@
-FROM alpine:3.11 as runtime
+FROM alpine:3.12 as runtime
 
 RUN \
   apk add --update --no-cache --force-overwrite \
@@ -31,7 +31,7 @@ FROM runtime as build
 
 RUN \
   apk add --update --no-cache --force-overwrite \
-    llvm-dev llvm-static g++
+    llvm10-dev llvmi10-static g++
 
 ENV LIBRARY_PATH=/usr/lib/crystal/lib/
 
