@@ -2,14 +2,19 @@ name "llvm"
 LLVM_VERSION = (ENV['LLVM_VERSION'] || "6.0.1").strip
 default_version LLVM_VERSION
 
-source url: "http://releases.llvm.org/#{version}/llvm-#{version}.src.tar.xz"
-
 version "3.9.1" do
-  source md5: "3259018a7437e157f3642df80f1983ea"
+  source url: "http://releases.llvm.org/#{version}/llvm-#{version}.src.tar.xz",
+         md5: "3259018a7437e157f3642df80f1983ea"
 end
 
 version "6.0.1" do
-  source md5: "c88c98709300ce2c285391f387fecce0"
+  source url: "http://releases.llvm.org/#{version}/llvm-#{version}.src.tar.xz",
+         md5: "c88c98709300ce2c285391f387fecce0"
+end
+
+version "10.0.1" do
+  source url: "https://github.com/llvm/llvm-project/releases/download/llvmorg-#{version}/llvm-#{version}.src.tar.xz",
+         md5: "71c68c526cbbf1674b5aafc5542b336c"
 end
 
 relative_path "llvm-#{version}.src"
@@ -36,6 +41,8 @@ build do
     " -DBUILD_SHARED_LIBS=OFF" \
     " -DLLVM_OPTIMIZED_TABLEGEN=ON" \
     " -DLLVM_ENABLE_ASSERTIONS=ON" \
+    " -DLLVM_INCLUDE_TESTS=OFF" \
+    " -DLLVM_ENABLE_Z3_SOLVER=OFF" \
     "#{' -DPYTHON_EXECUTABLE=$(which python2.7)' if centos? }"\
     " #{project_dir}", env: env, cwd: llvm_build_dir
   command "cmake --build .", env: env, cwd: llvm_build_dir
