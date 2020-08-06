@@ -22,6 +22,7 @@ relative_path "llvm-#{version}.src"
 whitelist_file "lib/BugpointPasses.dylib"
 whitelist_file "lib/libLTO.dylib"
 whitelist_file "lib/LLVMHello.dylib"
+whitelist_file "lib/libRemarks.dylib"
 
 env = with_standard_compiler_flags(with_embedded_path)
 
