@@ -19,7 +19,7 @@ PACKAGE_MAINTAINER = Crystal Team <crystal@manas.tech>
 PREVIOUS_CRYSTAL_RELEASE_LINUX64_TARGZ ?=  ## url to crystal-{version}-{package}-linux-x86_64.tar.gz
 PREVIOUS_CRYSTAL_RELEASE_LINUX32_TARGZ ?=  ## url to crystal-{version}-{package}-linux-i686.tar.gz
 
-SHARDS_VERSION = v0.11.1
+SHARDS_VERSION = v0.12.0
 GC_VERSION = v8.0.4
 LIBATOMIC_OPS_VERSION = v7.6.10
 
