@@ -43,11 +43,11 @@ RUN sed -i 's|--list -- "$@"|--list "$@"|' /usr/bin/ldd
 # Install dependencies
 RUN apk add --no-cache \
       # Statically-compiled llvm
-      llvm8-dev llvm8-static \
+      llvm10-dev llvm10-static \
       # Static zlib, libyaml, libxml2, pcre, and libevent
       zlib-dev yaml-dev libxml2-dev pcre-dev libevent-static \
       # Build tools
-      git gcc g++ make automake libtool autoconf bash coreutils
+      git gcc g++ make automake libtool autoconf bash coreutils curl
 
 ARG release
 ENV CFLAGS="-fPIC -pipe ${release:+-O2}"
