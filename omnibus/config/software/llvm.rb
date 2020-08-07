@@ -1,5 +1,5 @@
 name "llvm"
-LLVM_VERSION = (ENV['LLVM_VERSION'] || "6.0.1").strip
+LLVM_VERSION = (ENV['LLVM_VERSION'] || "10.0.1").strip
 default_version LLVM_VERSION
 
 version "3.9.1" do
