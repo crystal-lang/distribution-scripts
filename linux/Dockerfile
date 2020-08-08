@@ -94,11 +94,11 @@ ARG musl_target
 RUN git clone https://github.com/crystal-lang/shards \
  && cd shards \
  && git checkout ${shards_version} \
- && make lib \
+ && make SHARDS=false CRYSTAL=/crystal/bin/crystal \
+         release=${release:+1} static=1 \
+         FLAGS="--stats --target ${musl_target}" \
  \
- && /crystal/bin/crystal build --stats --target ${musl_target} \
-    ./src/shards.cr -o shards --static ${release:+--release} \
- && ([ "$(ldd shards | wc -l)" -eq "1" ] || { echo 'shards is not statically linked'; ldd shards; exit 1; })
+ && ([ "$(ldd bin/shards | wc -l)" -eq "1" ] || { echo 'shards is not statically linked'; ldd bin/shards; exit 1; })
 
 COPY files/crystal-wrapper /output/bin/crystal
 COPY --from=debian /bdwgc/.libs/libgc.a /libgc-debian.a
@@ -120,7 +120,7 @@ RUN \
  && cp /crystal/.build/crystal /output/lib/crystal/bin/crystal \
  \
  # Copy shards to /lib/crystal/bin/
- && cp /shards/shards /output/lib/crystal/bin/shards \
+ && cp /shards/bin/shards /output/lib/crystal/bin/shards \
  && ln -s ../lib/crystal/bin/shards /output/bin/shards \
  \
  # Copy stdlib to /share/crystal/src/
