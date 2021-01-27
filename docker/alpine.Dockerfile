@@ -1,11 +1,11 @@
-FROM alpine:3.12 as runtime
+FROM alpine:3.13 as runtime
 
 RUN \
   apk add --update --no-cache --force-overwrite \
     # core dependencies
     gc-dev gcc gmp-dev libatomic_ops libevent-static musl-dev pcre-dev \
     # stdlib dependencies
-    libxml2-dev openssl-dev openssl-libs-static tzdata yaml-dev zlib-static \
+    libxml2-dev openssl-libs-static tzdata yaml-static zlib-static \
     # dev tools
     make git
 
@@ -31,6 +31,6 @@ FROM runtime as build
 
 RUN \
   apk add --update --no-cache --force-overwrite \
-    llvm10-dev llvm10-static g++
+    llvm10-static g++
 
 CMD ["/bin/sh"]

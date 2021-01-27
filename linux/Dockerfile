@@ -43,7 +43,7 @@ RUN sed -i 's|--list -- "$@"|--list "$@"|' /usr/bin/ldd
 # Install dependencies
 RUN apk add --no-cache \
       # Statically-compiled llvm
-      llvm10-dev llvm10-static \
+      llvm10-static \
       # Static zlib, libyaml, libxml2, pcre, and libevent
       zlib-static yaml-static libxml2-dev pcre-dev libevent-static \
       # Build tools
