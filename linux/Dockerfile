@@ -27,15 +27,6 @@ RUN git clone https://github.com/ivmai/bdwgc \
  && ./configure --disable-debug --disable-shared --enable-large-config \
  && make -j$(nproc)
 
-# Cross-compile crystal and build libcrystal.a
-ARG crystal_sha1
-ARG musl_target
-RUN git clone https://github.com/crystal-lang/crystal \
- && cd crystal \
- && git checkout ${crystal_sha1} \
- \
- && make deps
-
 FROM ${alpine_image}
 
 RUN sed -i 's|--list -- "$@"|--list "$@"|' /usr/bin/ldd
@@ -101,17 +92,12 @@ RUN git clone https://github.com/crystal-lang/shards \
 
 COPY files/crystal-wrapper /output/bin/crystal
 COPY --from=debian /bdwgc/.libs/libgc.a /libgc-debian.a
-COPY --from=debian /crystal/src/ext/libcrystal.a /libcrystal-debian.a
 
 ARG package_iteration
 
 RUN \
- # Remove musl binaries from source and replace with debian ones
-    rm -Rf /crystal/src/{llvm/ext/llvm_ext.o,ext/sigfault.o,ext/libcrystal.a} \
- && mv /libcrystal-debian.a /crystal/src/ext/libcrystal.a \
- \
  # Copy libgc.a to /lib/crystal/lib/
- && mkdir -p /output/lib/crystal/lib/ \
+ mkdir -p /output/lib/crystal/lib/ \
  && cp /libgc-debian.a /output/lib/crystal/lib/libgc.a \
  \
  # Copy crystal to /lib/crystal/bin/
