@@ -25,11 +25,13 @@ NOTES
 
   The following packages may be installed:
 
+  - wget (on Debian/Ubuntu when missing)
+  - curl (on openSUSE when missing)
   - yum-utils (on CentOS/Fedora when using --crystal=x.y.z)
 
   This script source and issue-tracker can be found at:
 
-  - https://github.com/crystal-lang/distribution-scripts/tree/master/bintray/scripts/install.sh
+  - https://github.com/crystal-lang/distribution-scripts/tree/master/packages/scripts/install.sh
 
 END
 }
@@ -138,8 +140,13 @@ if [[ -z "${DISTRO_REPO}" ]]; then
 fi
 
 _install_apt() {
+  if [[ -z $(command -v wget &> /dev/null) ]] || [[ -z $(command -v gpg &> /dev/null) ]]; then
+    apt-get update
+    apt-get install -y wget gpg
+  fi
+
   # Add repo signign key
-  curl -fsSL https://download.opensuse.org/repositories/devel:languages:crystal/${DISTRO_REPO}/Release.key | gpg --dearmor | tee /etc/apt/trusted.gpg.d/devel_languages_crystal.gpg > /dev/null
+  wget -qO- https://download.opensuse.org/repositories/devel:languages:crystal/${DISTRO_REPO}/Release.key | gpg --dearmor | tee /etc/apt/trusted.gpg.d/devel_languages_crystal.gpg > /dev/null
   echo "deb http://download.opensuse.org/repositories/devel:/languages:/crystal/${DISTRO_REPO}/ /" | tee /etc/apt/sources.list.d/crystal.list
   apt-get update
 
@@ -157,8 +164,6 @@ _install_rpm_key() {
 
 _install_yum() {
   _install_rpm_key
-
-  [[ command wget ]] || yum install -y wget
 
   cat > /etc/yum.repos.d/crystal.repo <<EOF
 [crystal]
@@ -204,6 +209,11 @@ _install_dnf() {
 }
 
 _install_zypper() {
+  if [[ -z $(command -v curl &> /dev/null) ]]; then
+    zypper refresh
+    zypper install -y curl
+  fi
+
   _install_rpm_key
   zypper --non-interactive addrepo https://download.opensuse.org/repositories/devel:languages:crystal/$DISTRO_REPO/devel:languages:crystal.repo
   zypper --non-interactive refresh

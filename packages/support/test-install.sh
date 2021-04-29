@@ -6,21 +6,12 @@ DISTRO_TYPE=""
 [[ -x "/usr/bin/apt-get" ]] && DISTRO_TYPE="deb"
 [[ -x "/usr/bin/yum" ]]     && DISTRO_TYPE="rpm"
 
-# Requirements
-case $DISTRO_TYPE in
-  deb)
-    export DEBIAN_FRONTEND=noninteractive
-    apt-get update
-    apt-get install -y gnupg ca-certificates apt-transport-https
-    ;;
-  *)
-    ;;
-esac
-
 ../scripts/install.sh
 crystal --version
 shards --version
 crystal eval 'puts "Hello World!"'
+
+exit 0
 
 # Uninstall explicitly for downgrade
 case $DISTRO_TYPE in
