@@ -53,14 +53,21 @@ _warn() {
 
 _check_version_id() {
   if [[ -z "${VERSION_ID}" ]]; then
-    cat /etc/os-release
-    _error "Unable to identify distribution. Please, report to https://forum.crystal-lang.org/c/help-support/11"
+    _error "Unable to identify distribution repository for ${ID}. Please, report to https://forum.crystal-lang.org/c/help-support/11"
     exit 1
   fi
 }
 
 _discover_distro_repo() {
-  source /etc/os-release
+  if [[ -r /etc/os-release ]]; then
+    source /etc/os-release
+  elif [[ -r /usr/lib/os-release ]]; then
+    source /usr/lib/os-release
+  else
+    _error "Unable to identify distribution. Please, report to https://forum.crystal-lang.org/c/help-support/11"
+    exit 1
+  fi
+
   case "$ID" in
     debian)
       if [[ -z "${VERSION_ID:+}" ]]; then
