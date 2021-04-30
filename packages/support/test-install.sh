@@ -11,6 +11,8 @@ crystal --version
 shards --version
 crystal eval 'puts "Hello World!"'
 
+# OBS doesn't have any fully valid older releases yet, so skipping the following
+# checks for now.
 exit 0
 
 # Uninstall explicitly for downgrade
