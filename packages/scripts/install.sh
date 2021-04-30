@@ -38,6 +38,7 @@ END
 
 set -eu
 
+OBS_PROJECT=${OBS_PROJECT:-"devel:languages:crystal"}
 DISTRO_REPO=${DISTRO_REPO:-}
 CRYSTAL_VERSION="latest"
 CHANNEL="stable"
@@ -146,8 +147,8 @@ _install_apt() {
   fi
 
   # Add repo signign key
-  wget -qO- https://download.opensuse.org/repositories/devel:languages:crystal/${DISTRO_REPO}/Release.key | gpg --dearmor | tee /etc/apt/trusted.gpg.d/devel_languages_crystal.gpg > /dev/null
-  echo "deb http://download.opensuse.org/repositories/devel:/languages:/crystal/${DISTRO_REPO}/ /" | tee /etc/apt/sources.list.d/crystal.list
+  wget -qO- https://download.opensuse.org/repositories/${OBS_PROJECT}/${DISTRO_REPO}/Release.key | gpg --dearmor | tee /etc/apt/trusted.gpg.d/devel_languages_crystal.gpg > /dev/null
+  echo "deb http://download.opensuse.org/repositories/${OBS_PROJECT}/${DISTRO_REPO}/ /" | tee /etc/apt/sources.list.d/crystal.list
   apt-get update
 
   if [[ "$CRYSTAL_VERSION" == "latest" ]]; then
@@ -159,7 +160,7 @@ _install_apt() {
 }
 
 _install_rpm_key() {
-  rpm --verbose --import https://build.opensuse.org/projects/devel:languages:crystal/public_key
+  rpm --verbose --import https://build.opensuse.org/projects/${OBS_PROJECT}/public_key
 }
 
 _install_yum() {
@@ -169,9 +170,9 @@ _install_yum() {
 [crystal]
 name=Crystal (${DISTRO_REPO})
 type=rpm-md
-baseurl=https://download.opensuse.org/repositories/devel:/languages:/crystal/${DISTRO_REPO}/
+baseurl=https://download.opensuse.org/repositories/${OBS_PROJECT}/${DISTRO_REPO}/
 gpgcheck=1
-gpgkey=https://download.opensuse.org/repositories/devel:/languages:/crystal/${DISTRO_REPO}/repodata/repomd.xml.key
+gpgkey=https://download.opensuse.org/repositories/${OBS_PROJECT}/${DISTRO_REPO}/repodata/repomd.xml.key
 enabled=1
 EOF
 
@@ -192,7 +193,7 @@ EOF
 _install_dnf() {
   _install_rpm_key
 
-  dnf config-manager --add-repo https://download.opensuse.org/repositories/devel:languages:crystal/$DISTRO_REPO/devel:languages:crystal.repo
+  dnf config-manager --add-repo https://download.opensuse.org/repositories/${OBS_PROJECT}/$DISTRO_REPO/${OBS_PROJECT}.repo
 
   if [[ "$CRYSTAL_VERSION" == "latest" ]]; then
     dnf install -y crystal
@@ -215,7 +216,7 @@ _install_zypper() {
   fi
 
   _install_rpm_key
-  zypper --non-interactive addrepo https://download.opensuse.org/repositories/devel:languages:crystal/$DISTRO_REPO/devel:languages:crystal.repo
+  zypper --non-interactive addrepo https://download.opensuse.org/repositories/${OBS_PROJECT}/$DISTRO_REPO/${OBS_PROJECT}.repo
   zypper --non-interactive refresh
 
   if [[ "$CRYSTAL_VERSION" == "latest" ]]; then
