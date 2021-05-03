@@ -149,6 +149,7 @@ fi
 
 _install_apt() {
   if [[ -z $(command -v wget &> /dev/null) ]] || [[ -z $(command -v gpg &> /dev/null) ]]; then
+    [[ -f /etc/apt/sources.list.d/crystal.list ]] && rm -f /etc/apt/sources.list.d/crystal.list
     apt-get update
     apt-get install -y wget gpg
   fi
