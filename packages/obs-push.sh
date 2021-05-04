@@ -32,18 +32,10 @@ cp "$CRYSTAL_LINUX64_TARGZ" "$PACKAGE-snapshot-linux-x86_64.tar.gz"
 cp "$CRYSTAL_LINUX32_TARGZ" "$PACKAGE-snapshot-linux-i686.tar.gz"
 cp "$CRYSTAL_DOCS_TARGZ" "$PACKAGE-snapshot-docs.tar.gz"
 
-osc add "$PACKAGE-snapshot-linux-x86_64.tar.gz"
-osc add "$PACKAGE-snapshot-linux-i686.tar.gz"
-osc add "$PACKAGE-snapshot-docs.tar.gz"
-
 # Write version info
 echo "$VERSION" > "$PACKAGE-version.txt"
 echo "$SNAPSHOT" > "$PACKAGE-snapshot.txt"
 echo "${COMMIT_HASH:0:8}" > "$PACKAGE-commit_hash.txt"
-
-osc add "$PACKAGE-version.txt"
-osc add "$PACKAGE-snapshot.txt"
-osc add "$PACKAGE-commit_hash.txt"
 
 # Commit changes to OBS
 message="Update to $SNAPSHOT - $COMMIT_HASH"
