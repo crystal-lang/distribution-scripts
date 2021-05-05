@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 
-# $ ./trigger-obs-build.sh PROJECT VERSION SNAPSHOT COMMIT_HASH CRYSTAL_LINUX64_TARGZ CRYSTAL_LINUX32_TARGZ CRYSTAL_DOCS_TARGZ
+# $ ./obs-push.sh PROJECT VERSION SNAPSHOT COMMIT_HASH CRYSTAL_LINUX64_TARGZ CRYSTAL_LINUX32_TARGZ CRYSTAL_DOCS_TARGZ
 
-# This script checks out PROJECT, updates the version information
+# This script uses osc to check out PROJECT, update the version information
 # (VERSION, SNAPSHOT, COMMIT_HASH) and build artifacts (*_TARGZ arguments),
-# and commits the changes to OBS.
+# and commit the changes to OBS.
 #
 # Requirements:
-# * packages: osc, python3-m2crypto
+# * packages: osc build which
 # * configured ~/.oscrc with credentials
 
 set -eu

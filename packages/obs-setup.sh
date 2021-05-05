@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# This script installs configures OSC credentials for
+# This script configures OSC credentials for
 # https://api.opensuse.org
 #
 # Environment variables:
