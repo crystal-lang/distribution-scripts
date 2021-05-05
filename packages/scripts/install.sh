@@ -167,6 +167,18 @@ case $i in
 esac
 done
 
+case $CHANNEL in
+  stable)
+    ;;
+  nightly | unstable)
+    OBS_PROJECT="${OBS_PROJECT}:${CHANNEL}"
+    ;;
+  *)
+    _error "Unsupported channel $CHANNEL"
+    exit 1
+    ;;
+esac
+
 if [[ -z "${DISTRO_REPO}" ]]; then
   _discover_distro_repo
 fi

@@ -14,6 +14,16 @@ crystal --version
 shards --version
 crystal eval 'puts "Hello World!"'
 
+../scripts/install.sh --channel=unstable
+crystal --version
+shards --version
+crystal eval 'puts "Hello World!"'
+
+../scripts/install.sh --channel=nightly
+crystal --version
+shards --version
+crystal eval 'puts "Hello World!"'
+
 # OBS doesn't have any fully valid older releases yet, so skipping the following
 # checks for now.
 exit 0
@@ -35,16 +45,6 @@ shards --version
 [[ $DISTRO_TYPE == "deb" ]] && crystal eval 'puts "Hello World!"'
 
 ../scripts/install.sh --crystal=0.35
-crystal --version
-shards --version
-crystal eval 'puts "Hello World!"'
-
-../scripts/install.sh --channel=unstable
-crystal --version
-shards --version
-crystal eval 'puts "Hello World!"'
-
-../scripts/install.sh --channel=nightly
 crystal --version
 shards --version
 crystal eval 'puts "Hello World!"'
