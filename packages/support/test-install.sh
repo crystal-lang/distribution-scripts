@@ -14,6 +14,16 @@ crystal --version
 shards --version
 crystal eval 'puts "Hello World!"'
 
+../scripts/install.sh --channel=unstable
+crystal --version
+shards --version
+crystal eval 'puts "Hello World!"'
+
+../scripts/install.sh --channel=nightly
+crystal --version
+shards --version
+crystal eval 'puts "Hello World!"'
+
 # OBS doesn't have any fully valid older releases yet, so skipping the following
 # checks for now.
 exit 0
@@ -38,31 +48,3 @@ shards --version
 crystal --version
 shards --version
 crystal eval 'puts "Hello World!"'
-
-../scripts/install.sh --channel=unstable
-crystal --version
-shards --version
-crystal eval 'puts "Hello World!"'
-
-../scripts/install.sh --channel=nightly
-crystal --version
-shards --version
-crystal eval 'puts "Hello World!"'
-
-# Additional packages needed on docker images to run scripts/install.sh
-#
-# | Docker Image           | gnupg | ca-certificates | apt-transport-https |
-# |------------------------|-------|-----------------|---------------------|
-# | ubuntu:focal           | x     |                 |                     |
-# | ubuntu:eoan            | x     |                 |                     |
-# | ubuntu:bionic          | x     |                 |                     |
-# | ubuntu:xenial          | x     |                 | x                   |
-# | ubuntu:trusty          | x     |                 | x                   |
-# | i386/ubuntu:xenial     | x     |                 | x                   |
-# |------------------------|-------|-----------------|---------------------|
-# | debian:10 (buster)     | x     | x               |                     |
-# | debian:9 (stretch)     | x     | x               | x                   |
-# | debian:8 (jessie)      | x     | x               | x                   |
-# | i386/debian:8 (jessie) | x     | x               | x                   |
-# |------------------------|-------|-----------------|---------------------|
-#
