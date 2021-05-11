@@ -1,6 +1,7 @@
 name "llvm_bin"
-LLVM_VERSION = (ENV['LLVM_VERSION'] || "6.0.1").strip
-default_version "#{LLVM_VERSION}-1"
+LLVM_VERSION = (ENV['LLVM_VERSION'] || "10.0.1").strip
+default_version "#{LLVM_VERSION}-2"
+skip_transitive_dependency_licensing true
 
 if linux?
   case LLVM_VERSION
@@ -13,18 +14,24 @@ if linux?
   else
     raise "llvm_bin #{LLVM_VERSION} not supported on linux"
   end
-elsif mac_os_x? && _64_bit?
+elsif (macos? || mac_os_x?) && _64_bit?
   case LLVM_VERSION
   when "3.9.1"
     source_md5 = "9fb52b6a648e700f431b459586eb5403"
   when "6.0.1"
     source_md5 = "435beaff5e309921f4d87c275cad4e03"
+  when "10.0.1"
+    source_md5 = nil # TODO: Needs build in S3
   else
     raise "llvm_bin #{LLVM_VERSION} not supported on osx"
   end
 end
 
-source url: "http://crystal-lang.s3.amazonaws.com/llvm/llvm-#{version}-#{ohai['os']}-#{ohai['kernel']['machine']}.tar.gz",
-       md5: source_md5
+if source_md5
+  source url: "http://crystal-lang.s3.amazonaws.com/llvm/llvm-#{version}-#{ohai['os']}-#{ohai['kernel']['machine']}.tar.gz",
+        md5: source_md5
+else
+  source path: "pkg/llvm-#{version}-#{ohai['os']}-#{ohai['kernel']['machine']}.tar.gz"
+end
 
 relative_path "llvm-#{version}"

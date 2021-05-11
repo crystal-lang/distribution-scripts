@@ -1,6 +1,7 @@
 name "llvm"
-LLVM_VERSION = (ENV['LLVM_VERSION'] || "6.0.1").strip
+LLVM_VERSION = (ENV['LLVM_VERSION'] || "10.0.1").strip
 default_version LLVM_VERSION
+skip_transitive_dependency_licensing true
 
 version "3.9.1" do
   source url: "http://releases.llvm.org/#{version}/llvm-#{version}.src.tar.xz",
@@ -40,6 +41,7 @@ build do
     " -DLLVM_TARGETS_TO_BUILD=X86" \
     " -DLLVM_ENABLE_TERMINFO=OFF" \
     " -DLLVM_ENABLE_FFI=OFF" \
+    " -DLLVM_ENABLE_LIBXML2=OFF" \
     " -DLLVM_ENABLE_ZLIB=OFF" \
     " -DLLVM_BUILD_DOCS=OFF" \
     " -DLLVM_INCLUDE_DOCS=OFF" \

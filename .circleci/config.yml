@@ -5,7 +5,7 @@ jobs:
     macos:
       xcode: "11.1.0"
     environment:
-      LLVM_VERSION: 6.0.1
+      LLVM_VERSION: 10.0.1
       MACOSX_DEPLOYMENT_TARGET: 10.11
     shell: /bin/bash --login -eo pipefail
     steps:

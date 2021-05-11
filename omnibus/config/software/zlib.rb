@@ -16,16 +16,19 @@
 
 name "zlib"
 default_version "1.2.8"
+license "Zlib"
+license_file "README"
+skip_transitive_dependency_licensing true
 
 version "1.2.6" do
-  source md5: "618e944d7c7cd6521551e30b32322f4a"
+  source sha256: "21235e08552e6feba09ea5e8d750805b3391c62fb81c71a235c0044dc7a8a61b"
 end
 
 version "1.2.8" do
-  source md5: "44d667c142d7cda120332623eab69f40"
+  source sha256: "36658cb768a54c1d4dec43c3116c27ed893e88b02ecfcb44f2166f9c0b7f2a0d"
 end
 
-source url: "http://downloads.sourceforge.net/project/libpng/zlib/#{version}/zlib-#{version}.tar.gz"
+source url: "https://zlib.net/fossils/zlib-#{version}.tar.gz"
 
 relative_path "zlib-#{version}"
 
