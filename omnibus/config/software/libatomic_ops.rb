@@ -1,5 +1,6 @@
 name "libatomic_ops"
 default_version "7.6.10"
+skip_transitive_dependency_licensing true
 
 source :url => "https://github.com/ivmai/libatomic_ops/releases/download/v#{version}/libatomic_ops-#{version}.tar.gz"
 

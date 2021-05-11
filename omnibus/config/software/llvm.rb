@@ -1,6 +1,7 @@
 name "llvm"
 LLVM_VERSION = (ENV['LLVM_VERSION'] || "10.0.0").strip
 default_version LLVM_VERSION
+skip_transitive_dependency_licensing true
 
 version "3.9.1" do
   source url: "http://releases.llvm.org/#{version}/llvm-#{version}.src.tar.xz",

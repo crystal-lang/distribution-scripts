@@ -1,6 +1,7 @@
 name "llvm_bin"
 LLVM_VERSION = (ENV['LLVM_VERSION'] || "10.0.0").strip
 default_version "#{LLVM_VERSION}-1"
+skip_transitive_dependency_licensing true
 
 if linux?
   case LLVM_VERSION
@@ -13,7 +14,7 @@ if linux?
   else
     raise "llvm_bin #{LLVM_VERSION} not supported on linux"
   end
-elsif mac_os_x? && _64_bit?
+elsif (macos? || mac_os_x?) && _64_bit?
   case LLVM_VERSION
   when "3.9.1"
     source_md5 = "9fb52b6a648e700f431b459586eb5403"
