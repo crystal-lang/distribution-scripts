@@ -52,5 +52,5 @@ env = with_standard_compiler_flags(with_embedded_path(
 
 build do
   make "bin/shards SHARDS=false CRYSTAL=#{install_dir}/bin/crystal FLAGS='--no-debug --release'", env: env
-  command "cp bin/shards #{install_dir}/embedded/bin/shards"
+  copy "bin/shards", "#{install_dir}/embedded/bin/shards"
 end
