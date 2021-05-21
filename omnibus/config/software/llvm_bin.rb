@@ -1,5 +1,5 @@
 name "llvm_bin"
-LLVM_VERSION = (ENV['LLVM_VERSION'] || "6.0.1").strip
+LLVM_VERSION = (ENV['LLVM_VERSION'] || "10.0.0").strip
 default_version "#{LLVM_VERSION}-1"
 
 if linux?
