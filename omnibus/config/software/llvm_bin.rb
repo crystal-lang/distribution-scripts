@@ -19,6 +19,8 @@ elsif mac_os_x? && _64_bit?
     source_md5 = "9fb52b6a648e700f431b459586eb5403"
   when "6.0.1"
     source_md5 = "435beaff5e309921f4d87c275cad4e03"
+  when "10.0.0"
+    source_md5 = "edccfa777cba6e160b19bd5b57b12c8f"
   else
     raise "llvm_bin #{LLVM_VERSION} not supported on osx"
   end
