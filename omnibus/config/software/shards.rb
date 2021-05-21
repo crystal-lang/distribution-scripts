@@ -45,9 +45,12 @@ end
 source url: "https://github.com/crystal-lang/shards/archive/v#{version}.tar.gz"
 
 relative_path "shards-#{version}"
-env = with_standard_compiler_flags(with_embedded_path)
+env = with_standard_compiler_flags(with_embedded_path(
+  "LIBRARY_PATH" => "#{install_dir}/embedded/lib",
+  "CRYSTAL_LIBRARY_PATH" => "#{install_dir}/embedded/lib"
+))
 
 build do
   make "bin/shards SHARDS=false CRYSTAL=#{install_dir}/bin/crystal FLAGS='--no-debug --release'", env: env
-  command "cp bin/shards #{install_dir}/embedded/bin/shards"
+  copy "bin/shards", "#{install_dir}/embedded/bin/shards"
 end

@@ -11,6 +11,9 @@ ARG release
 ENV CFLAGS="-fPIC -pipe ${release:+-O2}"
 ENV CC="clang-8"
 
+# Termporary pinning libcurl oldrelease because current (7.74.0) is broken
+RUN apt-get install -y --allow-downgrades libcurl3-gnutls=7.64.0-4+deb10u2
+
 # Build libgc
 ARG gc_version
 ARG libatomic_ops_version
@@ -26,15 +29,6 @@ RUN git clone https://github.com/ivmai/bdwgc \
  && ./autogen.sh \
  && ./configure --disable-debug --disable-shared --enable-large-config \
  && make -j$(nproc)
-
-# Cross-compile crystal and build libcrystal.a
-ARG crystal_sha1
-ARG musl_target
-RUN git clone https://github.com/crystal-lang/crystal \
- && cd crystal \
- && git checkout ${crystal_sha1} \
- \
- && make deps
 
 FROM ${alpine_image}
 
@@ -86,7 +80,7 @@ RUN git clone https://github.com/crystal-lang/crystal \
  \
  && make crystal stats=true static=true ${release:+release=true} \
                  CRYSTAL_CONFIG_TARGET=${gnu_target} CRYSTAL_CONFIG_LIBRARY_PATH= \
- && ([ "$(ldd .build/crystal | wc -l)" -eq "1" ] || { echo './build/crystal is not statically linked'; ldd .build/crystal; exit 1; })
+ && ([ "$(ldd .build/crystal | wc -l)" -eq "0" ] || { echo './build/crystal is not statically linked'; ldd .build/crystal; exit 1; })
 
 # Build shards
 ARG shards_version
@@ -97,21 +91,16 @@ RUN git clone https://github.com/crystal-lang/shards \
  && make SHARDS=false CRYSTAL=/crystal/bin/crystal \
          FLAGS="--stats --target ${musl_target} --static ${release:+--release}" \
  \
- && ([ "$(ldd bin/shards | wc -l)" -eq "1" ] || { echo 'shards is not statically linked'; ldd bin/shards; exit 1; })
+ && ([ "$(ldd bin/shards | wc -l)" -eq "0" ] || { echo 'shards is not statically linked'; ldd bin/shards; exit 1; })
 
 COPY files/crystal-wrapper /output/bin/crystal
 COPY --from=debian /bdwgc/.libs/libgc.a /libgc-debian.a
-COPY --from=debian /crystal/src/ext/libcrystal.a /libcrystal-debian.a
 
 ARG package_iteration
 
 RUN \
- # Remove musl binaries from source and replace with debian ones
-    rm -Rf /crystal/src/{llvm/ext/llvm_ext.o,ext/sigfault.o,ext/libcrystal.a} \
- && mv /libcrystal-debian.a /crystal/src/ext/libcrystal.a \
- \
  # Copy libgc.a to /lib/crystal/lib/
- && mkdir -p /output/lib/crystal/lib/ \
+ mkdir -p /output/lib/crystal/lib/ \
  && cp /libgc-debian.a /output/lib/crystal/lib/libgc.a \
  \
  # Copy crystal to /lib/crystal/bin/
