@@ -43,11 +43,11 @@ RUN sed -i 's|--list -- "$@"|--list "$@"|' /usr/bin/ldd
 # Install dependencies
 RUN apk add --no-cache \
       # Statically-compiled llvm
-      llvm8-dev llvm8-static \
+      llvm10-dev llvm10-static \
       # Static zlib, libyaml, libxml2, pcre, and libevent
-      zlib-dev yaml-dev libxml2-dev pcre-dev libevent-static \
+      zlib-static yaml-static libxml2-dev pcre-dev libevent-static \
       # Build tools
-      git gcc g++ make automake libtool autoconf bash coreutils
+      git gcc g++ make automake libtool autoconf bash coreutils curl
 
 ARG release
 ENV CFLAGS="-fPIC -pipe ${release:+-O2}"
@@ -94,11 +94,10 @@ ARG musl_target
 RUN git clone https://github.com/crystal-lang/shards \
  && cd shards \
  && git checkout ${shards_version} \
- && make lib \
+ && make SHARDS=false CRYSTAL=/crystal/bin/crystal \
+         FLAGS="--stats --target ${musl_target} --static ${release:+--release}" \
  \
- && /crystal/bin/crystal build --stats --target ${musl_target} \
-    ./src/shards.cr -o shards --static ${release:+--release} \
- && ([ "$(ldd shards | wc -l)" -eq "1" ] || { echo 'shards is not statically linked'; ldd shards; exit 1; })
+ && ([ "$(ldd bin/shards | wc -l)" -eq "1" ] || { echo 'shards is not statically linked'; ldd bin/shards; exit 1; })
 
 COPY files/crystal-wrapper /output/bin/crystal
 COPY --from=debian /bdwgc/.libs/libgc.a /libgc-debian.a
@@ -120,7 +119,7 @@ RUN \
  && cp /crystal/.build/crystal /output/lib/crystal/bin/crystal \
  \
  # Copy shards to /lib/crystal/bin/
- && cp /shards/shards /output/lib/crystal/bin/shards \
+ && cp /shards/bin/shards /output/lib/crystal/bin/shards \
  && ln -s ../lib/crystal/bin/shards /output/bin/shards \
  \
  # Copy stdlib to /share/crystal/src/

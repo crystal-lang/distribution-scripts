@@ -19,7 +19,7 @@ PACKAGE_MAINTAINER = Crystal Team <crystal@manas.tech>
 PREVIOUS_CRYSTAL_RELEASE_LINUX64_TARGZ ?=  ## url to crystal-{version}-{package}-linux-x86_64.tar.gz
 PREVIOUS_CRYSTAL_RELEASE_LINUX32_TARGZ ?=  ## url to crystal-{version}-{package}-linux-i686.tar.gz
 
-SHARDS_VERSION = v0.12.0
+SHARDS_VERSION = v0.14.1
 GC_VERSION = v8.0.4
 LIBATOMIC_OPS_VERSION = v7.6.10
 
@@ -48,14 +48,14 @@ BUILD_ARGS_COMMON = $(DOCKER_BUILD_ARGS) \
 BUILD_ARGS64 = $(BUILD_ARGS_COMMON) \
                --build-arg previous_crystal_release=$(PREVIOUS_CRYSTAL_RELEASE_LINUX64_TARGZ)	\
                --build-arg debian_image=debian:10 \
-               --build-arg alpine_image=alpine:3.10 \
+               --build-arg alpine_image=alpine:3.12 \
                --build-arg musl_target=x86_64-linux-musl \
                --build-arg gnu_target=x86_64-unknown-linux-gnu
 
 BUILD_ARGS32 = $(BUILD_ARGS_COMMON) \
                --build-arg previous_crystal_release=$(PREVIOUS_CRYSTAL_RELEASE_LINUX32_TARGZ) \
                --build-arg debian_image=i386/debian:10 \
-               --build-arg alpine_image=i386/alpine:3.10 \
+               --build-arg alpine_image=i386/alpine:3.12 \
                --build-arg musl_target=i686-linux-musl \
                --build-arg gnu_target=i686-unknown-linux-gnu
 

@@ -1,4 +1,4 @@
-SHARDS_VERSION = "0.12.0"
+SHARDS_VERSION = "0.14.1"
 
 name "shards"
 default_version SHARDS_VERSION
@@ -34,18 +34,20 @@ version "0.12.0" do
   source md5: "c65327561cfbb0c465ec4bd945423fe9"
 end
 
+version "0.13.0" do
+  source md5: "a66b767ad9914472c23e1cb76446fead"
+end
+
+version "0.14.1" do
+  source md5: "d7bdd10bb096b71428b06fc93097b3cc"
+end
+
 source url: "https://github.com/crystal-lang/shards/archive/v#{version}.tar.gz"
 
 relative_path "shards-#{version}"
 env = with_standard_compiler_flags(with_embedded_path)
 
 build do
-  command "make lib", env: env
-
-  command "#{install_dir}/bin/crystal" \
-          " build" \
-          " -o #{install_dir}/embedded/bin/shards" \
-          " src/shards.cr" \
-          " --no-debug" \
-          " --release ", env: env
+  make "bin/shards SHARDS=false CRYSTAL=#{install_dir}/bin/crystal FLAGS='--no-debug --release'", env: env
+  command "cp bin/shards #{install_dir}/embedded/bin/shards"
 end
