@@ -17,11 +17,6 @@ version "10.0.0" do
          md5: "693cefdc49d618f828144486a18b473f"
 end
 
-version "10.0.1" do
-  source url: "https://github.com/llvm/llvm-project/releases/download/llvmorg-#{version}/llvm-#{version}.src.tar.xz",
-         md5: "71c68c526cbbf1674b5aafc5542b336c"
-end
-
 relative_path "llvm-#{version}.src"
 
 whitelist_file "lib/BugpointPasses.dylib"
