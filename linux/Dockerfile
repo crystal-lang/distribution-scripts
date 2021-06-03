@@ -11,6 +11,9 @@ ARG release
 ENV CFLAGS="-fPIC -pipe ${release:+-O2}"
 ENV CC="clang-8"
 
+# Termporary pinning libcurl oldrelease because current (7.74.0) is broken
+RUN apt-get install -y --allow-downgrades libcurl3-gnutls=7.64.0-4+deb10u2
+
 # Build libgc
 ARG gc_version
 ARG libatomic_ops_version
@@ -27,15 +30,6 @@ RUN git clone https://github.com/ivmai/bdwgc \
  && ./configure --disable-debug --disable-shared --enable-large-config \
  && make -j$(nproc)
 
-# Cross-compile crystal and build libcrystal.a
-ARG crystal_sha1
-ARG musl_target
-RUN git clone https://github.com/crystal-lang/crystal \
- && cd crystal \
- && git checkout ${crystal_sha1} \
- \
- && make deps
-
 FROM ${alpine_image}
 
 RUN sed -i 's|--list -- "$@"|--list "$@"|' /usr/bin/ldd
@@ -43,11 +37,11 @@ RUN sed -i 's|--list -- "$@"|--list "$@"|' /usr/bin/ldd
 # Install dependencies
 RUN apk add --no-cache \
       # Statically-compiled llvm
-      llvm8-dev llvm8-static \
+      llvm10-dev llvm10-static \
       # Static zlib, libyaml, libxml2, pcre, and libevent
-      zlib-dev yaml-dev libxml2-dev pcre-dev libevent-static \
+      zlib-static yaml-static libxml2-dev pcre-dev libevent-static \
       # Build tools
-      git gcc g++ make automake libtool autoconf bash coreutils
+      git gcc g++ make automake libtool autoconf bash coreutils curl
 
 ARG release
 ENV CFLAGS="-fPIC -pipe ${release:+-O2}"
@@ -86,7 +80,7 @@ RUN git clone https://github.com/crystal-lang/crystal \
  \
  && make crystal stats=true static=true ${release:+release=true} \
                  CRYSTAL_CONFIG_TARGET=${gnu_target} CRYSTAL_CONFIG_LIBRARY_PATH= \
- && ([ "$(ldd .build/crystal | wc -l)" -eq "1" ] || { echo './build/crystal is not statically linked'; ldd .build/crystal; exit 1; })
+ && ([ "$(ldd .build/crystal | wc -l)" -eq "0" ] || { echo './build/crystal is not statically linked'; ldd .build/crystal; exit 1; })
 
 # Build shards
 ARG shards_version
@@ -94,25 +88,19 @@ ARG musl_target
 RUN git clone https://github.com/crystal-lang/shards \
  && cd shards \
  && git checkout ${shards_version} \
- && shards install --production \
+ && make SHARDS=false CRYSTAL=/crystal/bin/crystal \
+         FLAGS="--stats --target ${musl_target} --static ${release:+--release}" \
  \
- && /crystal/bin/crystal build --stats --target ${musl_target} \
-    ./src/shards.cr -o shards --static ${release:+--release} \
- && ([ "$(ldd shards | wc -l)" -eq "1" ] || { echo 'shards is not statically linked'; ldd shards; exit 1; })
+ && ([ "$(ldd bin/shards | wc -l)" -eq "0" ] || { echo 'shards is not statically linked'; ldd bin/shards; exit 1; })
 
 COPY files/crystal-wrapper /output/bin/crystal
 COPY --from=debian /bdwgc/.libs/libgc.a /libgc-debian.a
-COPY --from=debian /crystal/src/ext/libcrystal.a /libcrystal-debian.a
 
 ARG package_iteration
 
 RUN \
- # Remove musl binaries from source and replace with debian ones
-    rm -Rf /crystal/src/{llvm/ext/llvm_ext.o,ext/sigfault.o,ext/libcrystal.a} \
- && mv /libcrystal-debian.a /crystal/src/ext/libcrystal.a \
- \
  # Copy libgc.a to /lib/crystal/lib/
- && mkdir -p /output/lib/crystal/lib/ \
+ mkdir -p /output/lib/crystal/lib/ \
  && cp /libgc-debian.a /output/lib/crystal/lib/libgc.a \
  \
  # Copy crystal to /lib/crystal/bin/
@@ -120,7 +108,7 @@ RUN \
  && cp /crystal/.build/crystal /output/lib/crystal/bin/crystal \
  \
  # Copy shards to /lib/crystal/bin/
- && cp /shards/shards /output/lib/crystal/bin/shards \
+ && cp /shards/bin/shards /output/lib/crystal/bin/shards \
  && ln -s ../lib/crystal/bin/shards /output/bin/shards \
  \
  # Copy stdlib to /share/crystal/src/
