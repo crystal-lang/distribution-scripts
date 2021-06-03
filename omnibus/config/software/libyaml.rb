@@ -17,7 +17,11 @@
 name "libyaml"
 default_version '0.1.6'
 
-source url: "http://pyyaml.org/download/libyaml/yaml-#{version}.tar.gz",
+# The sources of pyyaml are republished in S3 since pyyaml.org
+# seems to be restricting the user agent or the requests from our CI
+# http://pyyaml.org/download/libyaml/yaml-#{version}.tar.gz
+
+source url: "http://crystal-lang.s3.amazonaws.com/libyaml/yaml-#{version}.tar.gz",
        md5: '5fe00cda18ca5daeb43762b80c38e06e'
 
 relative_path "yaml-#{version}"
@@ -25,7 +29,7 @@ relative_path "yaml-#{version}"
 build do
   env = with_standard_compiler_flags(with_embedded_path)
 
-  command "./configure --prefix=#{install_dir}/embedded", env: env
+  command "./configure --disable-shared --prefix=#{install_dir}/embedded", env: env
 
   make "-j #{workers}", env: env
   make "-j #{workers} install", env: env
