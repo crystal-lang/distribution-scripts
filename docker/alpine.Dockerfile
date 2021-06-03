@@ -29,7 +29,7 @@ RUN git clone https://github.com/ivmai/bdwgc \
  && make install
 
 # Remove build tools from image now that libgc is built
-RUN apk del -r --purge autoconf automake libtool
+RUN apk del -r --purge autoconf automake libtool patch
 
 ARG crystal_targz
 COPY ${crystal_targz} /tmp/crystal.tar.gz
