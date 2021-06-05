@@ -20,9 +20,10 @@ dependency "libevent"
 
 env = with_standard_compiler_flags(with_embedded_path(
   "LIBRARY_PATH" => "#{install_dir}/embedded/lib",
-  "CRYSTAL_LIBRARY_PATH" => "#{install_dir}/embedded/lib"
+  "CRYSTAL_LIBRARY_PATH" => "#{install_dir}/embedded/lib",
 ))
-env["CFLAGS"] << " -fPIC"
+env["CFLAGS"] << " -fPIC -arch arm64 -arch x86_64"
+env["CPPFLAGS"] = env["CPPFLAGS"].gsub("-arch arm64 -arch x86_64", "")
 
 unless FIRST_RUN
   llvm_bin = Omnibus::Software.load(project, "llvm_bin", nil)
@@ -50,15 +51,38 @@ build do
   command "make deps", env: env
   command "mkdir .build", env: env
   command "echo #{Dir.pwd}", env: env
-  command "cp #{Dir.pwd}/crystal-#{ohai['os']}-#{ohai['kernel']['machine']} .build/crystal", env: env
-  command "make crystal stats=true release=true FLAGS=--no-debug CRYSTAL_CONFIG_LIBRARY_PATH= O=#{output_path}", env: env
+
+  crflags = "--no-debug"
+
+  command "cp #{Dir.pwd}/crystal-#{ohai['os']}-#{ohai['kernel']['machine']}/embedded/bin/crystal .build/crystal", env: env
+
+  # Compile for Intel
+  command "make crystal stats=true release=true FLAGS=\"#{crflags}\" CRYSTAL_CONFIG_LIBRARY_PATH= O=#{output_path}", env: env
+  command "mv #{output_bin} #{output_bin}_x86_64"
+
+  # Clean up
+  command "make clean"
+
+  # Compile for ARM64
+  env["CXXFLAGS"] << ' -target aarch64-apple-darwin'
+  command "make deps", env: env
+  command "mkdir .build", env: env
+  command "echo #{Dir.pwd}", env: env
+
+  crflags += " --cross-compile --target aarch64-apple-darwin -Dwithout_openssl -Dwithout_zlib --release --stats"
+  command "CRYSTAL_CONFIG_LIBRARY_PATH= bin/crystal build src/compiler/crystal.cr #{crflags}", env: env
+  command "clang crystal.o -o #{output_bin}_arm64 -target aarch64-apple-darwin src/llvm/ext/llvm_ext.o `llvm-config --libs --system-libs 2>/dev/null` -lstdc++ -lpcre -lgc -lpthread -levent -liconv -ldl", env: env
+
+  # Lipo them up
+  command "lipo -create -output #{output_bin} #{output_bin}_x86_64 #{output_bin}_arm64"
+  command "rm #{output_bin}_x86_64 #{output_bin}_arm64"
 
   block do
     raise "Could not build crystal" unless File.exists?(output_bin)
 
     if macos? || mac_os_x?
       otool_libs = `otool -L #{output_bin}`
-      if otool_libs.include?("/usr/local/lib")
+      if otool_libs.include?("/usr/local/lib") || otool_libs.include?('/opt/homebrew/lib')
         raise "Found local libraries linked to the generated compiler:\n#{otool_libs}"
       end
     end

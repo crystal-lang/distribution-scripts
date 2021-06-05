@@ -33,6 +33,7 @@ build do
   mkdir llvm_build_dir
   command "cmake" \
     " -DCMAKE_BUILD_TYPE=MinSizeRel" \
+    " -DCMAKE_OSX_ARCHITECTURES=\"arm64;x86_64\"" \
     " -DLLVM_TARGETS_TO_BUILD=\"X86;AArch64\"" \
     " -DLLVM_ENABLE_TERMINFO=OFF" \
     " -DLLVM_ENABLE_FFI=OFF" \

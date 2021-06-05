@@ -39,15 +39,15 @@ help: ## Show this help
 awk 'BEGIN {FS = "## "}; /^## [a-zA-Z_-]/ {printf "  \033[36m%s\033[0m\n", $$2}; /^##  / {printf "  %s\n", $$2}'
 
 .PHONY: darwin-previous
-darwin-previous: $(CURDIR)/../omnibus/crystal-darwin-x86_64 ## download previous crystal darwin release
+darwin-previous: $(CURDIR)/../omnibus/crystal-darwin-x86_64/embedded/bin/crystal ## download previous crystal darwin release
 
-$(CURDIR)/../omnibus/crystal-darwin-x86_64:
+# Once there are prior builds for arm64, this can use DARWIN_ARCH
+$(CURDIR)/../omnibus/crystal-darwin-x86_64/embedded/bin/crystal:
 	curl -L -o /tmp/crystal-darwin-x86_64.tar.gz $(PREVIOUS_CRYSTAL_RELEASE_DARWIN_TARGZ) \
-	&& tar xfz /tmp/crystal-darwin-x86_64.tar.gz -O "crystal-*/embedded/bin/crystal" > $(CURDIR)/../omnibus/crystal-darwin-x86_64 \
-	&& tar xfz /tmp/crystal-darwin-x86_64.tar.gz -O "crystal-*/embedded/bin/shards" > $(CURDIR)/../omnibus/shards-darwin-x86_64 \
+	&& mkdir -p $(CURDIR)/../omnibus/crystal-darwin-x86_64 \
+	&& tar xfz /tmp/crystal-darwin-x86_64.tar.gz -C $(CURDIR)/../omnibus/crystal-darwin-x86_64 --strip-components=1 \
 	&& rm /tmp/crystal-darwin-x86_64.tar.gz \
-	&& chmod +x $(CURDIR)/../omnibus/crystal-darwin-x86_64 \
-	&& chmod +x $(CURDIR)/../omnibus/shards-darwin-x86_64
+	&& chmod +x $(CURDIR)/../omnibus/crystal-darwin-x86_64/embedded/bin/crystal
 
 $(OUTPUT_DIR)/$(DARWIN_NAME) $(OUTPUT_DIR)/$(DARWIN_PKG_NAME): ## Build omnibus crystal project
 ifeq ($(FORCE_GIT_TAGGED), 0)
@@ -64,7 +64,8 @@ endif
   && export MACOSX_DEPLOYMENT_TARGET=10.11 \
 	&& bundle exec omnibus clean crystal shards \
   && bundle exec omnibus build crystal \
-  && cp ./pkg/$(DARWIN_NAME) ./pkg/$(DARWIN_PKG_NAME) $(CURDIR)/$(OUTPUT_DIR)/
+  && cp ./pkg/$(DARWIN_NAME) $(CURDIR)/$(OUTPUT_DIR)/$(subst x86_64,universal,$(DARWIN_NAME)) \
+	&& cp ./pkg/$(DARWIN_PKG_NAME) $(CURDIR)/$(OUTPUT_DIR)/$(subst x86_64,universal,$(DARWIN_PKG_NAME))
 
 .PHONY: clean
 clean: ## Clean up build directory
@@ -72,6 +73,6 @@ clean: ## Clean up build directory
 	rm -Rf $(CURDIR)/tmp
 	rm -Rf $(CURDIR)/../omnibus/pkg/crystal-*
 	rm -Rf $(CURDIR)/../omnibus/pkg/version-*
-	rm -Rf $(CURDIR)/../omnibus/crystal-darwin-x86_64
+	rm -Rf $(CURDIR)/../omnibus/crystal-darwin-*
 	rm -Rf /var/cache/omnibus/*
 	rm -Rf /opt/crystal/*

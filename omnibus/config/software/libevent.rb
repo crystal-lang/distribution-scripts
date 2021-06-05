@@ -7,9 +7,8 @@ source url: "https://github.com/libevent/libevent/archive/release-#{version}-sta
 
 relative_path "libevent-release-#{version}-stable"
 env = with_standard_compiler_flags(with_embedded_path)
-env["CFLAGS"] << " -fPIC"
-env["CFLAGS"] << " -I/usr/local/opt/openssl/include" if macos? || mac_os_x?
-env["LDFLAGS"] << " -L/usr/local/opt/openssl/lib" if macos? || mac_os_x?
+env["CFLAGS"] << " -fPIC -arch arm64 -arch x86_64"
+env["CPPFLAGS"] = env["CPPFLAGS"].gsub("-arch arm64 -arch x86_64", "")
 
 build do
   command "./autogen.sh"

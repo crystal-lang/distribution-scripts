@@ -25,7 +25,8 @@ relative_path "pcre-#{version}"
 
 build do
   env = with_standard_compiler_flags(with_embedded_path)
-  env["CFLAGS"] << " -fPIC"
+  env["CFLAGS"] << " -fPIC -arch arm64 -arch x86_64"
+  env["CPPFLAGS"] = env["CPPFLAGS"].gsub("-arch arm64 -arch x86_64", "")
 
   command "./configure" \
           " --prefix=#{install_dir}/embedded" \

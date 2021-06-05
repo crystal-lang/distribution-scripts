@@ -25,7 +25,8 @@ dependency "libatomic_ops"
 relative_path "gc-#{version}"
 
 env = with_standard_compiler_flags(with_embedded_path)
-env["CFLAGS"] << " -fPIC"
+env["CFLAGS"] << " -fPIC -arch arm64 -arch x86_64"
+env["CPPFLAGS"] = env["CPPFLAGS"].gsub("-arch arm64 -arch x86_64", "")
 
 build do
   patch source: 'feature-thread-stackbottom-upstream.patch', plevel: 1
