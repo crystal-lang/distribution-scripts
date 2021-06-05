@@ -39,6 +39,10 @@ end
 
 if macos? || mac_os_x?
   env["CRYSTAL_PATH"] = "/private/var/cache/omnibus/src/crystal/src"
+
+  if arm?
+    env['CRYSTAL_CONFIG_TARGET'] = 'aarch64-apple-darwin'
+  end
 else
   env["CRYSTAL_PATH"] = "#{project_dir}/src"
 end
@@ -50,15 +54,33 @@ build do
   command "make deps", env: env
   command "mkdir .build", env: env
   command "echo #{Dir.pwd}", env: env
-  command "cp #{Dir.pwd}/crystal-#{ohai['os']}-#{ohai['kernel']['machine']} .build/crystal", env: env
-  command "make crystal stats=true release=true FLAGS=--no-debug CRYSTAL_CONFIG_LIBRARY_PATH= O=#{output_path}", env: env
+
+  crflags = "--no-debug"
+
+  if (macos? || mac_os_x?) && arm?
+    # Only needed until there are previous arm64 releases
+    crflags += " --cross-compile --target aarch64-apple-darwin -Dwithout_openssl -Dwithout_zlib --release --stats"
+
+    intel_omni_path = "#{Dir.pwd}/crystal-darwin-x86_64"
+    intel_env = env.merge(
+      "CRYSTAL_CONFIG_LIBRARY_PATH" => "",
+      "CRYSTAL_LIBRARY_PATH" => "#{intel_omni_path}/embedded/lib/",
+      "PKG_CONFIG_PATH" => "#{intel_omni_path}/embedded/lib/pkgconfig"
+    )
+    command "cp #{intel_omni_path}/embedded/bin/crystal .build/crystal", env: env
+    command "bin/crystal build src/compiler/crystal.cr #{crflags}", env: intel_env
+    command "clang crystal.o -o #{output_bin} src/llvm/ext/llvm_ext.o `llvm-config --libs --system-libs --ldflags 2>/dev/null` -lstdc++ -lpcre -lgc -lpthread -levent -liconv -ldl", env: env
+  else
+    command "cp #{Dir.pwd}/crystal-#{ohai['os']}-#{ohai['kernel']['machine']}/embedded/bin/crystal .build/crystal", env: env
+    command "make crystal stats=true release=true FLAGS=\"#{crflags}\" CRYSTAL_CONFIG_LIBRARY_PATH= O=#{output_path}", env: env
+  end
 
   block do
     raise "Could not build crystal" unless File.exists?(output_bin)
 
     if macos? || mac_os_x?
       otool_libs = `otool -L #{output_bin}`
-      if otool_libs.include?("/usr/local/lib")
+      if otool_libs.include?("/usr/local/lib") || otool_libs.include?('/opt/homebrew/lib')
         raise "Found local libraries linked to the generated compiler:\n#{otool_libs}"
       end
     end

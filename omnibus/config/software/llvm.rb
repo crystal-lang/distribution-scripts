@@ -33,7 +33,7 @@ build do
   mkdir llvm_build_dir
   command "cmake" \
     " -DCMAKE_BUILD_TYPE=MinSizeRel" \
-    " -DLLVM_TARGETS_TO_BUILD=X86" \
+    " -DLLVM_TARGETS_TO_BUILD=\"X86;AArch64\"" \
     " -DLLVM_ENABLE_TERMINFO=OFF" \
     " -DLLVM_ENABLE_FFI=OFF" \
     " -DLLVM_ENABLE_ZLIB=OFF" \
