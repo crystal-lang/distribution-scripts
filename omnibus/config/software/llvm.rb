@@ -45,6 +45,7 @@ build do
     " -DLLVM_ENABLE_ASSERTIONS=ON" \
     " -DLLVM_INCLUDE_TESTS=OFF" \
     " -DLLVM_ENABLE_Z3_SOLVER=OFF" \
+    " -DLLVM_ENABLE_LIBXML2=OFF" \
     "#{' -DPYTHON_EXECUTABLE=$(which python2.7)' if centos? }"\
     " #{project_dir}", env: env, cwd: llvm_build_dir
   command "cmake --build .", env: env, cwd: llvm_build_dir
