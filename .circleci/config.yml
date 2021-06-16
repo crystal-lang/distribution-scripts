@@ -3,7 +3,7 @@ version: 2
 jobs:
   omnibus_osx_llvm:
     macos:
-      xcode: "11.1.0"
+      xcode: 12.4.0
     environment:
       LLVM_VERSION: 10.0.0
       MACOSX_DEPLOYMENT_TARGET: 10.11
