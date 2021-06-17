@@ -41,6 +41,7 @@ if macos? || mac_os_x?
   env["CRYSTAL_PATH"] = "/private/var/cache/omnibus/src/crystal/src"
 
   if arm?
+    # Only needed until there are previous arm64 releases
     env['CRYSTAL_CONFIG_TARGET'] = 'aarch64-apple-darwin'
   end
 else
