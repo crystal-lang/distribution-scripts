@@ -1,5 +1,6 @@
 name "tgz_package"
 default_version "0.0.1"
+skip_transitive_dependency_licensing true
 
 build do
   block do
@@ -7,7 +8,7 @@ build do
     version = "#{project.build_version}-#{project.build_iteration}"
     version.gsub!("/", "-")
     tgz_name = "#{project.name}-#{version}-#{ohai['os']}-#{ohai['kernel']['machine']}.tar.gz"
-    if mac_os_x?
+    if macos? || mac_os_x?
       transform = "-s /./#{project.name}-#{version}/"
     else
       transform = %(--transform="s/./#{project.name}-#{version}/")

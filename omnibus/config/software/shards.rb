@@ -2,6 +2,7 @@ SHARDS_VERSION = "0.15.0"
 
 name "shards"
 default_version SHARDS_VERSION
+skip_transitive_dependency_licensing true
 
 dependency "crystal"
 dependency "libyaml"
