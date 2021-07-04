@@ -17,6 +17,7 @@ build do
           " --disable-dependency-tracking" \
           " --disable-shared" \
           " --disable-clock-gettime" \
+          " --disable-openssl" \
           " --prefix=#{install_dir}/embedded", env: env
   make "-j #{workers}", env: env
   make  "install"
