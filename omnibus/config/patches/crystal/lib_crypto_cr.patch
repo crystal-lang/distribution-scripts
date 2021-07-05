@@ -1,9 +1,0 @@
-diff --git a/libs/openssl/lib_crypto.cr b/libs/openssl/lib_crypto.cr
-index 2de1835..3f3239a 100644
---- a/libs/openssl/lib_crypto.cr
-+++ b/libs/openssl/lib_crypto.cr
-@@ -1,3 +1,4 @@
-+@[Link("z")]
- @[Link("crypto")]
- lib LibCrypto
-   struct Bio

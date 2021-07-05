@@ -1,7 +1,8 @@
-
 omnibus/pkg/
-
-omnibus/crystal-darwin-x86_64
+omnibus/.bundle
+omnibus/bin
+omnibus/crystal-darwin-*
+omnibus/shards-darwin-*
 
 docs/build/
 

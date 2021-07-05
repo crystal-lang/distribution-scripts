@@ -1,5 +1,6 @@
 name "bdw-gc"
 default_version "8.0.4"
+skip_transitive_dependency_licensing true
 
 source :url => "https://github.com/ivmai/bdwgc/releases/download/v#{version}/gc-#{version}.tar.gz"
 
@@ -24,7 +25,8 @@ dependency "libatomic_ops"
 relative_path "gc-#{version}"
 
 env = with_standard_compiler_flags(with_embedded_path)
-env["CFLAGS"] << " -fPIC"
+env["CFLAGS"] << " -fPIC -arch arm64 -arch x86_64"
+env["CPPFLAGS"] = env["CPPFLAGS"].gsub("-arch arm64 -arch x86_64", "")
 
 build do
   patch source: 'feature-thread-stackbottom-upstream.patch', plevel: 1
