@@ -16,7 +16,7 @@ OUTPUT_DIR = build
 DARWIN_ARCH = $(shell uname -m)
 DARWIN_PREFIX = crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION)
 DARWIN_NAME = $(DARWIN_PREFIX)-darwin-$(DARWIN_ARCH).tar.gz
-DARWIN_PKG_NAME = $(DARWIN_PREFIX).pkg
+DARWIN_PKG_NAME = $(DARWIN_PREFIX).$(DARWIN_ARCH).pkg
 
 .PHONY: all
 all: darwin-previous $(OUTPUT_DIR)/$(DARWIN_NAME) $(OUTPUT_DIR)/$(DARWIN_PKG_NAME) ## Build compressed omnibus and distribution packages [default]
@@ -44,7 +44,7 @@ darwin-previous: $(CURDIR)/../omnibus/crystal-darwin-x86_64/embedded/bin/crystal
 # Once there are prior builds for arm64, this can use DARWIN_ARCH
 $(CURDIR)/../omnibus/crystal-darwin-x86_64/embedded/bin/crystal:
 	curl -L -o /tmp/crystal-darwin-x86_64.tar.gz $(PREVIOUS_CRYSTAL_RELEASE_DARWIN_TARGZ) \
-	&& mkdir -p $(CURDIR)/../omnibus/crystal-darwin-x86_64
+	&& mkdir -p $(CURDIR)/../omnibus/crystal-darwin-x86_64 \
 	&& tar xfz /tmp/crystal-darwin-x86_64.tar.gz -C $(CURDIR)/../omnibus/crystal-darwin-x86_64 --strip-components=1 \
 	&& rm /tmp/crystal-darwin-x86_64.tar.gz \
 	&& chmod +x $(CURDIR)/../omnibus/crystal-darwin-x86_64/embedded/bin/crystal
