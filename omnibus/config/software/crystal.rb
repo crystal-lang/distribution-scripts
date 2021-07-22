@@ -61,7 +61,7 @@ build do
   command "mv #{output_bin} #{output_bin}_x86_64"
 
   # Clean up
-  command "make clean"
+  command "make clean_cache clean"
 
   # Compile for ARM64
   env["CXXFLAGS"] << ' -target aarch64-apple-darwin'
@@ -69,9 +69,10 @@ build do
   command "mkdir .build", env: env
   command "echo #{Dir.pwd}", env: env
 
-  crflags += " --cross-compile --target aarch64-apple-darwin -Dwithout_openssl -Dwithout_zlib --release --stats"
-  command "CRYSTAL_CONFIG_LIBRARY_PATH= bin/crystal build src/compiler/crystal.cr #{crflags}", env: env
-  command "clang crystal.o -o #{output_bin}_arm64 -target aarch64-apple-darwin src/llvm/ext/llvm_ext.o `llvm-config --libs --system-libs 2>/dev/null` -lstdc++ -lpcre -lgc -lpthread -levent -liconv -ldl", env: env
+  crflags += " --cross-compile --target aarch64-apple-darwin"
+  command "make crystal stats=true release=true FLAGS=\"#{crflags}\" CRYSTAL_CONFIG_TARGET=aarch64-apple-darwin CRYSTAL_CONFIG_LIBRARY_PATH= O=#{output_path}", env: env
+  command "clang #{output_path}/crystal.o -o #{output_bin}_arm64 -target aarch64-apple-darwin src/llvm/ext/llvm_ext.o `llvm-config --libs --system-libs 2>/dev/null` -lstdc++ -lpcre -lgc -lpthread -levent -liconv -ldl", env: env
+  command "rm #{output_path}/crystal.o"
 
   # Lipo them up
   command "lipo -create -output #{output_bin} #{output_bin}_x86_64 #{output_bin}_arm64"
