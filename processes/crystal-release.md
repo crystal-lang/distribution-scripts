@@ -23,12 +23,12 @@
 3. Verify Maintenance CI workflow succeeds on the HEAD of the release branch
 4. Smoke test with [test-ecosystem](https://github.com/crystal-lang/test-ecosystem)
    * Run [*Test Crystal & Shards Workflow](https://github.com/crystal-lang/test-ecosystem/actions/workflows/test-crystal-shards.yml) with the release branch as `crystal_branch`.
-4. Merge the release PR
-5. Tag & annotate the commit with the changelog using `<M.m.p>` pattern as {version} (as a pre-release directly in GH?)
-6. Publish Github release
+5. Merge the release PR
+6. Tag & annotate the commit with the changelog using `<M.m.p>` pattern as {version} (as a pre-release directly in GH?)
+7. Publish Github release
    1. Copy the changelog section as description
    1. Binaries are added later
-7. Publish docs
+8. Publish docs
    1. Have s3cmd installed and AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY env variables defined
    1. `$ source /Volumes/Secured/secure/manas-aws-key-crystal-dist.sh`
    1. Checkout https://github.com/crystal-lang/crystal-dist
@@ -46,7 +46,7 @@
    * `crystal-*-linux-*.tar.gz`
    * `crystal-*.pkg`
    * `crystal-*-docs.tar.gz`
-3. Push changes to OBS for building linux packages
+4. Push changes to OBS for building linux packages
    1. Checkout https://github.com/crystal-lang/distribution-scripts
    3. Follow [./packages/README.md](../packages/README.md) in distribution-scripts
       1. The following steps should run in an openSUSE distribution with osc installed (https://github.com/crystal-lang/osc-docker)
@@ -71,7 +71,7 @@
       1. Verify package builds
          * `OBS_PROJECT=home:$OBS_USERNAME:branches:devel:languages:crystal/crystal make -C packages test`
       1. When everything is green, create a submit request against the original package (“Submit package” link in the menu bar on the package in your branch)
-9. Build and publish docker images
+5. Build and publish docker images
    1. Checkout https://github.com/crystal-lang/crystal-dist
    2. `$ ./dist.sh build-docker {version}`
    3. `$ ./dist.sh push-docker {version}`
@@ -85,17 +85,17 @@
       * `$ docker push crystallang/crystal:{version}-alpine-build`
       * `$ docker tag crystallang/crystal:{version}-alpine crystallang/crystal:latest-alpine`
       * `$ docker push crystallang/crystal:latest-alpine`
-11. Publish snap package
-    1. You need to logged in via `$ snapcraft login`
-    1. Recent tagged release is published directly to edge channel. The CI logs the snap revision number. Otherwise the .snap file is in the artifacts.
-    1. Check the current status to find the revision of the tagged release otherwise:
-    1. `$ snapcraft status crystal`
-    1. `$ snapcraft release crystal <revision-number> beta`
-    1. `$ snapcraft release crystal <revision-number> stable`
-13. Submit a PR to update the homebrew formula in https://github.com/Homebrew/homebrew-core/blob/master/Formula/crystal.rb .
-    1. Update the previous and new version (with their respective hashes).
-    1. Try locally `$ brew install --build-from-source <source of formula>`
-    1. Create PR
+6. Publish snap package
+   1. You need to logged in via `$ snapcraft login`
+   1. Recent tagged release is published directly to edge channel. The CI logs the snap revision number. Otherwise the .snap file is in the artifacts.
+   1. Check the current status to find the revision of the tagged release otherwise:
+   1. `$ snapcraft status crystal`
+   1. `$ snapcraft release crystal <revision-number> beta`
+   1. `$ snapcraft release crystal <revision-number> stable`
+7. Submit a PR to update the homebrew formula in https://github.com/Homebrew/homebrew-core/blob/master/Formula/crystal.rb .
+   1. Update the previous and new version (with their respective hashes).
+   1. Try locally `$ brew install --build-from-source <source of formula>`
+   1. Create PR
 
 ### Release announcements
 14. Update crystal-website
