@@ -6,7 +6,7 @@ install_dir '/opt/llvm'
 build_version do
   source :version, from_dependency: 'llvm'
 end
-build_iteration 1
+build_iteration 3
 
 def valid_cmake_version?
   `cmake --version` =~ /cmake version (\d+\.)(\d+\.)(\d)/
