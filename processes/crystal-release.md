@@ -47,30 +47,22 @@
    * `crystal-*.pkg`
    * `crystal-*-docs.tar.gz`
 4. Push changes to OBS for building linux packages
-   1. Checkout https://github.com/crystal-lang/distribution-scripts
-   3. Follow [./packages/README.md](../packages/README.md) in distribution-scripts
-      1. The following steps should run in an openSUSE distribution with osc installed (https://github.com/crystal-lang/osc-docker)
-      1. Configure build.opensuse.org credentials in ~/.oscrc
-      1. `osc branchco devel:languages:crystal crystal`
-      1. `cd home\:$OBS_USERNAME\:branches\:devel\:languages\:crystal/crystal`
-      1. Update version in package specifications:
-         ```bash
-         VERSION=1.1.0 # or whatever version you’re releasing
-         sed -i -e "s/^Version: .*/Version: ${VERSION}-1/" *.dsc
-         sed -i -e "s/^DEBTRANSFORM-TAR: .*/DEBTRANSFORM-TAR: ${VERSION}-1/" *.dsc
-         sed -i -e "s/^Version: .*/Version: ${VERSION}/" *.spec
-         ```
-      1. (optionally) Run local test builds
+   1. Checkout https://github.com/crystal-lang/distribution-scripts and go to [`./packages`](../packages)
+   2. Configure build.opensuse.org credentials in environment variables:
+      * `export OBS_USER=`
+      * `export OBS_PASSWORD=`
+   3. Run [`./obs-release.sh $VERSION`](../packages/obs-release.sh)
+      * Uses the docker image `crystallang/osc` to run the CLI client for OBS.
+      * The script creates a branch in you home project, updates the version and pushes it back to OBS.
+      * You can also run the commands from that file manually and check build locally with
          * `osc build xUbuntu_20.04 x86_64`
          * `osc build Fedora_Rawhide x86_64`
-      1. Verify the changes with `osc diff`
-      1. Update changelog: `osc vc -m “Update to Crystal $VERSION`
-      1. Commit changes: `osc commit -m “Update to Crystal $VERSION`
-      1. Now OBS builds the packages. It’s best to continue in the browser now: https://build.opensuse.org/project/show/home:$OBS_USER:branches:devel:langauges:crystal/crystal
+   4. Now OBS builds the packages. It’s best to follow the build status in the browser:
+      1. `open https://build.opensuse.org/project/show/home:$OBS_USER:branches:devel:langauges:crystal/crystal`
       1. Wait for all package build jobs to finish and succeed
-      1. Verify package builds
-         * `OBS_PROJECT=home:$OBS_USERNAME:branches:devel:languages:crystal/crystal make -C packages test`
-      1. When everything is green, create a submit request against the original package (“Submit package” link in the menu bar on the package in your branch)
+   5. Verify package installation
+      * `OBS_PROJECT=home:$OBS_USER:branches:devel:languages:crystal bats test`
+   6. When everything is green, create a submit request against the original package (*Submit package* link in the menu bar on the package in your branch)
 5. Build and publish docker images
    1. Checkout https://github.com/crystal-lang/crystal-dist
    2. `$ ./dist.sh build-docker {version}`
