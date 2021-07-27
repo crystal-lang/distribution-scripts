@@ -51,7 +51,7 @@
    2. Configure build.opensuse.org credentials in environment variables:
       * `export OBS_USER=`
       * `export OBS_PASSWORD=`
-   3. Run [`./obs-release.sh $VERSION`](../packages/obs-release.sh)
+   3. Run [`./obs-release.sh devel:languages:crystal crystal $VERSION`](../packages/obs-release.sh)
       * Uses the docker image `crystallang/osc` to run the CLI client for OBS.
       * The script creates a branch in you home project, updates the version and pushes it back to OBS.
       * You can also run the commands from that file manually and check build locally with
