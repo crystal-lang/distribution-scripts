@@ -1,6 +1,7 @@
 name "llvm"
 LLVM_VERSION = (ENV['LLVM_VERSION'] || "10.0.0").strip
 default_version LLVM_VERSION
+skip_transitive_dependency_licensing true
 
 version "3.9.1" do
   source url: "http://releases.llvm.org/#{version}/llvm-#{version}.src.tar.xz",
@@ -32,7 +33,8 @@ build do
   mkdir llvm_build_dir
   command "cmake" \
     " -DCMAKE_BUILD_TYPE=MinSizeRel" \
-    " -DLLVM_TARGETS_TO_BUILD=X86" \
+    " -DCMAKE_OSX_ARCHITECTURES=\"arm64;x86_64\"" \
+    " -DLLVM_TARGETS_TO_BUILD=\"X86;AArch64\"" \
     " -DLLVM_ENABLE_TERMINFO=OFF" \
     " -DLLVM_ENABLE_FFI=OFF" \
     " -DLLVM_ENABLE_ZLIB=OFF" \
@@ -44,6 +46,7 @@ build do
     " -DLLVM_ENABLE_ASSERTIONS=ON" \
     " -DLLVM_INCLUDE_TESTS=OFF" \
     " -DLLVM_ENABLE_Z3_SOLVER=OFF" \
+    " -DLLVM_ENABLE_LIBXML2=OFF" \
     "#{' -DPYTHON_EXECUTABLE=$(which python2.7)' if centos? }"\
     " #{project_dir}", env: env, cwd: llvm_build_dir
   command "cmake --build .", env: env, cwd: llvm_build_dir

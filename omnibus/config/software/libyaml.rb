@@ -16,6 +16,7 @@
 
 name "libyaml"
 default_version '0.1.6'
+skip_transitive_dependency_licensing true
 
 # The sources of pyyaml are republished in S3 since pyyaml.org
 # seems to be restricting the user agent or the requests from our CI

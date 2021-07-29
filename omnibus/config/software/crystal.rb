@@ -5,6 +5,7 @@ CRYSTAL_SRC = (ENV['CRYSTAL_SRC'] || "").strip
 
 name "crystal"
 default_version CRYSTAL_VERSION
+skip_transitive_dependency_licensing true
 
 if CRYSTAL_SRC.empty?
   source git: "https://github.com/crystal-lang/crystal"
@@ -36,7 +37,7 @@ else
   env["PATH"] = "#{llvm_bin.project_dir}/bin:#{project_dir}/deps:#{env["PATH"]}"
 end
 
-if mac_os_x?
+if macos? || mac_os_x?
   env["CRYSTAL_PATH"] = "/private/var/cache/omnibus/src/crystal/src"
 else
   env["CRYSTAL_PATH"] = "#{project_dir}/src"
@@ -55,7 +56,7 @@ build do
   block do
     raise "Could not build crystal" unless File.exists?(output_bin)
 
-    if mac_os_x?
+    if macos? || mac_os_x?
       otool_libs = `otool -L #{output_bin}`
       if otool_libs.include?("/usr/local/lib")
         raise "Found local libraries linked to the generated compiler:\n#{otool_libs}"

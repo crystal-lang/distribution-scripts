@@ -13,9 +13,10 @@ PREVIOUS_CRYSTAL_RELEASE_DARWIN_TARGZ ?= ## url to crystal-{version}-{package}-d
 OUTPUT_DIR = build
 
 # mimics the tgz_package.rb version mangling
+DARWIN_ARCH = $(shell uname -m)
 DARWIN_PREFIX = crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION)
-DARWIN_NAME = $(DARWIN_PREFIX)-darwin-x86_64.tar.gz
-DARWIN_PKG_NAME = $(DARWIN_PREFIX).pkg
+DARWIN_NAME = $(DARWIN_PREFIX)-darwin-$(DARWIN_ARCH).tar.gz
+DARWIN_PKG_NAME = $(DARWIN_PREFIX).$(DARWIN_ARCH).pkg
 
 .PHONY: all
 all: darwin-previous $(OUTPUT_DIR)/$(DARWIN_NAME) $(OUTPUT_DIR)/$(DARWIN_PKG_NAME) ## Build compressed omnibus and distribution packages [default]
