@@ -90,13 +90,14 @@
    1. Create PR
 
 ### Release announcements
-14. Update crystal-website
-    1. Post a release notes in the website
-    1. Update information of `latest_release` in https://github.com/crystal-lang/crystal-website/blob/master/_config.yml
-    1. Update link to blog in https://github.com/crystal-lang/crystal-website/blob/5905e5644fcb4863976d0ca69856edbd74091370/index.html#L26
-15. Post announcement in https://forum.crystal-lang.org/c/news/official
-16. Tweet about the release
-17. Post in Reddit
+1. Update crystal-website
+   1. Post a release notes in the website
+   1. Update information of `latest_release` in https://github.com/crystal-lang/crystal-website/blob/master/_config.yml
+   1. Update link to blog in https://github.com/crystal-lang/crystal-website/blob/5905e5644fcb4863976d0ca69856edbd74091370/index.html#L26
+2. Post announcement in https://forum.crystal-lang.org/c/news/official
+3. Tweet about the release
+4. Post in Reddit
+5. Update https://github.com/crystal-lang/crystal-book/blob/master/crystal-version.txt
 
 ## Post-release
 1. Update crystal `master` branch to use released version
