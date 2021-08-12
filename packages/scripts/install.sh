@@ -5,7 +5,7 @@ _help() {
 
 USAGE
 
-    $ ./install.sh [--crystal=<crystal-version>] [--channel=stable|unstable|nightly]
+    $ ./install.sh [--version=<crystal-version>] [--channel=stable|unstable|nightly]
 
   - crystal-version: "latest", or a minor release version like 1.0 or 1.1 (Default: latest)
   - channel: "stable", "unstable", "nightly" (Default: stable)
@@ -27,7 +27,7 @@ NOTES
 
   - wget (on Debian/Ubuntu when missing)
   - curl (on openSUSE when missing)
-  - yum-utils (on CentOS/Fedora when using --crystal=x.y.z)
+  - yum-utils (on CentOS/Fedora when using --version=x.y.z)
 
   This script source and issue-tracker can be found at:
 
@@ -143,12 +143,17 @@ if [[ $EUID -ne 0 ]]; then
   exit 1
 fi
 
-# Parse --crystal=<VERSION> and --channel=<CHANNEL> arguments
+# Parse --version=<VERSION> and --channel=<CHANNEL> arguments
 
 for i in "$@"
 do
 case $i in
     --crystal=*)
+    CRYSTAL_VERSION="${i#*=}"
+    shift
+    echo "The argument --crystal= has been deprecated, please use --version= instead." >&2
+    ;;
+    --version=*)
     CRYSTAL_VERSION="${i#*=}"
     shift
     ;;
