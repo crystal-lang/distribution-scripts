@@ -19,7 +19,8 @@ end
 relative_path "libatomic_ops-#{version}"
 
 env = with_standard_compiler_flags
-env["CFLAGS"] << " -fPIC -arch arm64 -arch x86_64"
+sysroot = "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk"
+env["CFLAGS"] << " -fPIC -arch arm64 -arch x86_64 -isysroot #{sysroot} -isystem #{sysroot} "
 env["CPPFLAGS"] = env["CPPFLAGS"].gsub("-arch arm64 -arch x86_64", "")
 
 build do

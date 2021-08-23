@@ -7,7 +7,8 @@ source url: "https://github.com/libevent/libevent/archive/release-#{version}-sta
 
 relative_path "libevent-release-#{version}-stable"
 env = with_standard_compiler_flags(with_embedded_path)
-env["CFLAGS"] << " -fPIC -arch arm64 -arch x86_64"
+sysroot = "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk"
+env["CFLAGS"] << " -fPIC -arch arm64 -arch x86_64 -isysroot #{sysroot} -isystem #{sysroot} "
 env["CPPFLAGS"] = env["CPPFLAGS"].gsub("-arch arm64 -arch x86_64", "")
 
 build do

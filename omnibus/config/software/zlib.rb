@@ -37,7 +37,8 @@ build do
   # up the embedded libtool instead of the system libtool which the zlib
   # configure script cannot handle.
   env = with_standard_compiler_flags
-  env["CFLAGS"] << " -fPIC -arch arm64 -arch x86_64"
+  sysroot = "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk"
+  env["CFLAGS"] << " -fPIC -arch arm64 -arch x86_64 -isysroot #{sysroot} -isystem #{sysroot} "
   env["CPPFLAGS"] = env["CPPFLAGS"].gsub("-arch arm64 -arch x86_64", "")
 
   # For some reason zlib needs this flag on solaris (cargocult warning?)
