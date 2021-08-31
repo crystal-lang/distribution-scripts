@@ -2,9 +2,9 @@
 
 ## Release preparation
 
-1. Start preparing changelog and release post
-2. Announce expected release date and time span for feature freeze
+1. Announce expected release date and time span for feature freeze
    * Feature freeze is about two weeks before release
+2. Start preparing changelog and release post
 3. Start feature freeze period
    * Either no merging of features into `master` or split off release branch for backporting bugfixes.
 4. Publish release PR draft
