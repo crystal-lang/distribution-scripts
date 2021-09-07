@@ -48,35 +48,39 @@ build do
   command "git checkout #{CRYSTAL_SHA1}", cwd: project_dir
 
   mkdir "#{project_dir}/deps"
-  command "make deps", env: env
-  command "mkdir .build", env: env
+  make "deps", env: env
+  mkdir ".build"
   command "echo #{Dir.pwd}", env: env
 
   crflags = "--no-debug"
 
-  command "cp #{Dir.pwd}/crystal-#{ohai['os']}-#{ohai['kernel']['machine']}/embedded/bin/crystal .build/crystal", env: env
+  copy "#{Dir.pwd}/crystal-#{ohai['os']}-#{ohai['kernel']['machine']}/embedded/bin/crystal", ".build/crystal"
 
   # Compile for Intel
   command "make crystal stats=true release=true FLAGS=\"#{crflags}\" CRYSTAL_CONFIG_LIBRARY_PATH= O=#{output_path}", env: env
-  command "mv #{output_bin} #{output_bin}_x86_64"
+  move output_bin, "#{output_bin}_x86_64"
 
   # Clean up
-  command "make clean_cache clean"
+  make "clean_cache clean", env: env
 
-  # Compile for ARM64
-  env["CXXFLAGS"] << ' -target aarch64-apple-darwin'
-  command "make deps", env: env
-  command "mkdir .build", env: env
-  command "echo #{Dir.pwd}", env: env
+  # Restore x86_64 compiler w/ cross-compile support
+  mkdir ".build"
+  copy "#{output_bin}_x86_64", ".build/crystal"
 
-  crflags += " --cross-compile --target aarch64-apple-darwin"
-  command "make crystal stats=true release=true FLAGS=\"#{crflags}\" CRYSTAL_CONFIG_TARGET=aarch64-apple-darwin CRYSTAL_CONFIG_LIBRARY_PATH= O=#{output_path}", env: env
-  command "clang #{output_path}/crystal.o -o #{output_bin}_arm64 -target aarch64-apple-darwin src/llvm/ext/llvm_ext.o `llvm-config --libs --system-libs 2>/dev/null` -lstdc++ -lpcre -lgc -lpthread -levent -liconv -ldl", env: env
-  command "rm #{output_path}/crystal.o"
+  # Compile for ARM64. Apple's clang only understands arm64, LLVM uses aarch64,
+  # so we need to sub out aarch64 in our calls to Apple tools
+  env["CXXFLAGS"] << " -target arm64-apple-darwin"
+  make "deps", env: env
+
+  make "crystal stats=true release=true target=aarch64-apple-darwin FLAGS=\"#{crflags}\" CRYSTAL_CONFIG_TARGET=aarch64-apple-darwin CRYSTAL_CONFIG_LIBRARY_PATH= O=#{output_path}", env: env
+
+  command "clang #{output_path}/crystal.o -o #{output_bin}_arm64 -target arm64-apple-darwin src/llvm/ext/llvm_ext.o `llvm-config --libs --system-libs --ldflags 2>/dev/null` -lstdc++ -lpcre -lgc -lpthread -levent -liconv -ldl -v", env: env
+  delete "#{output_path}/crystal.o"
 
   # Lipo them up
   command "lipo -create -output #{output_bin} #{output_bin}_x86_64 #{output_bin}_arm64"
-  command "rm #{output_bin}_x86_64 #{output_bin}_arm64"
+  delete "#{output_bin}_x86_64"
+  delete "#{output_bin}_arm64"
 
   block do
     raise "Could not build crystal" unless File.exists?(output_bin)
