@@ -54,8 +54,26 @@ env = with_standard_compiler_flags(with_embedded_path(
   "LIBRARY_PATH" => "#{install_dir}/embedded/lib",
   "CRYSTAL_LIBRARY_PATH" => "#{install_dir}/embedded/lib"
 ))
+env["CFLAGS"] << " -fPIC -arch arm64 -arch x86_64"
+env["CPPFLAGS"] = env["CPPFLAGS"].gsub("-arch arm64 -arch x86_64", "")
 
 build do
-  make "bin/shards SHARDS=false CRYSTAL=#{install_dir}/bin/crystal FLAGS='--no-debug --release'", env: env
+  crflags = "--no-debug --release"
+
+  # Build for Intel
+  make "bin/shards SHARDS=false CRYSTAL=#{install_dir}/bin/crystal FLAGS='#{crflags}'", env: env
+  move "bin/shards", "bin/shards_x86_64"
+
+  # Clean
+  make "clean", env: env
+
+  # Build for ARM64
+  crflags += " --cross-compile --target aarch64-apple-darwin"
+  make "bin/shards SHARDS=false CRYSTAL=#{install_dir}/bin/crystal FLAGS='#{crflags}'", env: env
+  command "clang bin/shards.o -o bin/shards_arm64 -target arm64-apple-darwin -L#{install_dir}/embedded/lib -lyaml -lpcre -lgc -lpthread -levent -liconv -ldl", env: env
+
+  # Lipo them up
+  command "lipo -create -output bin/shards bin/shards_x86_64 bin/shards_arm64"
+
   copy "bin/shards", "#{install_dir}/embedded/bin/shards"
 end

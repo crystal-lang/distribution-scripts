@@ -29,8 +29,12 @@ relative_path "yaml-#{version}"
 
 build do
   env = with_standard_compiler_flags(with_embedded_path)
+  env["CFLAGS"] << " -fPIC -arch arm64 -arch x86_64"
+  env["CPPFLAGS"] = env["CPPFLAGS"].gsub("-arch arm64 -arch x86_64", "")
 
-  command "./configure --disable-shared --prefix=#{install_dir}/embedded", env: env
+  command "./configure" \
+          " --disable-shared" \
+          " --prefix=#{install_dir}/embedded", env: env
 
   make "-j #{workers}", env: env
   make "-j #{workers} install", env: env
