@@ -106,12 +106,6 @@ $(OUTPUT_BASENAME64).tar: Dockerfile $(FILES)
 .PHONY: compress64
 compress64: $(OUTPUT_BASENAME64).tar.gz $(OUTPUT_BASENAME64).tar.xz ## Build compressed tarballs
 
-$(OUTPUT_BASENAME64).tar.gz: $(OUTPUT_BASENAME64).tar
-	gzip -c $(OUTPUT_BASENAME64).tar > $(OUTPUT_BASENAME64).tar.gz
-
-$(OUTPUT_BASENAME64).tar.xz: $(OUTPUT_BASENAME64).tar
-	xz -T 0 -c $(OUTPUT_BASENAME64).tar > $(OUTPUT_BASENAME64).tar.xz
-
 .PHONY: package64
 package64: $(OUTPUT_DIR)/$(DEB_NAME64) $(OUTPUT_DIR)/$(RPM_NAME64) ## Build distribution packages from the tarballs
 
@@ -160,11 +154,11 @@ $(OUTPUT_BASENAME32).tar: Dockerfile $(FILES)
 .PHONY: compress32
 compress32: $(OUTPUT_BASENAME32).tar.gz $(OUTPUT_BASENAME32).tar.xz ## Build compressed tarballs
 
-$(OUTPUT_BASENAME32).tar.gz: $(OUTPUT_BASENAME32).tar
-	gzip -c $(OUTPUT_BASENAME32).tar > $(OUTPUT_BASENAME32).tar.gz
+$(OUTPUT_DIR)/%.gz: $(OUTPUT_DIR)/%
+	gzip -c $< > $@
 
-$(OUTPUT_BASENAME32).tar.xz: $(OUTPUT_BASENAME32).tar
-	xz -T 0 -c $(OUTPUT_BASENAME32).tar > $(OUTPUT_BASENAME32).tar.xz
+$(OUTPUT_DIR)/%.xz: $(OUTPUT_DIR)/%
+	xz -T 0 -c $< > $@
 
 .PHONY: package32
 package32: $(OUTPUT_DIR)/$(DEB_NAME32) $(OUTPUT_DIR)/$(RPM_NAME32) ## Build distribution packages from the tarballs
