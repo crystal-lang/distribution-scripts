@@ -105,32 +105,11 @@ RUN \
  mkdir -p /output/lib/crystal/lib/ \
  && cp /libgc-debian.a /output/lib/crystal/lib/libgc.a \
  \
- # Copy crystal to /lib/crystal/bin/
- && mkdir -p /output/lib/crystal/bin/ \
- && cp /crystal/.build/crystal /output/lib/crystal/bin/crystal \
+ # Install crystal
+ && make -C /crystal install DESTDIR=/output PREFIX= \
  \
- # Copy shards to /lib/crystal/bin/
- && cp /shards/bin/shards /output/lib/crystal/bin/shards \
- && ln -s ../lib/crystal/bin/shards /output/bin/shards \
- \
- # Copy stdlib to /share/crystal/src/
- && mkdir -p /output/share/crystal/ \
- && cp -r /crystal/src /output/share/crystal/src \
- \
- # Copy samples
- && mkdir -p /output/share/doc/crystal/ \
- && cp -r /crystal/samples /output/share/doc/crystal/examples \
- \
- # Copy and compress manpages
- && mkdir -p /output/share/man/man1/ /output/share/man/man5/ \
- && cp /crystal/man/crystal.1 /output/share/man/man1/crystal.1 \
- && cp /shards/man/shards.1 /output/share/man/man1/shards.1 \
- && cp /shards/man/shard.yml.5 /output/share/man/man5/shard.yml.5 \
- && gzip -9 /output/share/man/man1/crystal.1 /output/share/man/man1/shards.1 /output/share/man/man5/shard.yml.5 \
- \
- # Copy license
- && mkdir -p /output/share/licenses/crystal/ \
- && cp /crystal/LICENSE /output/share/licenses/crystal/LICENSE \
+ # Install shards
+ && make -C /shards install DESTDIR=/output PREFIX= \
  \
  # Create tarball
  && mv /output /crystal-${crystal_version}-${package_iteration} \
