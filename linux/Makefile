@@ -26,7 +26,6 @@ LIBATOMIC_OPS_VERSION = v7.6.10
 OUTPUT_DIR = build
 OUTPUT_BASENAME64 = $(OUTPUT_DIR)/crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION)-linux-x86_64
 OUTPUT_BASENAME32 = $(OUTPUT_DIR)/crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION)-linux-i686
-FILES = files/crystal-wrapper
 
 DEB_NAME64 = crystal_$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION)_amd64.deb
 RPM_NAME64 = crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION).x86_64.rpm
@@ -96,7 +95,7 @@ awk 'BEGIN {FS = "## "}; /^## [a-zA-Z_-]/ {printf "  \033[36m%s\033[0m\n", $$2};
 .PHONY: build
 build: $(OUTPUT_BASENAME64).tar ## Build the raw uncompressed tarball
 
-$(OUTPUT_BASENAME64).tar: Dockerfile $(FILES)
+$(OUTPUT_BASENAME64).tar: Dockerfile
 	mkdir -p $(OUTPUT_DIR)
 	docker build $(BUILD_ARGS64) -t crystal-build-temp .
 	container_id="$$(docker create crystal-build-temp)" \
@@ -150,7 +149,7 @@ $(OUTPUT_DIR)/$(RPM_NAME64): docker-fpm $(OUTPUT_BASENAME64).tar
 .PHONY: build32
 build32: $(OUTPUT_BASENAME32).tar ## Build the raw uncompressed tarball
 
-$(OUTPUT_BASENAME32).tar: Dockerfile $(FILES)
+$(OUTPUT_BASENAME32).tar: Dockerfile
 	mkdir -p $(OUTPUT_DIR)
 	docker build $(BUILD_ARGS32) -t crystal-build32-temp .
 	container_id="$$(docker create crystal-build32-temp)" \

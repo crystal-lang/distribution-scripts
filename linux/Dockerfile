@@ -95,7 +95,6 @@ RUN git clone https://github.com/crystal-lang/shards \
  \
  && ([ "$(ldd bin/shards | wc -l)" -eq "1" ] || { echo 'shards is not statically linked'; ldd bin/shards; exit 1; })
 
-COPY files/crystal-wrapper /output/bin/crystal
 COPY --from=debian /bdwgc/.libs/libgc.a /libgc-debian.a
 
 ARG package_iteration
