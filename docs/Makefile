@@ -1,6 +1,6 @@
 CRYSTAL_VERSION ?=                 ## How the binaries should be branded
 CRYSTAL_SHA1 ?= $(CRYSTAL_VERSION) ## Git tag/branch/sha1 to checkout and build source
-CRYSTAL_DOCKER_IMAGE ?=            ## Which crystal docker build image to use
+CRYSTAL_DOCKER_IMAGE ?= crystallang/crystal:latest ## Which crystal docker build image to use
 
 OUTPUT_DIR = build
 OUTPUT_DOCS_BASE_NAME = crystal-$(CRYSTAL_VERSION)-docs
