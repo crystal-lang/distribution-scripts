@@ -1,4 +1,4 @@
-FROM alpine:3.13 as runtime
+FROM alpine:3.12 as runtime
 
 RUN \
   apk add --update --no-cache --force-overwrite \

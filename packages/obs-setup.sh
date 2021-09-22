@@ -7,6 +7,8 @@
 # * OBS_USER: username
 # * OBS_PASSWORD: password
 
+set -eu
+
 # Configure OSC
 cat > ~/.oscrc <<EOF
 [general]

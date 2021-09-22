@@ -1,5 +1,6 @@
 name "libatomic_ops"
 default_version "7.6.10"
+skip_transitive_dependency_licensing true
 
 source :url => "https://github.com/ivmai/libatomic_ops/releases/download/v#{version}/libatomic_ops-#{version}.tar.gz"
 
@@ -18,12 +19,14 @@ end
 relative_path "libatomic_ops-#{version}"
 
 env = with_standard_compiler_flags
-env["CFLAGS"] << " -fPIC"
+env["CFLAGS"] << " -fPIC -arch arm64 -arch x86_64"
+env["CPPFLAGS"] = env["CPPFLAGS"].gsub("-arch arm64 -arch x86_64", "")
 
 build do
   command "./configure" \
           " --disable-dependency-tracking" \
+          " --disable-docs" \
           " --prefix=#{install_dir}/embedded", env: env
-  make "-j #{workers}"
-  make "install"
+  make "-j #{workers} SUBDIRS=src" # Skipping tests
+  make "install SUBDIRS=src"
 end

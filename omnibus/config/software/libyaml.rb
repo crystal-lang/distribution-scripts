@@ -16,6 +16,7 @@
 
 name "libyaml"
 default_version '0.1.6'
+skip_transitive_dependency_licensing true
 
 # The sources of pyyaml are republished in S3 since pyyaml.org
 # seems to be restricting the user agent or the requests from our CI
@@ -28,8 +29,12 @@ relative_path "yaml-#{version}"
 
 build do
   env = with_standard_compiler_flags(with_embedded_path)
+  env["CFLAGS"] << " -fPIC -arch arm64 -arch x86_64"
+  env["CPPFLAGS"] = env["CPPFLAGS"].gsub("-arch arm64 -arch x86_64", "")
 
-  command "./configure --disable-shared --prefix=#{install_dir}/embedded", env: env
+  command "./configure" \
+          " --disable-shared" \
+          " --prefix=#{install_dir}/embedded", env: env
 
   make "-j #{workers}", env: env
   make "-j #{workers} install", env: env

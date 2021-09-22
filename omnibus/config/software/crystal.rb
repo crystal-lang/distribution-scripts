@@ -5,6 +5,7 @@ CRYSTAL_SRC = (ENV['CRYSTAL_SRC'] || "").strip
 
 name "crystal"
 default_version CRYSTAL_VERSION
+skip_transitive_dependency_licensing true
 
 if CRYSTAL_SRC.empty?
   source git: "https://github.com/crystal-lang/crystal"
@@ -19,9 +20,10 @@ dependency "libevent"
 
 env = with_standard_compiler_flags(with_embedded_path(
   "LIBRARY_PATH" => "#{install_dir}/embedded/lib",
-  "CRYSTAL_LIBRARY_PATH" => "#{install_dir}/embedded/lib"
+  "CRYSTAL_LIBRARY_PATH" => "#{install_dir}/embedded/lib",
 ))
-env["CFLAGS"] << " -fPIC"
+env["CFLAGS"] << " -fPIC -arch arm64 -arch x86_64"
+env["CPPFLAGS"] = env["CPPFLAGS"].gsub("-arch arm64 -arch x86_64", "")
 
 unless FIRST_RUN
   llvm_bin = Omnibus::Software.load(project, "llvm_bin", nil)
@@ -36,7 +38,7 @@ else
   env["PATH"] = "#{llvm_bin.project_dir}/bin:#{project_dir}/deps:#{env["PATH"]}"
 end
 
-if mac_os_x?
+if macos? || mac_os_x?
   env["CRYSTAL_PATH"] = "/private/var/cache/omnibus/src/crystal/src"
 else
   env["CRYSTAL_PATH"] = "#{project_dir}/src"
@@ -46,18 +48,46 @@ build do
   command "git checkout #{CRYSTAL_SHA1}", cwd: project_dir
 
   mkdir "#{project_dir}/deps"
-  command "make deps", env: env
-  command "mkdir .build", env: env
+  make "deps", env: env
+  mkdir ".build"
   command "echo #{Dir.pwd}", env: env
-  command "cp #{Dir.pwd}/crystal-#{ohai['os']}-#{ohai['kernel']['machine']} .build/crystal", env: env
-  command "make crystal stats=true release=true FLAGS=--no-debug CRYSTAL_CONFIG_LIBRARY_PATH= O=#{output_path}", env: env
+
+  crflags = "--no-debug"
+
+  copy "#{Dir.pwd}/crystal-#{ohai['os']}-#{ohai['kernel']['machine']}/embedded/bin/crystal", ".build/crystal"
+
+  # Compile for Intel
+  command "make crystal stats=true release=true FLAGS=\"#{crflags}\" CRYSTAL_CONFIG_LIBRARY_PATH= O=#{output_path}", env: env
+  move output_bin, "#{output_bin}_x86_64"
+
+  # Clean up
+  make "clean_cache clean", env: env
+
+  # Restore x86_64 compiler w/ cross-compile support
+  mkdir ".build"
+  copy "#{output_bin}_x86_64", ".build/crystal"
+
+  # Compile for ARM64. Apple's clang only understands arm64, LLVM uses aarch64,
+  # so we need to sub out aarch64 in our calls to Apple tools
+  env["CXXFLAGS"] << " -target arm64-apple-darwin"
+  make "deps", env: env
+
+  make "crystal stats=true release=true target=aarch64-apple-darwin FLAGS=\"#{crflags}\" CRYSTAL_CONFIG_TARGET=aarch64-apple-darwin CRYSTAL_CONFIG_LIBRARY_PATH= O=#{output_path}", env: env
+
+  command "clang #{output_path}/crystal.o -o #{output_bin}_arm64 -target arm64-apple-darwin src/llvm/ext/llvm_ext.o `llvm-config --libs --system-libs --ldflags 2>/dev/null` -lstdc++ -lpcre -lgc -lpthread -levent -liconv -ldl -v", env: env
+  delete "#{output_path}/crystal.o"
+
+  # Lipo them up
+  command "lipo -create -output #{output_bin} #{output_bin}_x86_64 #{output_bin}_arm64"
+  delete "#{output_bin}_x86_64"
+  delete "#{output_bin}_arm64"
 
   block do
     raise "Could not build crystal" unless File.exists?(output_bin)
 
-    if mac_os_x?
+    if macos? || mac_os_x?
       otool_libs = `otool -L #{output_bin}`
-      if otool_libs.include?("/usr/local/lib")
+      if otool_libs.include?("/usr/local/lib") || otool_libs.include?('/opt/homebrew/lib')
         raise "Found local libraries linked to the generated compiler:\n#{otool_libs}"
       end
     end

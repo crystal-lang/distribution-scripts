@@ -1,64 +1,88 @@
 GIT
   remote: https://github.com/chef/omnibus-software.git
-  revision: ae2a2f1cae3e8d80197a1cac5311b910300a53ff
-  ref: ae2a2f1cae3e8d80197a1cac5311b910300a53ff
+  revision: 76b31d11c1fbbc43a4ed1a1990a2662d05b28644
+  ref: 76b31d11c1fbbc43a4ed1a1990a2662d05b28644
   specs:
     omnibus-software (4.0.0)
-      chef-sugar-ng (>= 5.0.0)
-      omnibus (>= 5.6.1)
+      omnibus (>= 8.0.0)
+
+GIT
+  remote: https://github.com/chef/omnibus.git
+  revision: 1d97cd9e79a062dfc12f0c047215f3a9e4d65b09
+  ref: 1d97cd9e79a062dfc12f0c047215f3a9e4d65b09
+  specs:
+    omnibus (8.1.8)
+      aws-sdk-s3 (~> 1)
+      chef-cleanroom (~> 1.0)
+      chef-utils (>= 15.4)
+      ffi-yajl (~> 2.2)
+      license_scout (~> 1.0)
+      mixlib-shellout (>= 2.0, < 4.0)
+      mixlib-versioning
+      ohai (>= 15, < 17)
+      pedump
+      ruby-progressbar (~> 1.7)
+      thor (>= 0.18, < 2.0)
 
 GEM
   remote: https://rubygems.org/
   specs:
     addressable (2.7.0)
       public_suffix (>= 2.0.2, < 5.0)
-    awesome_print (1.8.0)
-    aws-eventstream (1.0.3)
-    aws-partitions (1.216.0)
-    aws-sdk-core (3.68.0)
-      aws-eventstream (~> 1.0, >= 1.0.2)
-      aws-partitions (~> 1.0)
+    awesome_print (1.9.2)
+    aws-eventstream (1.1.1)
+    aws-partitions (1.449.0)
+    aws-sdk-core (3.114.0)
+      aws-eventstream (~> 1, >= 1.0.2)
+      aws-partitions (~> 1, >= 1.239.0)
       aws-sigv4 (~> 1.1)
       jmespath (~> 1.0)
-    aws-sdk-kms (1.24.0)
-      aws-sdk-core (~> 3, >= 3.61.1)
+    aws-sdk-kms (1.43.0)
+      aws-sdk-core (~> 3, >= 3.112.0)
       aws-sigv4 (~> 1.1)
-    aws-sdk-s3 (1.48.0)
-      aws-sdk-core (~> 3, >= 3.61.1)
+    aws-sdk-s3 (1.94.0)
+      aws-sdk-core (~> 3, >= 3.112.0)
       aws-sdk-kms (~> 1)
       aws-sigv4 (~> 1.1)
-    aws-sigv4 (1.1.0)
-      aws-eventstream (~> 1.0, >= 1.0.2)
+    aws-sigv4 (1.2.3)
+      aws-eventstream (~> 1, >= 1.0.2)
     chef-cleanroom (1.0.2)
-    chef-config (15.3.14)
+    chef-config (16.13.16)
       addressable
+      chef-utils (= 16.13.16)
       fuzzyurl
       mixlib-config (>= 2.2.12, < 4.0)
       mixlib-shellout (>= 2.0, < 4.0)
       tomlrb (~> 1.2)
-    chef-sugar-ng (5.0.4)
+    chef-utils (16.13.16)
     citrus (3.0.2)
-    ffi (1.11.1)
-    ffi-yajl (2.3.1)
-      libyajl2 (~> 1.2)
+    ffi (1.15.0)
+    ffi-yajl (2.4.0)
+      libyajl2 (>= 1.2)
     fuzzyurl (0.9.0)
     iostruct (0.0.4)
     ipaddress (0.8.3)
     jmespath (1.4.0)
-    libyajl2 (1.2.0)
-    license_scout (1.0.24)
+    json (2.5.1)
+    libyajl2 (2.1.0)
+    license_scout (1.2.10)
       ffi-yajl (~> 2.2)
-      mixlib-shellout (~> 2.2)
-      toml-rb (~> 1.0)
-    mixlib-cli (2.1.1)
-    mixlib-config (3.0.1)
+      mixlib-shellout (>= 2.2, < 4.0)
+      toml-rb (>= 1, < 3)
+    mixlib-cli (2.1.8)
+    mixlib-config (3.0.9)
       tomlrb
-    mixlib-log (3.0.1)
-    mixlib-shellout (2.4.4)
-    mixlib-versioning (1.2.7)
-    multipart-post (2.0.0)
-    ohai (15.3.1)
-      chef-config (>= 12.8, < 16)
+    mixlib-log (3.0.9)
+    mixlib-shellout (3.2.5)
+      chef-utils
+    mixlib-versioning (1.2.12)
+    multipart-post (2.1.1)
+    net-scp (3.0.0)
+      net-ssh (>= 2.6.5, < 7.0.0)
+    net-ssh (6.1.0)
+    ohai (16.13.0)
+      chef-config (>= 12.8, < 17)
+      chef-utils (>= 16.0, < 17)
       ffi (~> 1.9)
       ffi-yajl (~> 2.2)
       ipaddress
@@ -67,44 +91,38 @@ GEM
       mixlib-log (>= 2.0.1, < 4.0)
       mixlib-shellout (>= 2.0, < 4.0)
       plist (~> 3.1)
-      systemu (~> 2.6.4)
+      train-core
       wmi-lite (~> 1.0)
-    omnibus (6.1.4)
-      aws-sdk-s3 (~> 1)
-      chef-cleanroom (~> 1.0)
-      chef-sugar-ng (>= 3.3)
-      ffi-yajl (~> 2.2)
-      license_scout (~> 1.0)
-      mixlib-shellout (>= 2.0, < 4.0)
-      mixlib-versioning
-      ohai (>= 13, < 16)
-      pedump
-      ruby-progressbar (~> 1.7)
-      thor (~> 0.18)
-    pedump (0.5.2)
+    pedump (0.6.2)
       awesome_print
       iostruct (>= 0.0.4)
-      multipart-post (~> 2.0.0)
-      progressbar
+      multipart-post (>= 2.0.0)
+      rainbow
       zhexdump (>= 0.0.2)
-    plist (3.5.0)
-    progressbar (1.10.1)
-    public_suffix (4.0.1)
-    ruby-progressbar (1.10.1)
-    systemu (2.6.5)
-    thor (0.20.3)
-    toml-rb (1.1.2)
+    plist (3.6.0)
+    public_suffix (4.0.6)
+    rainbow (3.0.0)
+    ruby-progressbar (1.11.0)
+    thor (1.1.0)
+    toml-rb (2.0.1)
       citrus (~> 3.0, > 3.0)
-    tomlrb (1.2.8)
-    wmi-lite (1.0.2)
+    tomlrb (1.3.0)
+    train-core (3.7.0)
+      addressable (~> 2.5)
+      ffi (!= 1.13.0)
+      json (>= 1.8, < 3.0)
+      mixlib-shellout (>= 2.0, < 4.0)
+      net-scp (>= 1.2, < 4.0)
+      net-ssh (>= 2.9, < 7.0)
+    wmi-lite (1.0.5)
     zhexdump (0.0.2)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
-  omnibus (~> 6.1.4)
+  omnibus!
   omnibus-software!
 
 BUNDLED WITH
-   1.17.3
+   2.2.16
