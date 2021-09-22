@@ -16,8 +16,10 @@ CRYSTAL_SHA1 ?= $(CRYSTAL_VERSION) ## Git tag/branch/sha1 to checkout and build 
 PACKAGE_ITERATION ?= 1
 PACKAGE_MAINTAINER = Crystal Team <crystal@manas.tech>
 
-PREVIOUS_CRYSTAL_RELEASE_LINUX64_TARGZ ?=  ## url to crystal-{version}-{package}-linux-x86_64.tar.gz
-PREVIOUS_CRYSTAL_RELEASE_LINUX32_TARGZ ?=  ## url to crystal-{version}-{package}-linux-i686.tar.gz
+PREVIOUS_CRYSTAL_VERSION ?= ## Version of the bootstrap compiler
+PREVIOUS_CRYSTAL_PACKAGE_ITERATION ?= 1 ## Package iteration of the bootstrap compiler
+PREVIOUS_CRYSTAL_RELEASE_LINUX64_TARGZ ?= https://github.com/crystal-lang/crystal/releases/download/$(PREVIOUS_CRYSTAL_VERSION)/crystal-$(PREVIOUS_CRYSTAL_VERSION)-$(PREVIOUS_CRYSTAL_PACKAGE_ITERATION)-linux-x86_64.tar.gz ## url to crystal-{version}-{package}-linux-x86_64.tar.gz
+PREVIOUS_CRYSTAL_RELEASE_LINUX32_TARGZ ?= https://github.com/crystal-lang/crystal/releases/download/$(PREVIOUS_CRYSTAL_VERSION)/crystal-$(PREVIOUS_CRYSTAL_VERSION)-$(PREVIOUS_CRYSTAL_PACKAGE_ITERATION)-linux-i686.tar.gz ## url to crystal-{version}-{package}-linux-i686.tar.gz
 
 SHARDS_VERSION = v0.15.0
 GC_VERSION = v8.0.4
@@ -92,12 +94,6 @@ $(OUTPUT_BASENAME64).tar: Dockerfile $(FILES)
 .PHONY: compress64
 compress64: $(OUTPUT_BASENAME64).tar.gz $(OUTPUT_BASENAME64).tar.xz ## Build compressed tarballs
 
-$(OUTPUT_BASENAME64).tar.gz: $(OUTPUT_BASENAME64).tar
-	gzip -c $(OUTPUT_BASENAME64).tar > $(OUTPUT_BASENAME64).tar.gz
-
-$(OUTPUT_BASENAME64).tar.xz: $(OUTPUT_BASENAME64).tar
-	xz -T 0 -c $(OUTPUT_BASENAME64).tar > $(OUTPUT_BASENAME64).tar.xz
-
 .PHONY: build32
 build32: $(OUTPUT_BASENAME32).tar ## Build the raw uncompressed tarball
 
@@ -111,11 +107,11 @@ $(OUTPUT_BASENAME32).tar: Dockerfile $(FILES)
 .PHONY: compress32
 compress32: $(OUTPUT_BASENAME32).tar.gz $(OUTPUT_BASENAME32).tar.xz ## Build compressed tarballs
 
-$(OUTPUT_BASENAME32).tar.gz: $(OUTPUT_BASENAME32).tar
-	gzip -c $(OUTPUT_BASENAME32).tar > $(OUTPUT_BASENAME32).tar.gz
+$(OUTPUT_DIR)/%.gz: $(OUTPUT_DIR)/%
+	gzip -c $< > $@
 
-$(OUTPUT_BASENAME32).tar.xz: $(OUTPUT_BASENAME32).tar
-	xz -T 0 -c $(OUTPUT_BASENAME32).tar > $(OUTPUT_BASENAME32).tar.xz
+$(OUTPUT_DIR)/%.xz: $(OUTPUT_DIR)/%
+	xz -T 0 -c $< > $@
 
 .PHONY: clean
 clean: ## Clean up build directory

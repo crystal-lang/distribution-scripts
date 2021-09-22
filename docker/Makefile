@@ -1,17 +1,17 @@
 # Recipies for this Makefile
 
 ## Build all docker images
-##   $ make DOCKER_REPOSITORY=crystal-lang/crystal DOCKER_TAG=nightly CRYSTAL_VERSION=0.xy.z CRYSTAL_DEB=... CRYSTAL_TARGZ=...
+##   $ make DOCKER_TAG=nightly CRYSTAL_VERSION=0.xy.z CRYSTAL_DEB=... CRYSTAL_TARGZ=...
 ## Build ubuntu64 docker images
-##   $ make ubuntu64 DOCKER_REPOSITORY=crystal-lang/crystal DOCKER_TAG=nightly CRYSTAL_VERSION=0.xy.z CRYSTAL_DEB=...
+##   $ make ubuntu64 DOCKER_TAG=nightly CRYSTAL_VERSION=0.xy.z CRYSTAL_DEB=...
 ## Build alpine docker images
-##   $ make alpine DOCKER_REPOSITORY=crystal-lang/crystal DOCKER_TAG=nightly CRYSTAL_VERSION=0.xy.z CRYSTAL_TARGZ=...
+##   $ make alpine DOCKER_TAG=nightly CRYSTAL_VERSION=0.xy.z CRYSTAL_TARGZ=...
 
 CRYSTAL_VERSION ?=   ## How the binaries should be branded
 CRYSTAL_DEB ?=       ## Which crystal.deb file to install in debian based docker images (ubuntu)
 CRYSTAL_TARGZ ?=     ## Which crystal.tar.gz file to install in docker images (alpine)
-DOCKER_TAG ?=	     ## How to tag the docker image (examples: `0.27.2`, `nightly20190307`). `-build` will be appended for build images.
-DOCKER_REPOSITORY ?= ## Docker hub repository to commit image
+DOCKER_TAG ?= $(CRYSTAL_VERSION) ## How to tag the docker image (examples: `0.27.2`, `nightly20190307`). `-build` will be appended for build images.
+DOCKER_REPOSITORY ?= crystallang/crystal ## Docker hub repository to commit image
 
 GC_VERSION = v8.0.4
 LIBATOMIC_OPS_VERSION = v7.6.10
