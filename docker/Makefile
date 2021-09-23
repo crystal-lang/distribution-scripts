@@ -48,7 +48,7 @@ alpine: ## Build alpine images
 alpine: $(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-alpine.tar.gz
 alpine: $(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-alpine-build.tar.gz
 
-$(BUILD_CONTEXT)/ubuntu32: ubuntu32.Dockerfile $(BUILD_CONTEXT)/ubuntu32/crystal.tar.gz
+$(BUILD_CONTEXT)/ubuntu32: ubuntu32.Dockerfile $(BUILD_CONTEXT)/ubuntu32/crystal.deb
 	cp ubuntu32.Dockerfile $@/Dockerfile
 
 $(BUILD_CONTEXT)/ubuntu64: ubuntu.Dockerfile $(BUILD_CONTEXT)/ubuntu64/crystal.tar.gz
