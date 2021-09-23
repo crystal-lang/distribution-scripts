@@ -24,6 +24,7 @@ PREVIOUS_CRYSTAL_RELEASE_LINUX32_TARGZ ?= https://github.com/crystal-lang/crysta
 SHARDS_VERSION = v0.15.0
 GC_VERSION = v8.0.4
 LIBATOMIC_OPS_VERSION = v7.6.10
+LIBPCRE_VERSION = 8.45
 
 OUTPUT_DIR = build
 OUTPUT_BASENAME64 = $(OUTPUT_DIR)/crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION)-linux-x86_64
@@ -47,6 +48,9 @@ BUILD_ARGS64 = $(BUILD_ARGS_COMMON) \
                --build-arg alpine_image=alpine:3.12 \
                --build-arg musl_target=x86_64-linux-musl \
                --build-arg gnu_target=x86_64-unknown-linux-gnu
+
+BUILD_ARGS64_BUNDLED = $(BUILD_ARGS64) \
+               --build-arg libpcre_version=$(LIBPCRE_VERSION)
 
 BUILD_ARGS32 = $(BUILD_ARGS_COMMON) \
                --build-arg previous_crystal_release=$(PREVIOUS_CRYSTAL_RELEASE_LINUX32_TARGZ) \
@@ -91,8 +95,19 @@ $(OUTPUT_BASENAME64).tar: Dockerfile $(FILES)
 	  && docker cp "$$container_id":/output/crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION).tar $(OUTPUT_BASENAME64).tar \
 	  && docker rm -v "$$container_id"
 
+$(OUTPUT_BASENAME64)-bundled.tar: $(OUTPUT_BASENAME64).tar $(OUTPUT_DIR)/bundled-libs.tar
+	cp $< $@
+	tar -Af $@ $(OUTPUT_DIR)/bundled-libs.tar
+
+$(OUTPUT_DIR)/bundled-libs.tar: bundled.dockerfile
+	mkdir -p $(OUTPUT_DIR)
+	docker build $(BUILD_ARGS64_BUNDLED) -t crystal-build-temp -f bundled.dockerfile .
+	container_id="$$(docker create crystal-build-temp)" \
+	  && docker cp "$$container_id":/output/bundled-libs.tar $@ \
+	  && docker rm -v "$$container_id"
+
 .PHONY: compress64
-compress64: $(OUTPUT_BASENAME64).tar.gz $(OUTPUT_BASENAME64).tar.xz ## Build compressed tarballs
+compress64: $(OUTPUT_BASENAME64).tar.gz $(OUTPUT_BASENAME64).tar.xz $(OUTPUT_BASENAME64)-bundled.tar.gz ## Build compressed tarballs
 
 .PHONY: build32
 build32: $(OUTPUT_BASENAME32).tar ## Build the raw uncompressed tarball
