@@ -10,10 +10,12 @@ RUN \
                      libpcre3-dev libevent-dev libz-dev && \
   apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-ARG crystal_deb
-COPY ${crystal_deb} /tmp/crystal.deb
-# nightly packages do not have valid version numbers
-RUN dpkg --force-bad-version -i /tmp/crystal.deb
+ARG crystal_targz
+COPY ${crystal_targz} /tmp/crystal.tar.gz
+
+RUN \
+  tar -xz -C /usr --strip-component=1 -f /tmp/crystal.tar.gz && \
+  rm /tmp/crystal.tar.gz
 
 CMD ["/bin/sh"]
 

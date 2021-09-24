@@ -3,13 +3,13 @@
 ## Build all docker images
 ##   $ make DOCKER_TAG=nightly CRYSTAL_VERSION=0.xy.z CRYSTAL_DEB=... CRYSTAL_TARGZ=...
 ## Build ubuntu64 docker images
-##   $ make ubuntu64 DOCKER_TAG=nightly CRYSTAL_VERSION=0.xy.z CRYSTAL_DEB=...
+##   $ make ubuntu64 DOCKER_TAG=nightly CRYSTAL_VERSION=0.xy.z CRYSTAL_TARGZ=...
 ## Build alpine docker images
 ##   $ make alpine DOCKER_TAG=nightly CRYSTAL_VERSION=0.xy.z CRYSTAL_TARGZ=...
 
 CRYSTAL_VERSION ?=   ## How the binaries should be branded
-CRYSTAL_DEB ?=       ## Which crystal.deb file to install in debian based docker images (ubuntu)
-CRYSTAL_TARGZ ?=     ## Which crystal.tar.gz file to install in docker images (alpine)
+CRYSTAL_DEB ?=       ## Which crystal.deb file to install in debian based docker images (ubuntu32)
+CRYSTAL_TARGZ ?=     ## Which crystal.tar.gz file to install in docker images (ubuntu64, alpine)
 DOCKER_TAG ?= $(CRYSTAL_VERSION) ## How to tag the docker image (examples: `0.27.2`, `nightly20190307`). `-build` will be appended for build images.
 DOCKER_REPOSITORY ?= crystallang/crystal ## Docker hub repository to commit image
 
@@ -18,7 +18,7 @@ LIBATOMIC_OPS_VERSION = v7.6.10
 
 OUTPUT_DIR := build
 BUILD_CONTEXT := $(CURDIR)/build-context
-BUILD_ARGS_UBUNTU64 := --build-arg crystal_deb=crystal.deb $(BUILD_CONTEXT)/ubuntu64 --build-arg base_docker_image=ubuntu:focal
+BUILD_ARGS_UBUNTU64 := --build-arg crystal_targz=crystal.tar.gz $(BUILD_CONTEXT)/ubuntu64 --build-arg base_docker_image=ubuntu:focal
 BUILD_ARGS_UBUNTU32 := --build-arg crystal_deb=crystal.deb $(BUILD_CONTEXT)/ubuntu32 --build-arg base_docker_image=i386/ubuntu:bionic
 BUILD_ARGS_ALPINE := --build-arg crystal_targz=crystal.tar.gz $(BUILD_CONTEXT)/alpine --build-arg gc_version=$(GC_VERSION) --build-arg libatomic_ops_version=$(LIBATOMIC_OPS_VERSION)
 DOCKER_TAG_UBUNTU := $(DOCKER_REPOSITORY):$(DOCKER_TAG)
@@ -51,7 +51,7 @@ alpine: $(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-alpine-build.tar.gz
 $(BUILD_CONTEXT)/ubuntu32: ubuntu32.Dockerfile $(BUILD_CONTEXT)/ubuntu32/crystal.deb
 	cp ubuntu32.Dockerfile $@/Dockerfile
 
-$(BUILD_CONTEXT)/ubuntu64: ubuntu.Dockerfile $(BUILD_CONTEXT)/ubuntu64/crystal.deb
+$(BUILD_CONTEXT)/ubuntu64: ubuntu.Dockerfile $(BUILD_CONTEXT)/ubuntu64/crystal.tar.gz
 	cp ubuntu.Dockerfile $@/Dockerfile
 
 $(BUILD_CONTEXT)/alpine: alpine.Dockerfile $(BUILD_CONTEXT)/alpine/crystal.tar.gz
