@@ -22,7 +22,7 @@ PREVIOUS_CRYSTAL_RELEASE_LINUX64_TARGZ ?= https://github.com/crystal-lang/crysta
 PREVIOUS_CRYSTAL_RELEASE_LINUX32_TARGZ ?= https://github.com/crystal-lang/crystal/releases/download/$(PREVIOUS_CRYSTAL_VERSION)/crystal-$(PREVIOUS_CRYSTAL_VERSION)-$(PREVIOUS_CRYSTAL_PACKAGE_ITERATION)-linux-i686.tar.gz ## url to crystal-{version}-{package}-linux-i686.tar.gz
 
 SHARDS_VERSION = v0.15.0
-GC_VERSION = v8.0.4
+GC_VERSION = v8.2.0
 LIBATOMIC_OPS_VERSION = v7.6.10
 LIBPCRE_VERSION = 8.45
 
