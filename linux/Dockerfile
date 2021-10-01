@@ -59,7 +59,10 @@ RUN git clone https://github.com/ivmai/bdwgc \
  && ./configure --disable-debug --disable-shared --enable-large-config \
  && make -j$(nproc) CFLAGS=-DNO_GETCONTEXT
 
-ENV LIBRARY_PATH=/bdwgc/.libs/
+# This overrides default CRYSTAL_LIBRARY_PATH baked into the binary (starting with 1.2.0)
+# or configured via wrapper script (before 1.2.0) because we want to link against
+# the newly-built libraries, not the ones shipped with the bootstrap compiler.
+ENV CRYSTAL_LIBRARY_PATH=/bdwgc/.libs/
 RUN llvm-config --version
 
 ARG previous_crystal_release
