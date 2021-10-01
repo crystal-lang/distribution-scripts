@@ -67,6 +67,7 @@ RUN llvm-config --version
 
 ARG previous_crystal_release
 ADD ${previous_crystal_release} /tmp/crystal.tar.gz
+# TODO: Update path to new install directory /tmp/crystal/bin after migration period
 ENV PATH=${PATH}:/tmp/crystal/lib/crystal/bin/
 RUN mkdir -p /tmp/crystal \
   && tar xz -f /tmp/crystal.tar.gz -C /tmp/crystal --strip-component=1 \
@@ -109,6 +110,10 @@ RUN \
  \
  # Install crystal
  && make -C /crystal install DESTDIR=/output PREFIX= \
+ \
+ # TODO: Remove legacy paths to previous install directories after migration period
+ && ln -s ../../bin /output/lib/crystal/bin \
+ && ln -s .. /output/lib/crystal/lib \
  \
  # Install shards
  && make -C /shards install DESTDIR=/output PREFIX= \
