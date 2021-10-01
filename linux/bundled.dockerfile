@@ -2,7 +2,7 @@ ARG debian_image
 FROM ${debian_image} AS debian
 
 RUN apt-get update \
- && apt-get install -y curl build-essential git automake libtool
+ && apt-get install -y curl build-essential git automake libtool pkg-config
 
 ENV CFLAGS="-fPIC -pipe ${release:+-O2}"
 
