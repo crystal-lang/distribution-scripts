@@ -96,22 +96,6 @@ $(OUTPUT_DIR)/bundled-libs.tar: bundled.dockerfile
 .PHONY: compress64
 compress64: $(OUTPUT_BASENAME64).tar.gz $(OUTPUT_BASENAME64).tar.xz $(OUTPUT_BASENAME64)-bundled.tar.gz ## Build compressed tarballs
 
-<<<<<<< HEAD
-.PHONY: build32
-build32: $(OUTPUT_BASENAME32).tar ## Build the raw uncompressed tarball
-
-$(OUTPUT_BASENAME32).tar: Dockerfile
-	mkdir -p $(OUTPUT_DIR)
-	docker build $(BUILD_ARGS32) -t crystal-build32-temp .
-	container_id="$$(docker create crystal-build32-temp)" \
-	  && docker cp "$$container_id":/output/crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION).tar $(OUTPUT_BASENAME32).tar \
-	  && docker rm -v "$$container_id"
-
-.PHONY: compress32
-compress32: $(OUTPUT_BASENAME32).tar.gz $(OUTPUT_BASENAME32).tar.xz ## Build compressed tarballs
-
-=======
->>>>>>> master
 $(OUTPUT_DIR)/%.gz: $(OUTPUT_DIR)/%
 	gzip -c $< > $@
 
