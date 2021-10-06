@@ -19,7 +19,6 @@ PACKAGE_MAINTAINER = Crystal Team <crystal@manas.tech>
 PREVIOUS_CRYSTAL_VERSION ?= ## Version of the bootstrap compiler
 PREVIOUS_CRYSTAL_PACKAGE_ITERATION ?= 1## Package iteration of the bootstrap compiler
 PREVIOUS_CRYSTAL_RELEASE_LINUX64_TARGZ ?= https://github.com/crystal-lang/crystal/releases/download/$(PREVIOUS_CRYSTAL_VERSION)/crystal-$(PREVIOUS_CRYSTAL_VERSION)-$(PREVIOUS_CRYSTAL_PACKAGE_ITERATION)-linux-x86_64.tar.gz ## url to crystal-{version}-{package}-linux-x86_64.tar.gz
-PREVIOUS_CRYSTAL_RELEASE_LINUX32_TARGZ ?= https://github.com/crystal-lang/crystal/releases/download/$(PREVIOUS_CRYSTAL_VERSION)/crystal-$(PREVIOUS_CRYSTAL_VERSION)-$(PREVIOUS_CRYSTAL_PACKAGE_ITERATION)-linux-i686.tar.gz ## url to crystal-{version}-{package}-linux-i686.tar.gz
 
 SHARDS_VERSION = v0.15.0
 GC_VERSION = v8.0.4
@@ -28,7 +27,6 @@ LIBPCRE_VERSION = 8.45
 
 OUTPUT_DIR = build
 OUTPUT_BASENAME64 = $(OUTPUT_DIR)/crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION)-linux-x86_64
-OUTPUT_BASENAME32 = $(OUTPUT_DIR)/crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION)-linux-i686
 
 DOCKER_BUILD_ARGS = $(if $(no_cache),--no-cache )$(if $(pull_images),--pull )
 
@@ -51,21 +49,11 @@ BUILD_ARGS64 = $(BUILD_ARGS_COMMON) \
 BUILD_ARGS64_BUNDLED = $(BUILD_ARGS64) \
                --build-arg libpcre_version=$(LIBPCRE_VERSION)
 
-BUILD_ARGS32 = $(BUILD_ARGS_COMMON) \
-               --build-arg previous_crystal_release=$(PREVIOUS_CRYSTAL_RELEASE_LINUX32_TARGZ) \
-               --build-arg debian_image=i386/debian:10 \
-               --build-arg alpine_image=i386/alpine:3.12 \
-               --build-arg musl_target=i686-linux-musl \
-               --build-arg gnu_target=i686-unknown-linux-gnu
-
 .PHONY: all
-all: all64 all32 ## Build all distribution tarballs [default]
+all: all64 ## Build all distribution tarballs [default]
 
 .PHONY: all64
 all64: compress64 ## Build distribution tarballs for 64 bits
-
-.PHONY: all32
-all32: compress32 ## Build distribution tarballs for 32 bits
 
 .PHONY: help
 help: ## Show this help
@@ -91,7 +79,7 @@ $(OUTPUT_BASENAME64).tar: Dockerfile
 	mkdir -p $(OUTPUT_DIR)
 	docker build $(BUILD_ARGS64) -t crystal-build-temp .
 	container_id="$$(docker create crystal-build-temp)" \
-	  && docker cp "$$container_id":/output/crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION).tar $(OUTPUT_BASENAME64).tar \
+	  && docker cp "$$container_id":/output/crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION).tar $@ \
 	  && docker rm -v "$$container_id"
 
 $(OUTPUT_BASENAME64)-bundled.tar: $(OUTPUT_BASENAME64).tar $(OUTPUT_DIR)/bundled-libs.tar
@@ -108,6 +96,7 @@ $(OUTPUT_DIR)/bundled-libs.tar: bundled.dockerfile
 .PHONY: compress64
 compress64: $(OUTPUT_BASENAME64).tar.gz $(OUTPUT_BASENAME64).tar.xz $(OUTPUT_BASENAME64)-bundled.tar.gz ## Build compressed tarballs
 
+<<<<<<< HEAD
 .PHONY: build32
 build32: $(OUTPUT_BASENAME32).tar ## Build the raw uncompressed tarball
 
@@ -121,6 +110,8 @@ $(OUTPUT_BASENAME32).tar: Dockerfile
 .PHONY: compress32
 compress32: $(OUTPUT_BASENAME32).tar.gz $(OUTPUT_BASENAME32).tar.xz ## Build compressed tarballs
 
+=======
+>>>>>>> master
 $(OUTPUT_DIR)/%.gz: $(OUTPUT_DIR)/%
 	gzip -c $< > $@
 
