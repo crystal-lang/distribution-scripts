@@ -18,37 +18,25 @@ GC_VERSION = v8.0.4
 OUTPUT_DIR := build
 BUILD_CONTEXT := $(CURDIR)/build-context
 BUILD_ARGS_UBUNTU64 := --build-arg crystal_targz=crystal.tar.gz $(BUILD_CONTEXT)/ubuntu64 --build-arg base_docker_image=ubuntu:focal
-BUILD_ARGS_UBUNTU32 := --build-arg crystal_deb=crystal.deb $(BUILD_CONTEXT)/ubuntu32 --build-arg base_docker_image=i386/ubuntu:bionic
 BUILD_ARGS_ALPINE := --build-arg crystal_targz=crystal.tar.gz $(BUILD_CONTEXT)/alpine --build-arg gc_version=$(GC_VERSION)
-DOCKER_TAG_UBUNTU := $(DOCKER_REPOSITORY):$(DOCKER_TAG)
+=======
 DOCKER_TAG_ALPINE := $(DOCKER_REPOSITORY):$(DOCKER_TAG)-alpine
 
 .PHONY: all64
 all64: ubuntu64 alpine ## Build all x86_64 images
 
-.PHONY: all32
-all32: ubuntu32 ## Build all i386 images
-
 .PHONY: all_ubuntu
-all_ubuntu: ubuntu64 ubuntu32  ## Build all ubuntu images
+all_ubuntu: ubuntu64  ## Build all ubuntu images
 
 .PHONY: ubuntu64
 ubuntu64: ## Build ubuntu x86_64 images
 ubuntu64: $(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-ubuntu-x86_64.tar.gz
 ubuntu64: $(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-ubuntu-x86_64-build.tar.gz
 
-.PHONY: ubuntu32
-ubuntu32: ## Build ubuntu i386 images
-ubuntu32: $(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-ubuntu-i386.tar.gz
-ubuntu32: $(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-ubuntu-i386-build.tar.gz
-
 .PHONY: alpine
 alpine: ## Build alpine images
 alpine: $(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-alpine.tar.gz
 alpine: $(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-alpine-build.tar.gz
-
-$(BUILD_CONTEXT)/ubuntu32: ubuntu32.Dockerfile $(BUILD_CONTEXT)/ubuntu32/crystal.deb
-	cp ubuntu32.Dockerfile $@/Dockerfile
 
 $(BUILD_CONTEXT)/ubuntu64: ubuntu.Dockerfile $(BUILD_CONTEXT)/ubuntu64/crystal.tar.gz
 	cp ubuntu.Dockerfile $@/Dockerfile
@@ -77,15 +65,6 @@ $(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-ubuntu-x86_64.tar.gz: $(BUILD_CONTEXT)/u
 $(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-ubuntu-x86_64-build.tar.gz: $(BUILD_CONTEXT)/ubuntu64 $(OUTPUT_DIR)
 	docker build -t $(DOCKER_TAG_UBUNTU)-build --target build  $(BUILD_ARGS_UBUNTU64)
 	docker save $(DOCKER_TAG_UBUNTU)-build | gzip > $@
-
-# Ubuntu i386
-$(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-ubuntu-i386.tar.gz: $(BUILD_CONTEXT)/ubuntu32 $(OUTPUT_DIR)
-	docker build -t $(DOCKER_TAG_UBUNTU)-i386 --target runtime $(BUILD_ARGS_UBUNTU32)
-	docker save $(DOCKER_TAG_UBUNTU)-i386 | gzip > $@
-
-$(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-ubuntu-i386-build.tar.gz: $(BUILD_CONTEXT)/ubuntu32 $(OUTPUT_DIR)
-	docker build -t $(DOCKER_TAG_UBUNTU)-i386-build --target build  $(BUILD_ARGS_UBUNTU32)
-	docker save $(DOCKER_TAG_UBUNTU)-i386-build | gzip > $@
 
 # Alpine x86_64
 $(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-alpine.tar.gz: $(BUILD_CONTEXT)/alpine $(OUTPUT_DIR)
