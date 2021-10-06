@@ -6,11 +6,9 @@ RUN apt-get update \
 
 ENV CFLAGS="-fPIC -pipe ${release:+-O2}"
 
-ARG libpcre_version
-
 # build libpcre
-
 FROM debian AS libpcre
+ARG libpcre_version
 RUN curl https://ftp.pcre.org/pub/pcre/pcre-${libpcre_version}.tar.gz | tar -zx \
  && cd pcre-${libpcre_version} \
  && ./configure --disable-shared --disable-cpp --enable-jit --enable-utf --enable-unicode-properties \
@@ -30,6 +28,8 @@ RUN git clone https://github.com/libevent/libevent \
 FROM debian
 ARG crystal_version
 ARG package_iteration
+ARG libpcre_version
+ARG libevent_version
 
 RUN mkdir -p /output/lib/crystal/lib/
 
