@@ -20,7 +20,6 @@ ARG gc_version
 RUN git clone https://github.com/ivmai/bdwgc \
  && cd bdwgc \
  && git checkout ${gc_version} \
- \
  && ./autogen.sh \
  && ./configure --disable-debug --disable-shared --enable-large-config \
  && make -j$(nproc)
