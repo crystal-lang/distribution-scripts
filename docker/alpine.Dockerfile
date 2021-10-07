@@ -13,12 +13,10 @@ RUN \
 
 # Build libgc
 ARG gc_version
-COPY files/feature-thread-stackbottom-upstream.patch /tmp/
+
 RUN git clone https://github.com/ivmai/bdwgc \
  && cd bdwgc \
  && git checkout ${gc_version} \
- \
- && patch -p1 < /tmp/feature-thread-stackbottom-upstream.patch \
  \
  && ./autogen.sh \
  && ./configure --disable-debug --disable-shared --enable-large-config \

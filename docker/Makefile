@@ -13,7 +13,7 @@ CRYSTAL_TARGZ ?=     ## Which crystal.tar.gz file to install in docker images (u
 DOCKER_TAG ?= $(CRYSTAL_VERSION) ## How to tag the docker image (examples: `0.27.2`, `nightly20190307`). `-build` will be appended for build images.
 DOCKER_REPOSITORY ?= crystallang/crystal ## Docker hub repository to commit image
 
-GC_VERSION = v8.0.4
+GC_VERSION = v8.2.0
 
 OUTPUT_DIR := build
 BUILD_CONTEXT := $(CURDIR)/build-context
@@ -44,7 +44,6 @@ $(BUILD_CONTEXT)/ubuntu64: ubuntu.Dockerfile $(BUILD_CONTEXT)/ubuntu64/crystal.t
 $(BUILD_CONTEXT)/alpine: alpine.Dockerfile $(BUILD_CONTEXT)/alpine/crystal.tar.gz
 	cp alpine.Dockerfile $@/Dockerfile
 	mkdir $@/files/
-	cp ../linux/files/feature-thread-stackbottom-upstream.patch $@/files/feature-thread-stackbottom-upstream.patch
 
 %/crystal.deb:
 	mkdir -p $(shell dirname $@)
