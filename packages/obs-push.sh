@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# $ ./obs-push.sh PROJECT VERSION SNAPSHOT COMMIT_HASH CRYSTAL_LINUX64_TARGZ CRYSTAL_LINUX32_TARGZ CRYSTAL_DOCS_TARGZ
+# $ ./obs-push.sh PROJECT VERSION SNAPSHOT COMMIT_HASH CRYSTAL_LINUX64_TARGZ CRYSTAL_DOCS_TARGZ
 
 # This script uses osc to check out PROJECT, update the version information
 # (VERSION, SNAPSHOT, COMMIT_HASH) and build artifacts (*_TARGZ arguments),
@@ -19,8 +19,7 @@ VERSION=$2
 SNAPSHOT=$3
 COMMIT_HASH=$4
 CRYSTAL_LINUX64_TARGZ=$5
-CRYSTAL_LINUX32_TARGZ=$6
-CRYSTAL_DOCS_TARGZ=$7
+CRYSTAL_DOCS_TARGZ=$6
 
 # Checkout OBS package
 osc checkout "$PROJECT" "$PACKAGE"
@@ -29,7 +28,6 @@ pushd "$PROJECT/$PACKAGE"
 
 # Copy build artifacts
 cp "$CRYSTAL_LINUX64_TARGZ" "$PACKAGE-snapshot-linux-x86_64.tar.gz"
-cp "$CRYSTAL_LINUX32_TARGZ" "$PACKAGE-snapshot-linux-i686.tar.gz"
 cp "$CRYSTAL_DOCS_TARGZ" "$PACKAGE-snapshot-docs.tar.gz"
 
 # Update version in *.dsc and *.spec
