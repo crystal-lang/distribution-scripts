@@ -85,9 +85,14 @@ $(OUTPUT_BASENAME64).tar: Dockerfile $(FILES)
 	  && docker cp "$$container_id":/output/crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION).tar $@ \
 	  && docker rm -v "$$container_id"
 
-$(OUTPUT_BASENAME64)-bundled.tar: $(OUTPUT_BASENAME64).tar $(OUTPUT_DIR)/bundled-libs.tar
-	cp $< $@
-	tar -Af $@ $(OUTPUT_DIR)/bundled-libs.tar
+$(OUTPUT_BASENAME64)-bundled.tar: $(OUTPUT_BASENAME64)-bundled
+	tar -C $(OUTPUT_BASENAME64)-bundled -cf $@ ./
+
+$(OUTPUT_BASENAME64)-bundled: $(OUTPUT_BASENAME64).tar $(OUTPUT_DIR)/bundled-libs.tar
+	rm -rf $@
+	mkdir -p $@
+	tar -C $@ -xf $(OUTPUT_BASENAME64).tar
+	tar -C $@ -xf $(OUTPUT_DIR)/bundled-libs.tar
 
 $(OUTPUT_DIR)/bundled-libs.tar: bundled.dockerfile
 	mkdir -p $(OUTPUT_DIR)
