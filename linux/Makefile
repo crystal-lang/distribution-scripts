@@ -28,7 +28,6 @@ LIBEVENT_VERSION = release-2.1.12-stable
 
 OUTPUT_DIR = build
 OUTPUT_BASENAME64 = $(OUTPUT_DIR)/crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION)-linux-x86_64
-FILES = files/crystal-wrapper
 
 DOCKER_BUILD_ARGS = $(if $(no_cache),--no-cache )$(if $(pull_images),--pull )
 
@@ -78,7 +77,7 @@ awk 'BEGIN {FS = "## "}; /^## [a-zA-Z_-]/ {printf "  \033[36m%s\033[0m\n", $$2};
 .PHONY: build
 build: $(OUTPUT_BASENAME64).tar ## Build the raw uncompressed tarball
 
-$(OUTPUT_BASENAME64).tar: Dockerfile $(FILES)
+$(OUTPUT_BASENAME64).tar: Dockerfile
 	mkdir -p $(OUTPUT_DIR)
 	docker build $(BUILD_ARGS64) -t crystal-build-temp .
 	container_id="$$(docker create crystal-build-temp)" \
