@@ -17,14 +17,11 @@ RUN apt-get install -y --allow-downgrades libcurl3-gnutls=7.64.0-4+deb10u2
 # Build libgc
 ARG gc_version
 ARG libatomic_ops_version
-COPY files/feature-thread-stackbottom-upstream.patch /tmp/
 RUN git clone https://github.com/ivmai/bdwgc \
  && cd bdwgc \
  && git checkout ${gc_version} \
  && git clone https://github.com/ivmai/libatomic_ops \
  && (cd libatomic_ops && git checkout ${libatomic_ops_version}) \
- \
- && patch -p1 < /tmp/feature-thread-stackbottom-upstream.patch \
  \
  && ./autogen.sh \
  && ./configure --disable-debug --disable-shared --enable-large-config \
