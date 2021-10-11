@@ -24,6 +24,7 @@ SHARDS_VERSION = v0.16.0
 GC_VERSION = v8.2.0
 LIBATOMIC_OPS_VERSION = v7.6.10
 LIBPCRE_VERSION = 8.45
+LIBEVENT_VERSION = release-2.1.12-stable
 
 OUTPUT_DIR = build
 OUTPUT_BASENAME64 = $(OUTPUT_DIR)/crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION)-linux-x86_64
@@ -48,7 +49,8 @@ BUILD_ARGS64 = $(BUILD_ARGS_COMMON) \
                --build-arg gnu_target=x86_64-unknown-linux-gnu
 
 BUILD_ARGS64_BUNDLED = $(BUILD_ARGS64) \
-               --build-arg libpcre_version=$(LIBPCRE_VERSION)
+               --build-arg libpcre_version=$(LIBPCRE_VERSION) \
+               --build-arg libevent_version=$(LIBEVENT_VERSION)
 
 .PHONY: all
 all: all64 ## Build all distribution tarballs [default]
@@ -83,9 +85,14 @@ $(OUTPUT_BASENAME64).tar: Dockerfile $(FILES)
 	  && docker cp "$$container_id":/output/crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION).tar $@ \
 	  && docker rm -v "$$container_id"
 
-$(OUTPUT_BASENAME64)-bundled.tar: $(OUTPUT_BASENAME64).tar $(OUTPUT_DIR)/bundled-libs.tar
-	cp $< $@
-	tar -Af $@ $(OUTPUT_DIR)/bundled-libs.tar
+$(OUTPUT_BASENAME64)-bundled.tar: $(OUTPUT_BASENAME64)-bundled
+	tar -C $(OUTPUT_BASENAME64)-bundled -cf $@ ./
+
+$(OUTPUT_BASENAME64)-bundled: $(OUTPUT_BASENAME64).tar $(OUTPUT_DIR)/bundled-libs.tar
+	rm -rf $@
+	mkdir -p $@
+	tar -C $@ -xf $(OUTPUT_BASENAME64).tar
+	tar -C $@ -xf $(OUTPUT_DIR)/bundled-libs.tar
 
 $(OUTPUT_DIR)/bundled-libs.tar: bundled.dockerfile
 	mkdir -p $(OUTPUT_DIR)
