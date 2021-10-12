@@ -63,20 +63,10 @@
    5. Verify package installation
       * `OBS_PROJECT=home:$OBS_USER:branches:devel:languages:crystal bats test`
    6. When everything is green, create a submit request against the original package (*Submit package* link in the menu bar on the package in your branch)
-5. Build and publish docker images
-   1. Checkout https://github.com/crystal-lang/crystal-dist
-   2. `$ ./dist.sh build-docker {version}`
-   3. `$ ./dist.sh push-docker {version}`
-   4. Manually push the `crystallang/crystal:{version}` image as `crystallang/crystal:latest`
-      * `$ docker tag crystallang/crystal:{version} crystallang/crystal:latest`
-      * `$ docker push crystallang/crystal:latest`
-   5. Manually build and push alpine images
-      * Go to distribution-scripts/docker
-      * `$ make clean alpine DOCKER_REPOSITORY=crystallang/crystal DOCKER_TAG={version} CRYSTAL_VERSION={version} CRYSTAL_TARGZ=~/Downloads/crystal-{version}-1-linux-x86_64.tar.gz`
-      * `$ docker push crystallang/crystal:{version}-alpine`
-      * `$ docker push crystallang/crystal:{version}-alpine-build`
-      * `$ docker tag crystallang/crystal:{version}-alpine crystallang/crystal:latest-alpine`
-      * `$ docker push crystallang/crystal:latest-alpine`
+5. Tag `latest` docker images
+   * Versioned docker images have been pushed to dockerhub.
+   * Now just assign the `latest` tags:
+   * `$ ./docker/apply-latest-tags.sh {version}`
 6. Publish snap package
    1. You need to logged in via `$ snapcraft login`
    1. Recent tagged release is published directly to edge channel. The CI logs the snap revision number. Otherwise the .snap file is in the artifacts.
