@@ -30,7 +30,7 @@
    1. Binaries are added later
 8. Publish docs
    1. Have s3cmd installed and AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY env variables defined
-   1. `$ source /Volumes/Secured/secure/manas-aws-key-crystal-dist.sh`
+   1. Keys can be generated in https://console.aws.amazon.com/iam/home#/security_credentials (contact a Manas admin if you don't have access).
    1. Checkout https://github.com/crystal-lang/crystal-dist
    1. Download `*-docs.tar.gz` from circle-ci artifacts
    1. `$ ./dist.sh push-docs {version} path/to/crystal-{version}-docs.tar.gz`
