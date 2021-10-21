@@ -55,7 +55,7 @@ BUILD_ARGS64_BUNDLED = $(BUILD_ARGS64) \
 all: all64 ## Build all distribution tarballs [default]
 
 .PHONY: all64
-all64: compress64 ## Build distribution tarballs for 64 bits
+all64: compress64 clean_tmp ## Build distribution tarballs for 64 bits
 
 .PHONY: help
 help: ## Show this help
@@ -112,3 +112,8 @@ $(OUTPUT_DIR)/%.xz: $(OUTPUT_DIR)/%
 .PHONY: clean
 clean: ## Clean up build directory
 	rm -Rf $(OUTPUT_DIR)
+
+.PHONY: clean_tmp
+clean_tmp: ## Clean up temporary build artifacts
+	rm -Rf $(OUTPUT_DIR)/bundled-libs.tar
+	rm -Rf $(OUTPUT_BASENAME64)-bundled
