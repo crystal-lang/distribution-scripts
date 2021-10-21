@@ -52,7 +52,7 @@ fi
 sed -i -e "s/^Version: .*/Version: ${VERSION}-1/" *.dsc
 sed -i -e "s/^DEBTRANSFORM-TAR: .*/DEBTRANSFORM-TAR: ${VERSION}.tar.gz/" *.dsc
 sed -i -e "s/^Version: .*/Version: ${VERSION}/" *.spec
-sed -i -e "s/VERSION := .*/VERSION := ${VERSION}/" debian.rules
+sed -i -e "s/VERSION=.*/VERSION=${VERSION}/" debian.rules
 
 # Commit changes to OBS
 message="Release $VERSION"
@@ -65,3 +65,5 @@ osc commit -m "$message" --noservice
 # Remove OSC working dir
 popd
 rm -r "$LOCAL_BRANCH_FOLDER"
+
+echo "The OBS release update is now available at https://build.opensuse.org/package/show/${LOCAL_BRANCH_FOLDER}"
