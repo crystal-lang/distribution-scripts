@@ -14,4 +14,5 @@ RUN git clone https://github.com/crystal-lang/crystal \
  && mv ./docs ./${output_docs_base_name} \
  \
  && mkdir -p /output \
- && tar -zcvf /output/${output_docs_base_name}.tar.gz ./${output_docs_base_name}
+ && tar -zcvf /output/${output_docs_base_name}.tar.gz ./${output_docs_base_name} \
+ && scripts/docs-versions.sh > /output/versions.json

@@ -30,14 +30,6 @@ Add an issue `Crystal release X.Y.Z` in this repo with a copy of this document. 
 7. [ ] Publish Github release
    1. Copy the changelog section as description
    1. Binaries are added later
-8. [ ] Publish docs
-   1. Have s3cmd installed and AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY env variables defined
-   1. Keys can be generated in https://console.aws.amazon.com/iam/home#/security_credentials (contact a Manas admin if you don't have access).
-   1. Checkout https://github.com/crystal-lang/crystal-dist
-   1. Download `*-docs.tar.gz` from circle-ci artifacts
-   1. `$ ./dist.sh push-docs {version} path/to/crystal-{version}-docs.tar.gz`
-   1. `$ ./dist.sh update-docs-versions {crystal_working_copy}`
-   1. `$ ./dist.sh redirect-docs {version}`
 
 ### Binary releases
 
@@ -48,6 +40,11 @@ Add an issue `Crystal release X.Y.Z` in this repo with a copy of this document. 
    * `crystal-*-linux-*.tar.gz`
    * `crystal-*.pkg`
    * `crystal-*-docs.tar.gz`
+3. [ ] Publish docs
+   1. Have `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` env variables defined
+      * Keys can be generated at https://console.aws.amazon.com/iam/home#/security_credentials (contact a Manas admin if you don't have access).
+   2. Run `make -C docs publish_docs CRYSTAL_VERSION=${VERSION}` to publish docs to `api/${VERSION}`
+   3. Run `make -C docs dist-redirect_latest CRYSTAL_VERSION=${VERSION}` to apply redirect from `api/latest` to `api/${VERSION}`
 4. [ ] Push changes to OBS for building linux packages
    1. Checkout https://github.com/crystal-lang/distribution-scripts and go to [`./packages`](../packages)
    2. Configure build.opensuse.org credentials in environment variables:
