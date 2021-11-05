@@ -18,7 +18,7 @@ name "pcre"
 default_version "8.40"
 skip_transitive_dependency_licensing true
 
-source url: "https://ftp.pcre.org/pub/pcre/pcre-#{version}.tar.gz",
+source url: "https://sourceforge.net/projects/pcre/files/pcre/#{version}/pcre-#{version}.tar.gz/download",
        md5: "890c808122bd90f398e6bc40ec862102"
 
 relative_path "pcre-#{version}"
