@@ -6,6 +6,7 @@ Add an issue `Crystal release X.Y.Z` in this repo with a copy of this document. 
 
 1. [ ] Announce expected release date and time span for feature freeze
    * Feature freeze is about two weeks before release
+   * Set date on milestone
 2. [ ] Start preparing changelog and release post
 3. [ ] Start feature freeze period
    * Either no merging of features into `master` or split off release branch for backporting bugfixes.
@@ -27,9 +28,11 @@ Add an issue `Crystal release X.Y.Z` in this repo with a copy of this document. 
    * Run [*Test Crystal & Shards Workflow](https://github.com/crystal-lang/test-ecosystem/actions/workflows/test-crystal-shards.yml) with the release branch as `crystal_branch`.
 5. [ ] Merge the release PR
 6. [ ] Tag & annotate the commit with the changelog using `<M.m.p>` pattern as {version} (as a pre-release directly in GH?)
+   * `git tag -s -a -m $VERSION $VERSION`
 7. [ ] Publish Github release
    1. Copy the changelog section as description
    1. Binaries are added later
+8. [ ] Close milestone
 
 ### Binary releases
 
@@ -93,12 +96,10 @@ Add an issue `Crystal release X.Y.Z` in this repo with a copy of this document. 
    * Edit PREVIOUS_CRYSTAL_BASE_URL in `.circleci/config.yml`
    * Edit DOCKER_TEST_PREFIX in `bin/ci`
    * Edit `prepare_build` on_osx download package and folder
-   * Edit ` .github/workflows/win.yml` to point to docker image
+   * Edit ` .github/workflows/*.yml` to point to docker image
    * Edit `shell.nix` `latestCrystalBinary` using  `nix-prefetch-url --unpack <url>`
 2. [ ] Increment VERSION file to the next minor and -dev suffix
 3. [ ] Perform uncomment/todos left in the repo
-4. [ ] Update carc.in / play.crystal-lang.org (by jhass)
-    Note: This is done after Arch repos are updated
 
 ## Observable Helper
 
