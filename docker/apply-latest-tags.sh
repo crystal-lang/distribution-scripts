@@ -1,5 +1,12 @@
 #! /usr/bin/env bash
 
+# This helper script promotes the docker images for the specified version
+# to "latest".
+#
+# Usage:
+#
+#    ./apply-latest-tags.sh <version>
+
 set -eu
 
 apply_tag() {
