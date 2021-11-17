@@ -17,6 +17,7 @@ dependency "pcre"
 dependency "bdw-gc"
 dependency "llvm_bin" unless FIRST_RUN
 dependency "libevent"
+dependency "libffi"
 
 env = with_standard_compiler_flags(with_embedded_path(
   "LIBRARY_PATH" => "#{install_dir}/embedded/lib",
