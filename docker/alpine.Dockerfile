@@ -44,6 +44,6 @@ FROM runtime as build
 
 RUN \
   apk add --update --no-cache --force-overwrite \
-    llvm10-dev llvm10-static g++
+    llvm10-dev llvm10-static g++ libffi-dev
 
 CMD ["/bin/sh"]
