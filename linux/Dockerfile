@@ -35,8 +35,10 @@ RUN sed -i 's|--list -- "$@"|--list "$@"|' /usr/bin/ldd
 RUN apk add --no-cache \
       # Statically-compiled llvm
       llvm10-dev llvm10-static \
-      # Static zlib, libyaml, libxml2, pcre, and libevent
+      # Static stdlib dependencies
       zlib-static yaml-static libxml2-dev pcre-dev libevent-static \
+      # Static compiler dependencies
+      libffi-dev \
       # Build tools
       git gcc g++ make automake libtool autoconf bash coreutils curl
 
