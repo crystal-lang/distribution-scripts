@@ -32,6 +32,7 @@ COPY ${crystal_targz} /tmp/crystal.tar.gz
 RUN \
   tar -xz -C /usr --strip-component=1  -f /tmp/crystal.tar.gz \
     --exclude */lib/crystal/lib \
+    --exclude */lib/crystal/*.a \
     --exclude */share/crystal/src/llvm/ext/llvm_ext.o && \
   rm /tmp/crystal.tar.gz
 
@@ -41,6 +42,6 @@ FROM runtime as build
 
 RUN \
   apk add --update --no-cache --force-overwrite \
-    llvm10-dev llvm10-static g++
+    llvm10-dev llvm10-static g++ libffi-dev
 
 CMD ["/bin/sh"]

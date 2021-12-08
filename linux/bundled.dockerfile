@@ -9,7 +9,7 @@ ENV CFLAGS="-fPIC -pipe ${release:+-O2}"
 # build libpcre
 FROM debian AS libpcre
 ARG libpcre_version
-RUN curl https://ftp.pcre.org/pub/pcre/pcre-${libpcre_version}.tar.gz | tar -zx \
+RUN curl http://ftp.cs.stanford.edu/pub/exim/pcre/pcre-${libpcre_version}.tar.gz | tar -zx \
  && cd pcre-${libpcre_version} \
  && ./configure --disable-shared --disable-cpp --enable-jit --enable-utf --enable-unicode-properties \
  && make -j$(nproc)

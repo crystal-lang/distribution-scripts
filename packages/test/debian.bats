@@ -1,5 +1,9 @@
 #!/usr/bin/env bats
 
+@test "Debian 11" {
+  ./test-install-on-docker.sh debian:11
+}
+
 @test "Debian 10" {
   ./test-install-on-docker.sh debian:10
 }

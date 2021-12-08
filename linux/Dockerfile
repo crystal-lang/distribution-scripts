@@ -32,8 +32,10 @@ RUN sed -i 's|--list -- "$@"|--list "$@"|' /usr/bin/ldd
 RUN apk add --no-cache \
       # Statically-compiled llvm
       llvm10-dev llvm10-static \
-      # Static zlib, libyaml, libxml2, pcre, and libevent
+      # Static stdlib dependencies
       zlib-static yaml-static libxml2-dev pcre-dev libevent-static \
+      # Static compiler dependencies
+      libffi-dev \
       # Build tools
       git gcc g++ make automake libtool autoconf bash coreutils curl
 
@@ -50,11 +52,15 @@ RUN git clone https://github.com/ivmai/bdwgc \
  && ./configure --disable-debug --disable-shared --enable-large-config \
  && make -j$(nproc) CFLAGS=-DNO_GETCONTEXT
 
-ENV LIBRARY_PATH=/bdwgc/.libs/
+# This overrides default CRYSTAL_LIBRARY_PATH baked into the binary (starting with 1.2.0)
+# or configured via wrapper script (before 1.2.0) because we want to link against
+# the newly-built libraries, not the ones shipped with the bootstrap compiler.
+ENV CRYSTAL_LIBRARY_PATH=/bdwgc/.libs/
 RUN llvm-config --version
 
 ARG previous_crystal_release
 ADD ${previous_crystal_release} /tmp/crystal.tar.gz
+# TODO: Update path to new install directory /tmp/crystal/bin after migration period
 ENV PATH=${PATH}:/tmp/crystal/lib/crystal/bin/
 RUN mkdir -p /tmp/crystal \
   && tar xz -f /tmp/crystal.tar.gz -C /tmp/crystal --strip-component=1 \
@@ -70,7 +76,7 @@ RUN git clone https://github.com/crystal-lang/crystal \
  && git checkout ${crystal_sha1} \
  \
  && make crystal stats=true static=true ${release:+release=true} \
-                 CRYSTAL_CONFIG_TARGET=${gnu_target} CRYSTAL_CONFIG_LIBRARY_PATH= \
+                 CRYSTAL_CONFIG_TARGET=${gnu_target} \
  && ([ "$(ldd .build/crystal | wc -l)" -eq "1" ] || { echo './build/crystal is not statically linked'; ldd .build/crystal; exit 1; })
 
 # Build shards
@@ -86,42 +92,24 @@ RUN git clone https://github.com/crystal-lang/shards \
  \
  && ([ "$(ldd bin/shards | wc -l)" -eq "1" ] || { echo 'shards is not statically linked'; ldd bin/shards; exit 1; })
 
-COPY files/crystal-wrapper /output/bin/crystal
 COPY --from=debian /bdwgc/.libs/libgc.a /libgc-debian.a
 
 ARG package_iteration
 
 RUN \
- # Copy libgc.a to /lib/crystal/lib/
- mkdir -p /output/lib/crystal/lib/ \
- && cp /libgc-debian.a /output/lib/crystal/lib/libgc.a \
+ # Copy libgc.a to /lib/crystal/
+ mkdir -p /output/lib/crystal/ \
+ && cp /libgc-debian.a /output/lib/crystal/libgc.a \
  \
- # Copy crystal to /lib/crystal/bin/
- && mkdir -p /output/lib/crystal/bin/ \
- && cp /crystal/.build/crystal /output/lib/crystal/bin/crystal \
+ # Install crystal
+ && make -C /crystal install DESTDIR=/output PREFIX= \
  \
- # Copy shards to /lib/crystal/bin/
- && cp /shards/bin/shards /output/lib/crystal/bin/shards \
- && ln -s ../lib/crystal/bin/shards /output/bin/shards \
+ # TODO: Remove legacy paths to previous install directories after migration period
+ && ln -s ../../bin /output/lib/crystal/bin \
+ && ln -s .. /output/lib/crystal/lib \
  \
- # Copy stdlib to /share/crystal/src/
- && mkdir -p /output/share/crystal/ \
- && cp -r /crystal/src /output/share/crystal/src \
- \
- # Copy samples
- && mkdir -p /output/share/doc/crystal/ \
- && cp -r /crystal/samples /output/share/doc/crystal/examples \
- \
- # Copy and compress manpages
- && mkdir -p /output/share/man/man1/ /output/share/man/man5/ \
- && cp /crystal/man/crystal.1 /output/share/man/man1/crystal.1 \
- && cp /shards/man/shards.1 /output/share/man/man1/shards.1 \
- && cp /shards/man/shard.yml.5 /output/share/man/man5/shard.yml.5 \
- && gzip -9 /output/share/man/man1/crystal.1 /output/share/man/man1/shards.1 /output/share/man/man5/shard.yml.5 \
- \
- # Copy license
- && mkdir -p /output/share/licenses/crystal/ \
- && cp /crystal/LICENSE /output/share/licenses/crystal/LICENSE \
+ # Install shards
+ && make -C /shards install DESTDIR=/output PREFIX= \
  \
  # Create tarball
  && mv /output /crystal-${crystal_version}-${package_iteration} \

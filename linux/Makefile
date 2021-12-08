@@ -23,10 +23,10 @@ PREVIOUS_CRYSTAL_RELEASE_LINUX64_TARGZ ?= https://github.com/crystal-lang/crysta
 SHARDS_VERSION = v0.16.0
 GC_VERSION = v8.2.0
 LIBPCRE_VERSION = 8.45
+LIBEVENT_VERSION = release-2.1.12-stable
 
 OUTPUT_DIR = build
 OUTPUT_BASENAME64 = $(OUTPUT_DIR)/crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION)-linux-x86_64
-FILES = files/crystal-wrapper
 
 DOCKER_BUILD_ARGS = $(if $(no_cache),--no-cache )$(if $(pull_images),--pull )
 
@@ -46,13 +46,14 @@ BUILD_ARGS64 = $(BUILD_ARGS_COMMON) \
                --build-arg gnu_target=x86_64-unknown-linux-gnu
 
 BUILD_ARGS64_BUNDLED = $(BUILD_ARGS64) \
-               --build-arg libpcre_version=$(LIBPCRE_VERSION)
+               --build-arg libpcre_version=$(LIBPCRE_VERSION) \
+               --build-arg libevent_version=$(LIBEVENT_VERSION)
 
 .PHONY: all
 all: all64 ## Build all distribution tarballs [default]
 
 .PHONY: all64
-all64: compress64 ## Build distribution tarballs for 64 bits
+all64: compress64 clean_tmp ## Build distribution tarballs for 64 bits
 
 .PHONY: help
 help: ## Show this help
@@ -74,16 +75,21 @@ awk 'BEGIN {FS = "## "}; /^## [a-zA-Z_-]/ {printf "  \033[36m%s\033[0m\n", $$2};
 .PHONY: build
 build: $(OUTPUT_BASENAME64).tar ## Build the raw uncompressed tarball
 
-$(OUTPUT_BASENAME64).tar: Dockerfile $(FILES)
+$(OUTPUT_BASENAME64).tar: Dockerfile
 	mkdir -p $(OUTPUT_DIR)
 	docker build $(BUILD_ARGS64) -t crystal-build-temp .
 	container_id="$$(docker create crystal-build-temp)" \
 	  && docker cp "$$container_id":/output/crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION).tar $@ \
 	  && docker rm -v "$$container_id"
 
-$(OUTPUT_BASENAME64)-bundled.tar: $(OUTPUT_BASENAME64).tar $(OUTPUT_DIR)/bundled-libs.tar
-	cp $< $@
-	tar -Af $@ $(OUTPUT_DIR)/bundled-libs.tar
+$(OUTPUT_BASENAME64)-bundled.tar: $(OUTPUT_BASENAME64)-bundled
+	tar -C $(OUTPUT_BASENAME64)-bundled -cf $@ ./
+
+$(OUTPUT_BASENAME64)-bundled: $(OUTPUT_BASENAME64).tar $(OUTPUT_DIR)/bundled-libs.tar
+	rm -rf $@
+	mkdir -p $@
+	tar -C $@ -xf $(OUTPUT_BASENAME64).tar
+	tar -C $@ -xf $(OUTPUT_DIR)/bundled-libs.tar
 
 $(OUTPUT_DIR)/bundled-libs.tar: bundled.dockerfile
 	mkdir -p $(OUTPUT_DIR)
@@ -104,3 +110,8 @@ $(OUTPUT_DIR)/%.xz: $(OUTPUT_DIR)/%
 .PHONY: clean
 clean: ## Clean up build directory
 	rm -Rf $(OUTPUT_DIR)
+
+.PHONY: clean_tmp
+clean_tmp: ## Clean up temporary build artifacts
+	rm -Rf $(OUTPUT_DIR)/bundled-libs.tar
+	rm -Rf $(OUTPUT_BASENAME64)-bundled

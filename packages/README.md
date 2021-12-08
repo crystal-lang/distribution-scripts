@@ -66,7 +66,7 @@ osc commit
 
 NOTE: The `osc commit` command directly pushes to the remote repository. This is different from git, where a commit is only local and you need to explicitly push.
 
-Before committing the changes, you may use `osc build` for a local test to see if everything works. This uses the default build target, but you can specify a repository name and architecture are arguments (for example `osc build Debian_10 i586`).
+Before committing the changes, you may use `osc build` for a local test to see if everything works. This uses the default build target, but you can specify a repository name and architecture are arguments (for example `osc build Debian_10 x86_64`).
 
 Alternatively, you can use a branch package to run a test build on OBS.
 
