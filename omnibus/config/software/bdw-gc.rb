@@ -28,8 +28,6 @@ version "8.2.0" do
   source md5: "c3c04af9c1e4209e315eee50efe7b320"
 end
 
-dependency "libatomic_ops"
-
 relative_path "gc-#{version}"
 
 env = with_standard_compiler_flags(with_embedded_path)

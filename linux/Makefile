@@ -22,7 +22,6 @@ PREVIOUS_CRYSTAL_RELEASE_LINUX64_TARGZ ?= https://github.com/crystal-lang/crysta
 
 SHARDS_VERSION = v0.16.0
 GC_VERSION = v8.2.0
-LIBATOMIC_OPS_VERSION = v7.6.10
 LIBPCRE_VERSION = 8.45
 LIBEVENT_VERSION = release-2.1.12-stable
 
@@ -37,7 +36,6 @@ BUILD_ARGS_COMMON = $(DOCKER_BUILD_ARGS) \
                     --build-arg crystal_sha1=$(CRYSTAL_SHA1) \
                     --build-arg shards_version=$(SHARDS_VERSION) \
                     --build-arg gc_version=$(GC_VERSION) \
-                    --build-arg libatomic_ops_version=$(LIBATOMIC_OPS_VERSION) \
                     --build-arg package_iteration=$(PACKAGE_ITERATION)
 
 BUILD_ARGS64 = $(BUILD_ARGS_COMMON) \
