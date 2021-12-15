@@ -50,6 +50,10 @@ $(OUTPUT_DIR)/versions-$(CRYSTAL_VERSION).json: $(OUTPUT_DIR)/$(OUTPUT_DOCS_BASE
 dist-redirect_latest: $(OUTPUT_DIR)/aws-config.json ## Apply redirect from `api/latest` to `api/$(CRYSTAL_VERSION)` in S3 (needs to be manually applied)
 	$(AWS_CLI) s3api put-bucket-website --bucket "$(AWS_BUCKET)" --website-configuration "file://$<"
 
+.PHONY: get-website-configuration
+get-website-configuration: ## Pull website configuration from S3 bucket (run as `make pull-website-configuration -s > aws-config.json`)
+	$(AWS_CLI) s3api get-bucket-website --bucket "$(AWS_BUCKET)"
+
 .PHONY: $(OUTPUT_DIR)/aws-config.json
 $(OUTPUT_DIR)/aws-config.json: aws-config.json $(OUTPUT_DIR)
 	sed 's/$${CRYSTAL_VERSION}/$(CRYSTAL_VERSION)/g' "$<" > $@
