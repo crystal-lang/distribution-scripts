@@ -7,12 +7,17 @@ Add an issue `Crystal release X.Y.Z` in this repo with a copy of this document. 
 1. [ ] Announce expected release date and time span for feature freeze
    * Feature freeze is about two weeks before release
    * Set date on milestone
-2. [ ] Start preparing changelog and release post
+2. [ ] Start preparing changelog and release notes
 3. [ ] Start feature freeze period
    * Either no merging of features into `master` or split off release branch for backporting bugfixes.
 4. [ ] Publish release PR draft
    * It should contain the expected date of the release (~two weeks after the PR is issued).
    * It should be populated with updates to `CHANGELOG.md` and `VERSION`.
+5. [ ] Ensure documentation for language and compiler changes and other relevant changes is up to date.
+   * [Crystal Book](https://github.com/crystal-lang/crystal-book/)
+      * Update language specification
+      * Update compiler manual
+      * Add or update guides / tutorials?
 
 ## Release process
 
@@ -34,6 +39,15 @@ Add an issue `Crystal release X.Y.Z` in this repo with a copy of this document. 
    1. Binaries are added later
 8. [ ] Close milestone
 
+### Publish documentation for the release
+
+1. [ ] Publish API docs
+   1. Have `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` env variables defined
+      * Keys can be generated at https://console.aws.amazon.com/iam/home#/security_credentials (contact a Manas admin if you don't have access).
+   2. Run `make -C docs publish_docs CRYSTAL_VERSION=${VERSION}` to publish docs to `api/${VERSION}`
+   3. Run `make -C docs dist-redirect_latest CRYSTAL_VERSION=${VERSION}` to apply redirect from `api/latest` to `api/${VERSION}`
+2. [ ] Publish language reference (TBD)
+
 ### Binary releases
 
 1. [ ] Wait for the release build in circle CI
@@ -43,11 +57,6 @@ Add an issue `Crystal release X.Y.Z` in this repo with a copy of this document. 
    * `crystal-*-linux-*.tar.gz`
    * `crystal-*.pkg`
    * `crystal-*-docs.tar.gz`
-3. [ ] Publish docs
-   1. Have `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` env variables defined
-      * Keys can be generated at https://console.aws.amazon.com/iam/home#/security_credentials (contact a Manas admin if you don't have access).
-   2. Run `make -C docs publish_docs CRYSTAL_VERSION=${VERSION}` to publish docs to `api/${VERSION}`
-   3. Run `make -C docs dist-redirect_latest CRYSTAL_VERSION=${VERSION}` to apply redirect from `api/latest` to `api/${VERSION}`
 4. [ ] Push changes to OBS for building linux packages
    1. Checkout https://github.com/crystal-lang/distribution-scripts and go to [`./packages`](../packages)
    2. Configure build.opensuse.org credentials in environment variables:
@@ -82,10 +91,7 @@ Add an issue `Crystal release X.Y.Z` in this repo with a copy of this document. 
    1. Create PR
 
 ### Release announcements
-1. [ ] Update crystal-website
-   1. Post a release notes in the website
-   1. Update information of `latest_release` in https://github.com/crystal-lang/crystal-website/blob/master/_config.yml
-   1. Update link to blog in https://github.com/crystal-lang/crystal-website/blob/5905e5644fcb4863976d0ca69856edbd74091370/index.html#L26
+1. [ ] Publish release notes on the website
 2. [ ] Post announcement in https://forum.crystal-lang.org/c/news/official
 3. [ ] Tweet about the release
 4. [ ] Post in Reddit
