@@ -4,16 +4,16 @@ Add an issue `Crystal release X.Y.Z` in this repo with a copy of this document. 
 
 ## Release preparation
 
-1. [ ] Announce expected release date and time span for feature freeze
-   * Feature freeze is about two weeks before release
-   * Set date on milestone
+1. [ ] (minor) Announce expected release date and time span for feature freeze
+   * (minor) Feature freeze is about two weeks before release
+   * (minor) Set date on milestone
 2. [ ] Start preparing changelog and release notes
-3. [ ] Start feature freeze period
-   * Either no merging of features into `master` or split off release branch for backporting bugfixes.
+3. [ ] (minor) Start feature freeze period
+   * (minor) Either no merging of features into `master` or split off release branch for backporting bugfixes.
 4. [ ] Publish release PR draft
-   * It should contain the expected date of the release (~two weeks after the PR is issued).
+   * (minor) It should contain the expected date of the release (~two weeks after the PR is issued).
    * It should be populated with updates to `CHANGELOG.md` and `VERSION`.
-5. [ ] Ensure documentation for language and compiler changes and other relevant changes is up to date.
+5. [ ] (minor) Ensure documentation for language and compiler changes and other relevant changes is up to date.
    * [Crystal Book](https://github.com/crystal-lang/crystal-book/)
       * Update language specification
       * Update compiler manual
@@ -27,17 +27,18 @@ Add an issue `Crystal release X.Y.Z` in this repo with a copy of this document. 
    * Make sure all changes are mentioned in the changelog
    * Check release date
    * Un-draft the PR
-2. [ ] Split off release branch (`release/x.y`)
+2. [ ] (minor) Split off release branch (`release/x.y`)
 3. [ ] Verify Maintenance CI workflow succeeds on the HEAD of the release branch
 4. [ ] Smoke test with [test-ecosystem](https://github.com/crystal-lang/test-ecosystem)
    * Run [*Test Crystal & Shards Workflow](https://github.com/crystal-lang/test-ecosystem/actions/workflows/test-crystal-shards.yml) with the release branch as `crystal_branch`.
 5. [ ] Merge the release PR
 6. [ ] Tag & annotate the commit with the changelog using `<M.m.p>` pattern as {version} (as a pre-release directly in GH?)
    * `git tag -s -a -m $VERSION $VERSION`
-7. [ ] Publish Github release
+7. [ ] Publish Github release (https://github.com/crystal-lang/crystal/releases/new)
    1. Copy the changelog section as description
    1. Binaries are added later
-8. [ ] Close milestone
+8. [ ] Close milestone (https://github.com/crystal-lang/crystal/milestones)
+9. [ ] Wait for the release build in circle CI (https://app.circleci.com/pipelines/github/crystal-lang/crystal)
 
 ### Publish documentation for the release
 
@@ -46,12 +47,11 @@ Add an issue `Crystal release X.Y.Z` in this repo with a copy of this document. 
       * Keys can be generated at https://console.aws.amazon.com/iam/home#/security_credentials (contact a Manas admin if you don't have access).
    2. Run `make -C docs publish_docs CRYSTAL_VERSION=${VERSION}` to publish docs to `api/${VERSION}`
    3. Run `make -C docs dist-redirect_latest CRYSTAL_VERSION=${VERSION}` to apply redirect from `api/latest` to `api/${VERSION}`
-2. [ ] Publish language reference
-   1. Change default branch to `release/$VERSION`
+2. [ ] (minor) Publish language reference
+   1. (minor) Change default branch to `release/$VERSION`
 
 ### Binary releases
 
-1. [ ] Wait for the release build in circle CI
 2. [ ] Smoke test with test-ecosystem (again)
 3. [ ] Attach build artifacts from circleci and GitHub Actions (Windows) to GitHub release
    * `crystal-*-darwin-*.tar.gz`
@@ -70,6 +70,7 @@ Add an issue `Crystal release X.Y.Z` in this repo with a copy of this document. 
       * You can also run the commands from that file manually and check build locally with
          * `osc build xUbuntu_20.04 x86_64`
          * `osc build Fedora_Rawhide x86_64`
+   4. Run [`./obs-release.sh devel:languages:crystal crystal${VERSION%.*} $VERSION`](../packages/obs-release.sh)
    4. Now OBS builds the packages. It’s best to follow the build status in the browser:
       1. `open https://build.opensuse.org/project/show/home:$OBS_USER:branches:devel:langauges:crystal/crystal`
       1. Wait for all package build jobs to finish and succeed
@@ -106,14 +107,6 @@ Add an issue `Crystal release X.Y.Z` in this repo with a copy of this document. 
    * Edit `prepare_build` on_osx download package and folder
    * Edit ` .github/workflows/*.yml` to point to docker image
    * Edit `shell.nix` `latestCrystalBinary` using  `nix-prefetch-url --unpack <url>`
-2. [ ] Increment VERSION file to the next minor and -dev suffix
-3. [ ] Perform uncomment/todos left in the repo
+2. [ ] (minor) Increment VERSION file to the next minor and -dev suffix
+3. [ ] (minor) Perform uncomment/todos left in the repo
 4. [ ] Update default base version in test-ecosystem
-
-## Observable Helper
-
-Build changelog lines
-https://observablehq.com/d/035be530d554ccdf
-
-Check commit history
-https://observablehq.com/d/4937e5db876fe1d4
