@@ -46,17 +46,19 @@ Add an issue `Crystal release X.Y.Z` in this repo with a copy of this document. 
       * Keys can be generated at https://console.aws.amazon.com/iam/home#/security_credentials (contact a Manas admin if you don't have access).
    2. Run `make -C docs publish_docs CRYSTAL_VERSION=${VERSION}` to publish docs to `api/${VERSION}`
    3. Run `make -C docs dist-redirect_latest CRYSTAL_VERSION=${VERSION}` to apply redirect from `api/latest` to `api/${VERSION}`
-2. [ ] Publish language reference (TBD)
+2. [ ] Publish language reference
+   1. Change default branch to `release/$VERSION`
 
 ### Binary releases
 
 1. [ ] Wait for the release build in circle CI
 2. [ ] Smoke test with test-ecosystem (again)
-3. [ ] Attach build artifacts to Github release
+3. [ ] Attach build artifacts from circleci and GitHub Actions (Windows) to GitHub release
    * `crystal-*-darwin-*.tar.gz`
    * `crystal-*-linux-*.tar.gz`
    * `crystal-*.pkg`
    * `crystal-*-docs.tar.gz`
+   * `crystal.zip` (GHA) -> `crystal-$VERSION-windows-x86_64-msvc-unsupported.zip`
 4. [ ] Push changes to OBS for building linux packages
    1. Checkout https://github.com/crystal-lang/distribution-scripts and go to [`./packages`](../packages)
    2. Configure build.opensuse.org credentials in environment variables:
@@ -106,6 +108,7 @@ Add an issue `Crystal release X.Y.Z` in this repo with a copy of this document. 
    * Edit `shell.nix` `latestCrystalBinary` using  `nix-prefetch-url --unpack <url>`
 2. [ ] Increment VERSION file to the next minor and -dev suffix
 3. [ ] Perform uncomment/todos left in the repo
+4. [ ] Update default base version in test-ecosystem
 
 ## Observable Helper
 
