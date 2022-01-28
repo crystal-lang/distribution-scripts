@@ -29,9 +29,9 @@ apply_tag "crystallang/crystal:${version}"        "crystallang/crystal:latest"
 apply_tag "crystallang/crystal:${version}-alpine" "crystallang/crystal:latest-alpine"
 
 # Tag minor (x.y)
-apply_tag "crystallang/crystal:${version}"        "crystallang/crystal:${version:%.*}"
-apply_tag "crystallang/crystal:${version}-alpine" "crystallang/crystal:${version:%.*}-alpine"
+apply_tag "crystallang/crystal:${version}"        "crystallang/crystal:${version%.*}"
+apply_tag "crystallang/crystal:${version}-alpine" "crystallang/crystal:${version%.*}-alpine"
 
 # Tag major (x)
-apply_tag "crystallang/crystal:${version}"        "crystallang/crystal:${version:%%.*}"
-apply_tag "crystallang/crystal:${version}-alpine" "crystallang/crystal:${version:%%.*}-alpine"
+apply_tag "crystallang/crystal:${version}"        "crystallang/crystal:${version%%.*}"
+apply_tag "crystallang/crystal:${version}-alpine" "crystallang/crystal:${version%%.*}-alpine"
