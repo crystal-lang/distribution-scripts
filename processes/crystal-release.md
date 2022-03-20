@@ -1,6 +1,6 @@
 # Crystal release process checklist
 
-Add an issue `Crystal release X.Y.Z` in this repo with a copy of this document. In this way it's easy to track the progress of the release.
+Add an issue `Crystal release X.Y.Z` in https://github.com/crystal-lang/distribution-scripts/issues with a copy of this document. In this way it's easy to track the progress of the release (Helper script: [`scripts/prepare-crystal-release.sh`](./scripts/prepare-crystal-release.sh))
 
 ## Release preparation
 
@@ -11,7 +11,7 @@ Add an issue `Crystal release X.Y.Z` in this repo with a copy of this document. 
 3. [ ] (minor) Start feature freeze period
    * (minor) Either no merging of features into `master` or split off release branch for backporting bugfixes.
 4. [ ] Publish release PR draft
-   * (minor) It should contain the expected date of the release (~two weeks after the PR is issued).
+   * (minor) It should contain the expected date of the release.
    * It should be populated with updates to `CHANGELOG.md` and `VERSION`.
 5. [ ] (minor) Ensure documentation for language and compiler changes and other relevant changes is up to date.
    * [Crystal Book](https://github.com/crystal-lang/crystal-book/)
@@ -30,13 +30,13 @@ Add an issue `Crystal release X.Y.Z` in this repo with a copy of this document. 
 2. [ ] (minor) Split off release branch (`release/x.y`)
 3. [ ] Verify Maintenance CI workflow succeeds on the HEAD of the release branch
 4. [ ] Smoke test with [test-ecosystem](https://github.com/crystal-lang/test-ecosystem)
-   * Run [*Test Crystal & Shards Workflow](https://github.com/crystal-lang/test-ecosystem/actions/workflows/test-crystal-shards.yml) with the release branch as `crystal_branch`.
+   * Run [*Test Crystal & Shards Workflow*](https://github.com/crystal-lang/test-ecosystem/actions/workflows/test-crystal-shards.yml) with the release branch as `crystal_branch`.
 5. [ ] Merge the release PR
-6. [ ] Tag & annotate the commit with the changelog using `<M.m.p>` pattern as {version} (as a pre-release directly in GH?)
+6. [ ] Tag & annotate the commit with the changelog using `<M.m.p>` pattern as {version}
    * `git tag -s -a -m $VERSION $VERSION`
 7. [ ] Publish Github release (https://github.com/crystal-lang/crystal/releases/new)
-   1. Copy the changelog section as description
-   1. Binaries are added later
+   * Copy the changelog section as description
+   * Binaries are added later
 8. [ ] Close milestone (https://github.com/crystal-lang/crystal/milestones)
 9. [ ] Wait for the release build in circle CI (https://app.circleci.com/pipelines/github/crystal-lang/crystal)
 
