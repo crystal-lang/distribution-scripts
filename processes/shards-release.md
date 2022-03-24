@@ -1,6 +1,6 @@
 # Shards release process checklist
 
-Add an issue `Shards release X.Y.Z` in https://github.com/crystal-lang/distribution-scripts/issues with a copy of this document. In this way it's easy to track the progress of the release (Helper script: [`scripts/prepare-shards-release.sh`](./scripts/prepare-shards-release.sh))
+Add an issue `Shards release X.Y.Z` in https://github.com/crystal-lang/distribution-scripts/issues with a copy of this document. In this way it's easy to track the progress of the release (*Helper script: [`scripts/prepare-shards-release.sh`](./scripts/prepare-shards-release.sh)*)
 
 ## Release preparation
 
@@ -9,6 +9,8 @@ Add an issue `Shards release X.Y.Z` in https://github.com/crystal-lang/distribut
    * It should be populated with updates to `CHANGELOG.md`, `VERSION`, and `shard.yml`.
 
 ## Release process
+
+*Steps 4.-6. are automated via [`scripts/make-shards-release.sh`](https://github.com/crystal-lang/distribution-scripts/blob/master/processes/scripts/make-shards-release.sh)*
 
 1. [ ] Finalize the release PR
    * Make sure all changes are mentioned in the changelog
@@ -21,9 +23,9 @@ Add an issue `Shards release X.Y.Z` in https://github.com/crystal-lang/distribut
 4. [ ] Merge the release PR
 5. [ ] Tag & annotate the commit with the changelog using v`<M.m.p>` pattern as {version}
    * `git tag -s -a -m v$VERSION v$VERSION`
-7. [ ] Publish Github release (https://github.com/crystal-lang/crystal/releases/new)
+6. [ ] Publish Github release (https://github.com/crystal-lang/shards/releases/new)
    * Copy the changelog section as description
-8. [ ] Close milestone (https://github.com/crystal-lang/crystal/milestones)
+7. [ ] Close milestone (https://github.com/crystal-lang/shards/milestones)
 
 ## Post-release
 
