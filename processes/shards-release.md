@@ -30,7 +30,7 @@ Add an issue `Shards release X.Y.Z` in https://github.com/crystal-lang/distribut
 ## Post-release
 
 1. [ ] (minor) Increment VERSION file to the next minor and -dev suffix
-2. [ ] Update distribution-scripts
+2. [ ] Update distribution-scripts (*Helper script: [`scripts/update-shards.sh`](https://github.com/crystal-lang/distribution-scripts/blob/master/scripts/prepare-shards-release.sh)*)
    * Edit [linux/Makefile](../linux/Makefile)
    * Edit [omnibus/config/software/shards.rb](../omnibus/config/software/shards.rb)
 3. [ ] Update https://github.com/crystal-lang/crystal
