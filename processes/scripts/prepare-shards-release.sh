@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 #
-# This helper creates a new release issue for Crystal
+# This helper creates a new release issue for Shards
 #
 # Usage:
 #
-#    scripts/prepare-crystal-release.sh VERSION
+#    scripts/prepare-shards-release.sh VERSION
 #
-# The content is generated from Crystal release checklist (../crystal-release.md)
+# The content is generated from Shards release checklist (../shards-release.md)
 # with filters applied based on the version type (major, minor, or patch).
 
 set -eu
@@ -34,7 +34,7 @@ esac
 
 dist_scripts_root=$(dirname $(dirname $(dirname $(realpath $0))))
 
-body=$(sed -E '/^##/,$!d' $dist_scripts_root/processes/crystal-release.md)
+body=$(sed -E '/^##/,$!d' $dist_scripts_root/processes/shards-release.md)
 
 case $TYPE in
   patch)
@@ -49,4 +49,4 @@ case $TYPE in
 esac
 
 body=$(printf "%q" "$body")
-step "Create tracking issue in crystal-lang/distribution-scripts" gh issue create -R crystal-lang/distribution-scripts --body "$body" --label "release" --title \"Release Crystal $VERSION\"
+step "Create tracking issue in crystal-lang/distribution-scripts" gh issue create -R crystal-lang/distribution-scripts --body "\"$body\"" --label "release" --title \"Release Shards $VERSION\"

@@ -35,6 +35,8 @@ more CHANGELOG.$VERSION.md
 
 step "Create GitHub release" gh release -R crystal-lang/crystal create $VERSION --title $VERSION --notes-file CHANGELOG.$VERSION.md
 
+rm CHANGELOG.$VERSION.md
+
 step "Wait for CI workflow to build artifacts ☕" echo
 
 read -p "CircleCI artifact URL (one example): " circle_artifact_url
