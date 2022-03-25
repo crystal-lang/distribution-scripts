@@ -35,3 +35,5 @@ echo "$ more CHANGELOG.$VERSION.md"
 more CHANGELOG.$VERSION.md
 
 step "Create GitHub release" gh release -R crystal-lang/shards create $tag --title $tag --notes-file CHANGELOG.$VERSION.md
+
+rm CHANGELOG.$VERSION.md
