@@ -22,7 +22,7 @@ sed -i -E "s|SHARDS_VERSION = .*|SHARDS_VERSION = v${SHARDS_VERSION}|" linux/Mak
 
 # Add version to omnibus
 if ! grep -q -E "version \"${SHARDS_VERSION}\"" omnibus/config/software/shards.rb; then
-  archive_checksum=$(curl -L -s "https://github.com/crystal-lang/shards/archive/${SHARDS_VERSION}.tar.gz" | md5sum | cut -d' ' -f1)
+  archive_checksum=$(curl -L -s "https://github.com/crystal-lang/shards/archive/v${SHARDS_VERSION}.tar.gz" | md5sum | cut -d' ' -f1)
   sed -i -E "/^source url:/i version \"${SHARDS_VERSION}\" do\n  source md5: \"${archive_checksum}\"\nend\n" omnibus/config/software/shards.rb
 fi
 
