@@ -52,7 +52,7 @@ version "0.16.0" do
 end
 
 version "0.17.0" do
-  source md5: "3be7b8b182ccd96e48989b4e57311193"
+  source md5: "04bdf5739ea4a897267502b9f77ec46f"
 end
 
 source url: "https://github.com/crystal-lang/shards/archive/v#{version}.tar.gz"
