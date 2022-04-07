@@ -1,13 +1,14 @@
 # Crystal release process checklist
 
-Add an issue `Crystal release X.Y.Z` in https://github.com/crystal-lang/distribution-scripts/issues with a copy of this document. In this way it's easy to track the progress of the release (Helper script: [`scripts/prepare-crystal-release.sh`](./scripts/prepare-crystal-release.sh))
+Add an issue `Crystal release X.Y.Z` in https://github.com/crystal-lang/distribution-scripts/issues with a copy of this document. In this way it's easy to track the progress of the release (*Helper: [`scripts/prepare-crystal-release.sh`](./scripts/prepare-crystal-release.sh)*)
 
 ## Release preparation
 
 1. [ ] (minor) Announce expected release date and time span for feature freeze
    * (minor) Feature freeze is about two weeks before release
    * (minor) Set date on milestone
-2. [ ] Start preparing changelog and release notes
+2. [ ] Start preparing changelog (*Helper: [`crystal:scripts/github-changelog.cr`](https://github.com/crystal-lang/crystal/blob/master/scripts/github-changelog.cr)*)
+3. [ ] Start preparing release notes
 3. [ ] (minor) Start feature freeze period
    * (minor) Either no merging of features into `master` or split off release branch for backporting bugfixes.
 4. [ ] Publish release PR draft
@@ -22,6 +23,8 @@ Add an issue `Crystal release X.Y.Z` in https://github.com/crystal-lang/distribu
 ## Release process
 
 ### Source release
+
+*Steps 6.-7. are automated via [`scripts/make-crystal-release.sh`](https://github.com/crystal-lang/distribution-scripts/blob/master/processes/scripts/make-github-release.sh)*
 
 1. [ ] Finalize the release PR
    * Make sure all changes are mentioned in the changelog
@@ -47,13 +50,13 @@ Add an issue `Crystal release X.Y.Z` in https://github.com/crystal-lang/distribu
       * Keys can be generated at https://console.aws.amazon.com/iam/home#/security_credentials (contact a Manas admin if you don't have access).
    2. Run `make -C docs publish_docs CRYSTAL_VERSION=${VERSION}` to publish docs to `api/${VERSION}`
    3. Run `make -C docs dist-redirect_latest CRYSTAL_VERSION=${VERSION}` to apply redirect from `api/latest` to `api/${VERSION}`
-2. [ ] (minor) Publish language reference
+2. [ ] (minor) Publish Crystal book
+   1. (minor) Create `release/$VERSION` branch (deployment happens automatically in GHA)
    1. (minor) Change default branch to `release/$VERSION`
 
 ### Binary releases
 
-2. [ ] Smoke test with test-ecosystem (again)
-3. [ ] Attach build artifacts from circleci and GitHub Actions (Windows) to GitHub release
+3. [ ] Attach build artifacts from circleci and GitHub Actions (Windows) to GitHub release (*this is automated via [`scripts/make-crystal-release.sh`](https://github.com/crystal-lang/distribution-scripts/blob/master/processes/scripts/make-github-release.sh), except for the Windows artifact*)
    * `crystal-*-darwin-*.tar.gz`
    * `crystal-*-linux-*.tar.gz`
    * `crystal-*.pkg`
@@ -64,33 +67,34 @@ Add an issue `Crystal release X.Y.Z` in https://github.com/crystal-lang/distribu
    2. Configure build.opensuse.org credentials in environment variables:
       * `export OBS_USER=`
       * `export OBS_PASSWORD=`
-   3. Run [`./obs-release.sh devel:languages:crystal crystal $VERSION`](../packages/obs-release.sh)
+   3. Update the `crystal` package: [`./obs-release.sh devel:languages:crystal crystal $VERSION`](../packages/obs-release.sh)
       * Uses the docker image `crystallang/osc` to run the CLI client for OBS.
       * The script creates a branch in you home project, updates the version and pushes it back to OBS.
       * You can also run the commands from that file manually and check build locally with
          * `osc build xUbuntu_20.04 x86_64`
          * `osc build Fedora_Rawhide x86_64`
-   4. Run [`./obs-release.sh devel:languages:crystal crystal${VERSION%.*} $VERSION`](../packages/obs-release.sh)
-   4. Now OBS builds the packages. It’s best to follow the build status in the browser:
+   4. (minor) Create the `crystal${VERSION%.*}` package: [`./obs-new-minor.sh devel:languages:crystal crystal${VERSION%.*} $VERSION crystal${OLD_VERSION}`](../packages/obs-new-minor.sh)
+   4. (patch) Update the `crystal${VERSION%.*}` package: [`./obs-release.sh devel:languages:crystal crystal${VERSION%.*} $VERSION`](../packages/obs-release.sh)
+   5. Now OBS builds the packages. It’s best to follow the build status in the browser:
       1. `open https://build.opensuse.org/project/show/home:$OBS_USER:branches:devel:langauges:crystal/crystal`
       1. Wait for all package build jobs to finish and succeed
-   5. Verify package installation
-      * `OBS_PROJECT=home:$OBS_USER:branches:devel:languages:crystal bats test`
-   6. When everything is green, create a submit request against the original package (*Submit package* link in the menu bar on the package in your branch)
+   6. When everything is green, create a submit request against the original packages (*Submit package* link in the menu bar on the package in your branch)
+   7. Verify package installation
+      * `OBS_PROJECT=devel:languages:crystal bats test`
 5. [ ] Tag `latest` docker images
    * Versioned docker images have been pushed to dockerhub.
    * Now just assign the `latest` tags:
-   * `$ ./docker/apply-latest-tags.sh {version}`
+   * `./docker/apply-latest-tags.sh ${VERSION}`
 6. [ ] Publish snap package
    1. You need to logged in via `$ snapcraft login`
    1. Recent tagged release is published directly to edge channel. The CI logs the snap revision number. Otherwise the .snap file is in the artifacts.
    1. Check the current status to find the revision of the tagged release otherwise:
-   1. `$ snapcraft status crystal`
-   1. `$ snapcraft release crystal <revision-number> beta`
-   1. `$ snapcraft release crystal <revision-number> stable`
+   1. `snapcraft status crystal`
+   1. `snapcraft release crystal <revision-number> beta`
+   1. `snapcraft release crystal <revision-number> stable`
 7. [ ] Submit a PR to update the homebrew formula in https://github.com/Homebrew/homebrew-core/blob/master/Formula/crystal.rb .
    1. Update the previous and new version (with their respective hashes).
-   1. Try locally `$ brew install --build-from-source <source of formula>`
+   1. Try locally `brew install --build-from-source <source of formula>`
    1. Create PR
 
 ### Release announcements
