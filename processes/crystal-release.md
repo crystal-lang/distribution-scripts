@@ -15,10 +15,10 @@ Add an issue `Crystal release X.Y.Z` in https://github.com/crystal-lang/distribu
    * (minor) It should contain the expected date of the release.
    * It should be populated with updates to `CHANGELOG.md` and `VERSION`.
 5. [ ] (minor) Ensure documentation for language and compiler changes and other relevant changes is up to date.
-   * [Crystal Book](https://github.com/crystal-lang/crystal-book/)
-      * Update language specification
-      * Update compiler manual
-      * Add or update guides / tutorials?
+   * (minor) [Crystal Book](https://github.com/crystal-lang/crystal-book/)
+      * (minor) Update language specification
+      * (minor) Update compiler manual
+      * (minor) Add or update guides / tutorials?
 
 ## Release process
 
