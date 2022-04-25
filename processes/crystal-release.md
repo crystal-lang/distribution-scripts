@@ -105,7 +105,7 @@ Add an issue `Crystal release X.Y.Z` in https://github.com/crystal-lang/distribu
 5. [ ] Update https://github.com/crystal-lang/crystal-book/blob/master/crystal-version.txt
 
 ## Post-release
-1. [ ] Update crystal `master` branch to use released version
+1. [ ] Update crystal `master` branch to use released version (*Helper: [`crystal:scripts/release-update.sh`](https://github.com/crystal-lang/crystal/blob/master/scripts/release-update.sh)*)
    * Edit PREVIOUS_CRYSTAL_BASE_URL in `.circleci/config.yml`
    * Edit DOCKER_TEST_PREFIX in `bin/ci`
    * Edit `prepare_build` on_osx download package and folder
@@ -113,4 +113,4 @@ Add an issue `Crystal release X.Y.Z` in https://github.com/crystal-lang/distribu
    * Edit `shell.nix` `latestCrystalBinary` using  `nix-prefetch-url --unpack <url>`
 2. [ ] (minor) Increment VERSION file to the next minor and -dev suffix
 3. [ ] (minor) Perform uncomment/todos left in the repo
-4. [ ] Update default base version in test-ecosystem
+4. [ ] Update default base version in test-ecosystem (*Helper: [`test-ecosystem:scripts/release-update.sh`](https://github.com/crystal-lang/test-ecosystem/blob/master/scripts/release-update.sh)*)
