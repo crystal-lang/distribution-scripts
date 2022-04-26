@@ -4,7 +4,7 @@
 #
 # Usage:
 #
-#    scripts/make-crystal-release.sh [VERSION]
+#    scripts/make-crystal-release.sh
 #
 # Requirements:
 # * packages: git gh sed wget
