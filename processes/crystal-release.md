@@ -7,7 +7,7 @@ Add an issue `Crystal release X.Y.Z` in https://github.com/crystal-lang/distribu
 1. [ ] (minor) Announce expected release date and time span for feature freeze
    * (minor) Feature freeze is about two weeks before release
    * (minor) Set date on milestone
-2. [ ] Start preparing changelog (*Helper: [`crystal:scripts/github-changelog.cr`](https://github.com/crystal-lang/crystal/blob/master/scripts/github-changelog.cr)*)
+2. [ ] Prepare the changelog entry: [`crystal:scripts/github-changelog.cr`](https://github.com/crystal-lang/crystal/blob/master/scripts/github-changelog.cr)
 3. [ ] Start preparing release notes
 3. [ ] (minor) Start feature freeze period
    * (minor) Either no merging of features into `master` or split off release branch for backporting bugfixes.
@@ -24,7 +24,7 @@ Add an issue `Crystal release X.Y.Z` in https://github.com/crystal-lang/distribu
 
 ### Source release
 
-*Steps "Tag & annotate" and "Publish Github release" are automated via [`scripts/make-crystal-release.sh`](https://github.com/crystal-lang/distribution-scripts/blob/master/processes/scripts/make-crystal-release.sh)*
+*Steps "Tag & annotate" and "Publish Github release" are automated via
 
 1. [ ] Finalize the release PR
    * Make sure all changes are mentioned in the changelog
@@ -35,33 +35,26 @@ Add an issue `Crystal release X.Y.Z` in https://github.com/crystal-lang/distribu
 4. [ ] Smoke test with [test-ecosystem](https://github.com/crystal-lang/test-ecosystem)
    * Run [*Test Crystal & Shards Workflow*](https://github.com/crystal-lang/test-ecosystem/actions/workflows/test-crystal-shards.yml) with the release branch as `crystal_branch`.
 5. [ ] Merge the release PR
-6. [ ] Tag & annotate the commit with the changelog using `<M.m.p>` pattern as {version}
-   * `git tag -s -a -m $VERSION $VERSION`
-7. [ ] Publish Github release (https://github.com/crystal-lang/crystal/releases/new)
-   * Copy the changelog section as description
-   * Binaries are added later
+6. Make the release and publish it on GitHub: [`scripts/make-crystal-release.sh`](https://github.com/crystal-lang/distribution-scripts/blob/master/processes/scripts/make-crystal-release.sh) (run from `crystallang/crystal@master` work tree). This performs these steps:
+   1. Tag & annotate the commit with the changelog using `<M.m.p>` pattern as version
+     * `git tag -s -a -m $VERSION $VERSION`
+     * `git push --tags`
+   2. Publish Github release (https://github.com/crystal-lang/crystal/releases/new)
+      * Copy the changelog section as description
+      * Binaries are added later
 8. [ ] Close milestone (https://github.com/crystal-lang/crystal/milestones)
 9. [ ] Wait for the release build in circle CI (https://app.circleci.com/pipelines/github/crystal-lang/crystal)
 
-### Publish documentation for the release
-
-1. [ ] Publish API docs
-   1. Have `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` env variables defined
-      * Keys can be generated at https://console.aws.amazon.com/iam/home#/security_credentials (contact a Manas admin if you don't have access).
-   2. Run `make -C docs publish_docs CRYSTAL_VERSION=${VERSION}` to publish docs to `api/${VERSION}`
-   3. Run `make -C docs dist-redirect_latest CRYSTAL_VERSION=${VERSION}` to apply redirect from `api/latest` to `api/${VERSION}`
-2. [ ] (minor) Publish Crystal book
-   1. (minor) Create `release/$VERSION` branch (deployment happens automatically in GHA)
-   1. (minor) Change default branch to `release/$VERSION`
-
 ### Binary releases
 
-3. [ ] Attach build artifacts from circleci and GitHub Actions (Windows) to GitHub release (*this is automated via [`scripts/make-crystal-release.sh`](https://github.com/crystal-lang/distribution-scripts/blob/master/processes/scripts/make-github-release.sh), except for the Windows artifact*)
-   * `crystal-*-darwin-*.tar.gz`
-   * `crystal-*-linux-*.tar.gz`
-   * `crystal-*.pkg`
-   * `crystal-*-docs.tar.gz`
-   * `crystal.zip` (GHA) -> `crystal-$VERSION-windows-x86_64-msvc-unsupported.zip`
+3. Publish build artifacts from CircleCI and GitHub Actions to GitHub release
+   * [ ] Upload build artifacts from CircleCI: [`scripts/publish-crystal-packages-on-github.sh`](https://github.com/crystal-lang/distribution-scripts/blob/master/processes/scripts/publish-crystal-packages-on-github.sh)
+      * `crystal-*-darwin-*.tar.gz`
+      * `crystal-*-linux-*.tar.gz`
+      * `crystal-*.pkg`
+      * `crystal-*-docs.tar.gz`
+   * [ ] Upload build artifacts from GHA (Windows):
+      * `crystal.zip` -> `crystal-$VERSION-windows-x86_64-msvc-unsupported.zip`
 4. [ ] Push changes to OBS for building linux packages
    1. Checkout https://github.com/crystal-lang/distribution-scripts and go to [`./packages`](../packages)
    2. Configure build.opensuse.org credentials in environment variables:
@@ -73,7 +66,7 @@ Add an issue `Crystal release X.Y.Z` in https://github.com/crystal-lang/distribu
       * You can also run the commands from that file manually and check build locally with
          * `osc build xUbuntu_20.04 x86_64`
          * `osc build Fedora_Rawhide x86_64`
-   4. (minor) Create the `crystal${VERSION%.*}` package: [`./obs-new-minor.sh devel:languages:crystal crystal${VERSION%.*} $VERSION crystal${OLD_VERSION}`](../packages/obs-new-minor.sh)
+   4. (minor) Create the `crystal${VERSION%.*}` package: [`./obs-new-minor.sh devel:languages:crystal crystal${VERSION%.*} $VERSION crystal${OLD_VERSION%.*}`](../packages/obs-new-minor.sh)
    4. (patch) Update the `crystal${VERSION%.*}` package: [`./obs-release.sh devel:languages:crystal crystal${VERSION%.*} $VERSION`](../packages/obs-release.sh)
    5. Now OBS builds the packages. It’s best to follow the build status in the browser:
       1. `open https://build.opensuse.org/project/show/home:$OBS_USER:branches:devel:langauges:crystal/crystal`
@@ -97,6 +90,18 @@ Add an issue `Crystal release X.Y.Z` in https://github.com/crystal-lang/distribu
    1. Try locally `brew install --build-from-source <source of formula>`
    1. Create PR
 
+### Publish documentation for the release
+
+1. [ ] Publish API docs
+   1. Have `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` env variables defined
+      * Keys can be generated at https://console.aws.amazon.com/iam/home#/security_credentials (contact a Manas admin if you don't have access).
+   2. Run `make -C docs publish_docs CRYSTAL_VERSION=${VERSION}` to publish docs to `api/${VERSION}`
+   3. Run `make -C docs dist-redirect_latest CRYSTAL_VERSION=${VERSION}` to apply redirect from `api/latest` to `api/${VERSION}`
+2. [ ] (minor) Publish Crystal book
+   1. (minor) Create `release/${VERSION%.*}` branch (deployment happens automatically in GHA)
+   2. (minor) Change default branch to `release/${VERSION%.*}`
+   3. (minor) Verify that deployment was successfull
+
 ### Release announcements
 1. [ ] Publish release notes on the website
 2. [ ] Post announcement in https://forum.crystal-lang.org/c/news/official
@@ -105,7 +110,7 @@ Add an issue `Crystal release X.Y.Z` in https://github.com/crystal-lang/distribu
 5. [ ] Update https://github.com/crystal-lang/crystal-book/blob/master/crystal-version.txt
 
 ## Post-release
-1. [ ] Update crystal `master` branch to use released version (*Helper: [`crystal:scripts/release-update.sh`](https://github.com/crystal-lang/crystal/blob/master/scripts/release-update.sh)*)
+1. [ ] Update crystal `master` branch to use released version: [`crystal:scripts/release-update.sh`](https://github.com/crystal-lang/crystal/blob/master/scripts/release-update.sh)
    * Edit PREVIOUS_CRYSTAL_BASE_URL in `.circleci/config.yml`
    * Edit DOCKER_TEST_PREFIX in `bin/ci`
    * Edit `prepare_build` on_osx download package and folder
@@ -113,4 +118,4 @@ Add an issue `Crystal release X.Y.Z` in https://github.com/crystal-lang/distribu
    * Edit `shell.nix` `latestCrystalBinary` using  `nix-prefetch-url --unpack <url>`
 2. [ ] (minor) Increment VERSION file to the next minor and -dev suffix
 3. [ ] (minor) Perform uncomment/todos left in the repo
-4. [ ] Update default base version in test-ecosystem (*Helper: [`test-ecosystem:scripts/release-update.sh`](https://github.com/crystal-lang/test-ecosystem/blob/master/scripts/release-update.sh)*)
+4. [ ] Update default base version in test-ecosystem: [`test-ecosystem:scripts/release-update.sh`](https://github.com/crystal-lang/test-ecosystem/blob/master/scripts/release-update.sh)
