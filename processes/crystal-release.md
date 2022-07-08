@@ -24,7 +24,6 @@ Add an issue `Crystal release X.Y.Z` in https://github.com/crystal-lang/distribu
 
 ### Source release
 
-*Steps "Tag & annotate" and "Publish Github release" are automated via
 
 1. [ ] Finalize the release PR
    * Make sure all changes are mentioned in the changelog
