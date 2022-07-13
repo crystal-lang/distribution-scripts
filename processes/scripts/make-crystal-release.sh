@@ -7,13 +7,12 @@
 #    scripts/make-crystal-release.sh
 #
 # Requirements:
-# * packages: git gh sed wget
+# * packages: git gh sed
 # * Working directory should be in a checked out work tree of `crystal-lang/crystal`.
 #
 # * The version is read from `src/VERSION`.
 # * Tags current commit and pushes tag to GitHub.
 # * Creates GitHub release for that tag with content from `CHANGELOG.md`.
-# * Pulls release artifacts from CI and attaches them to the GitHub release.
 
 set -eu
 
@@ -38,20 +37,3 @@ step "Create GitHub release" gh release -R crystal-lang/crystal create $VERSION 
 rm CHANGELOG.$VERSION.md
 
 step "Wait for CI workflow to build artifacts ☕" echo
-
-read -p "CircleCI artifact URL (one example): " circle_artifact_url
-
-artifacts_dir=/tmp/artifacts-crystal-$VERSION
-mkdir -p $artifacts_dir
-rm -fr $artifacts_dir/*
-
-wget --directory-prefix=$artifacts_dir/ \
-  ${circle_artifact_url%/*}/crystal-$VERSION-1-darwin-universal.tar.gz \
-  ${circle_artifact_url%/*}/crystal-$VERSION-1-linux-x86_64-bundled.tar.gz \
-  ${circle_artifact_url%/*}/crystal-$VERSION-1-linux-x86_64.tar.gz \
-  ${circle_artifact_url%/*}/crystal-$VERSION-1.universal.pkg \
-  ${circle_artifact_url%/*}/crystal-$VERSION-docs.tar.gz | more
-
-ls -lh $artifacts_dir/
-
-step "Upload artifacts to GitHub release $VERSION" gh release -R crystal-lang/crystal upload $VERSION $artifacts_dir/*
