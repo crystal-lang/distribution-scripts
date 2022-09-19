@@ -2,9 +2,8 @@ ARG alpine_image
 ARG debian_image
 FROM ${debian_image} AS debian
 
-RUN echo "deb http://deb.debian.org/debian buster-backports main" >> /etc/apt/sources.list \
- && apt-get update \
- && apt-get install -y -t buster-backports build-essential libevent-dev libpcre3-dev automake libtool pkg-config git curl llvm-8 clang-8 \
+RUN apt-get update \
+ && apt-get install -y build-essential libevent-dev libpcre3-dev automake libtool pkg-config git curl llvm-8 clang-8 \
  && (pkg-config || true)
 
 ARG release
