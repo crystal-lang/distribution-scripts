@@ -26,8 +26,6 @@ RUN git clone https://github.com/ivmai/bdwgc \
 
 FROM ${alpine_image}
 
-RUN sed -i 's|--list -- "$@"|--list "$@"|' /usr/bin/ldd
-
 # Install dependencies
 RUN apk add --no-cache \
       # Statically-compiled llvm
