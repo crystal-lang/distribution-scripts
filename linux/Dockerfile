@@ -71,7 +71,7 @@ RUN git clone https://github.com/crystal-lang/crystal \
  \
  && make crystal stats=true static=true ${release:+release=true} \
                  CRYSTAL_CONFIG_TARGET=${gnu_target} \
- && ([ "$(ldd .build/crystal | wc -l)" -eq "1" ] || { echo './build/crystal is not statically linked'; ldd .build/crystal; exit 1; })
+ && ([ "$(ldd .build/crystal 2>&1 | wc -l)" -eq "1" ] || { echo './build/crystal is not statically linked'; ldd .build/crystal; exit 1; })
 
 # Build shards
 ARG shards_version
@@ -84,7 +84,7 @@ RUN git clone https://github.com/crystal-lang/shards \
  && make SHARDS=false CRYSTAL=/crystal/bin/crystal \
          FLAGS="--stats --target ${musl_target} --static ${release:+--release}" \
  \
- && ([ "$(ldd bin/shards | wc -l)" -eq "1" ] || { echo 'shards is not statically linked'; ldd bin/shards; exit 1; })
+ && ([ "$(ldd bin/shards 2>&1 | wc -l)" -eq "1" ] || { echo 'shards is not statically linked'; ldd bin/shards; exit 1; })
 
 COPY --from=debian /bdwgc/.libs/libgc.a /libgc-debian.a
 
