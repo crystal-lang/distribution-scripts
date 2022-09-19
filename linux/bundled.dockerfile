@@ -1,5 +1,4 @@
-ARG debian_image
-FROM ${debian_image} AS debian
+FROM debian:11 AS debian
 
 RUN apt-get update \
  && apt-get install -y curl build-essential git automake libtool pkg-config

@@ -1,6 +1,4 @@
-ARG alpine_image
-ARG debian_image
-FROM ${debian_image} AS debian
+FROM debian:11 AS debian
 
 RUN apt-get update \
  && apt-get install -y build-essential libevent-dev libpcre3-dev automake libtool pkg-config git curl llvm-13 clang-13 \
@@ -20,7 +18,7 @@ RUN git clone https://github.com/ivmai/bdwgc \
  && ./configure --disable-debug --disable-shared --enable-large-config \
  && make -j$(nproc)
 
-FROM ${alpine_image}
+FROM alpine:3.16
 
 # Install dependencies
 RUN apk add --no-cache \

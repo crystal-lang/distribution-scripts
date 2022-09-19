@@ -40,8 +40,6 @@ BUILD_ARGS_COMMON = $(DOCKER_BUILD_ARGS) \
 
 BUILD_ARGS64 = $(BUILD_ARGS_COMMON) \
                --build-arg previous_crystal_release=$(PREVIOUS_CRYSTAL_RELEASE_LINUX64_TARGZ)	\
-               --build-arg debian_image=debian:11 \
-               --build-arg alpine_image=alpine:3.16 \
                --build-arg musl_target=x86_64-linux-musl \
                --build-arg gnu_target=x86_64-unknown-linux-gnu
 
