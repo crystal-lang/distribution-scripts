@@ -11,9 +11,6 @@ ARG release
 ENV CFLAGS="-fPIC -pipe ${release:+-O2}"
 ENV CC="clang-8"
 
-# Termporary pinning libcurl oldrelease because current (7.74.0) is broken
-RUN apt-get install -y --allow-downgrades libcurl3-gnutls=7.64.0-4+deb10u2
-
 # Build libgc
 ARG gc_version
 
