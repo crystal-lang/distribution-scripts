@@ -3,12 +3,12 @@ ARG debian_image
 FROM ${debian_image} AS debian
 
 RUN apt-get update \
- && apt-get install -y build-essential libevent-dev libpcre3-dev automake libtool pkg-config git curl llvm-8 clang-8 \
+ && apt-get install -y build-essential libevent-dev libpcre3-dev automake libtool pkg-config git curl llvm-13 clang-13 \
  && (pkg-config || true)
 
 ARG release
 ENV CFLAGS="-fPIC -pipe ${release:+-O2}"
-ENV CC="clang-8"
+ENV CC="clang-13"
 
 # Build libgc
 ARG gc_version
@@ -25,7 +25,7 @@ FROM ${alpine_image}
 # Install dependencies
 RUN apk add --no-cache \
       # Statically-compiled llvm
-      llvm10-dev llvm10-static \
+      llvm13-dev llvm13-static \
       # Static stdlib dependencies
       zlib-static yaml-static libxml2-dev pcre-dev libevent-static \
       # Static compiler dependencies
