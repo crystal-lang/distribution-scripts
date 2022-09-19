@@ -1,18 +1,12 @@
-ARG alpine_image
-ARG debian_image
-FROM ${debian_image} AS debian
+FROM debian:11 AS debian
 
-RUN echo "deb http://deb.debian.org/debian buster-backports main" >> /etc/apt/sources.list \
- && apt-get update \
- && apt-get install -y -t buster-backports build-essential libevent-dev libpcre3-dev automake libtool pkg-config git curl llvm-8 clang-8 \
+RUN apt-get update \
+ && apt-get install -y build-essential libevent-dev libpcre3-dev automake libtool pkg-config git curl llvm-13 clang-13 \
  && (pkg-config || true)
 
 ARG release
 ENV CFLAGS="-fPIC -pipe ${release:+-O2}"
-ENV CC="clang-8"
-
-# Termporary pinning libcurl oldrelease because current (7.74.0) is broken
-RUN apt-get install -y --allow-downgrades libcurl3-gnutls=7.64.0-4+deb10u2
+ENV CC="clang-13"
 
 # Build libgc
 ARG gc_version
@@ -24,14 +18,12 @@ RUN git clone https://github.com/ivmai/bdwgc \
  && ./configure --disable-debug --disable-shared --enable-large-config \
  && make -j$(nproc)
 
-FROM ${alpine_image}
-
-RUN sed -i 's|--list -- "$@"|--list "$@"|' /usr/bin/ldd
+FROM alpine:3.16
 
 # Install dependencies
 RUN apk add --no-cache \
       # Statically-compiled llvm
-      llvm10-dev llvm10-static \
+      llvm13-dev llvm13-static \
       # Static stdlib dependencies
       zlib-static yaml-static libxml2-dev pcre-dev libevent-static \
       # Static compiler dependencies
@@ -77,7 +69,7 @@ RUN git clone https://github.com/crystal-lang/crystal \
  \
  && make crystal stats=true static=true ${release:+release=true} \
                  CRYSTAL_CONFIG_TARGET=${gnu_target} \
- && ([ "$(ldd .build/crystal | wc -l)" -eq "1" ] || { echo './build/crystal is not statically linked'; ldd .build/crystal; exit 1; })
+ && ([ "$(ldd .build/crystal 2>&1 | wc -l)" -eq "1" ] || { echo './build/crystal is not statically linked'; ldd .build/crystal; exit 1; })
 
 # Build shards
 ARG shards_version
@@ -90,7 +82,7 @@ RUN git clone https://github.com/crystal-lang/shards \
  && make SHARDS=false CRYSTAL=/crystal/bin/crystal \
          FLAGS="--stats --target ${musl_target} --static ${release:+--release}" \
  \
- && ([ "$(ldd bin/shards | wc -l)" -eq "1" ] || { echo 'shards is not statically linked'; ldd bin/shards; exit 1; })
+ && ([ "$(ldd bin/shards 2>&1 | wc -l)" -eq "1" ] || { echo 'shards is not statically linked'; ldd bin/shards; exit 1; })
 
 COPY --from=debian /bdwgc/.libs/libgc.a /libgc-debian.a
 

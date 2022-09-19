@@ -21,7 +21,7 @@ PREVIOUS_CRYSTAL_PACKAGE_ITERATION ?= 1## Package iteration of the bootstrap com
 PREVIOUS_CRYSTAL_RELEASE_LINUX64_TARGZ ?= https://github.com/crystal-lang/crystal/releases/download/$(PREVIOUS_CRYSTAL_VERSION)/crystal-$(PREVIOUS_CRYSTAL_VERSION)-$(PREVIOUS_CRYSTAL_PACKAGE_ITERATION)-linux-x86_64.tar.gz ## url to crystal-{version}-{package}-linux-x86_64.tar.gz
 
 SHARDS_VERSION = v0.17.0
-GC_VERSION = v8.2.0
+GC_VERSION = v8.2.2
 LIBPCRE_VERSION = 8.45
 LIBEVENT_VERSION = release-2.1.12-stable
 
@@ -40,8 +40,6 @@ BUILD_ARGS_COMMON = $(DOCKER_BUILD_ARGS) \
 
 BUILD_ARGS64 = $(BUILD_ARGS_COMMON) \
                --build-arg previous_crystal_release=$(PREVIOUS_CRYSTAL_RELEASE_LINUX64_TARGZ)	\
-               --build-arg debian_image=debian:10 \
-               --build-arg alpine_image=alpine:3.12 \
                --build-arg musl_target=x86_64-linux-musl \
                --build-arg gnu_target=x86_64-unknown-linux-gnu
 
