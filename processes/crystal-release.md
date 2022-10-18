@@ -8,6 +8,8 @@ Add an issue `Crystal release X.Y.Z` in https://github.com/crystal-lang/distribu
    * (minor) Feature freeze is about two weeks before release
    * (minor) Set date on milestone
 2. [ ] Prepare the changelog entry: [`crystal:scripts/github-changelog.cr`](https://github.com/crystal-lang/crystal/blob/master/scripts/github-changelog.cr)
+   * Ensure that all merged PRs are added to the milestone (check [`is:pr is:merged sort:updated-desc no:milestone`](https://github.com/crystal-lang/crystal/pulls?q=is%3Apr+is%3Amerged+sort%3Aupdated-desc+no%3Amilestone)).
+   * Ensure that all milestoned PRs are properly labelled (check [`is:pr is:merged sort:updated-desc no:label milestone:${VERSION}`](https://github.com/crystal-lang/crystal/pulls?q=is%3Apr+is%3Amerged+sort%3Aupdated-desc+milestone%3A${VERSION}+no%3Alabel)).
 3. [ ] Start preparing release notes
 3. [ ] (minor) Start feature freeze period
    * (minor) Either no merging of features into `master` or split off release branch for backporting bugfixes.
@@ -19,6 +21,8 @@ Add an issue `Crystal release X.Y.Z` in https://github.com/crystal-lang/distribu
       * (minor) Update language specification
       * (minor) Update compiler manual
       * (minor) Add or update guides / tutorials?
+6. [ ] Ensure that [test-ecosystem](https://github.com/crystal-lang/test-ecosystem) functions and succeeeds on master
+   * Run [*Test Crystal & Shards Workflow*](https://github.com/crystal-lang/test-ecosystem/actions/workflows/test-crystal-shards.yml)
 
 ## Release process
 
