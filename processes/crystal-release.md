@@ -111,6 +111,7 @@ Add an issue `Crystal release X.Y.Z` in https://github.com/crystal-lang/distribu
 3. [ ] Tweet about the release
 4. [ ] Post in Reddit
 5. [ ] Update https://github.com/crystal-lang/crystal-book/blob/master/crystal-version.txt
+6. [ ] (minor) Post the release in https://opencollective.com/crystal-lang
 
 ## Post-release
 1. [ ] Update crystal `master` branch to use released version: [`crystal:scripts/release-update.sh`](https://github.com/crystal-lang/crystal/blob/master/scripts/release-update.sh)
