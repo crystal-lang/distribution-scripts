@@ -53,6 +53,7 @@ sed -i -e "s/^Version: .*/Version: ${VERSION}-1/" *.dsc
 sed -i -e "s/^DEBTRANSFORM-TAR: .*/DEBTRANSFORM-TAR: ${VERSION}.tar.gz/" *.dsc
 sed -i -e "s/^Version: .*/Version: ${VERSION}/" *.spec
 sed -i -e "s/VERSION=.*/VERSION=${VERSION}/" debian.rules
+sed -i -e "s/Provides: crystal.*/Provides: crystal${VERSION%.*}/" debian.control
 
 # Commit changes to OBS
 message="Release $VERSION"
