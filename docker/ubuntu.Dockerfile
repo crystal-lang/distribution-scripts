@@ -11,6 +11,7 @@ RUN \
   apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 ARG crystal_targz
+# Copy in platform specific crystal build
 COPY ${crystal_targz} /tmp/crystal.tar.gz
 
 RUN \

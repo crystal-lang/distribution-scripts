@@ -20,12 +20,13 @@ RUN git clone https://github.com/ivmai/bdwgc \
  \
  && ./autogen.sh \
  && ./configure --disable-debug --disable-shared --enable-large-config \
- && make -j$(nproc) CFLAGS=-DNO_GETCONTEXT \
+ && make -j$(nproc) CFLAGS="-DNO_GETCONTEXT -pipe -fPIC -O3" \
  && make install
 
 # Remove build tools from image now that libgc is built
 RUN apk del -r --purge autoconf automake libtool patch
 
+# Copy platform specific crystal build into container
 ARG crystal_targz
 COPY ${crystal_targz} /tmp/crystal.tar.gz
 
@@ -40,8 +41,10 @@ CMD ["/bin/sh"]
 
 FROM runtime as build
 
+ARG llvm_version=13
+
 RUN \
   apk add --update --no-cache --force-overwrite \
-    llvm13-dev llvm13-static g++ libffi-dev
+    llvm${llvm_version}-dev llvm${llvm_version}-static g++ libffi-dev
 
 CMD ["/bin/sh"]
