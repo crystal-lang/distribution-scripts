@@ -42,7 +42,7 @@ RUN git clone https://github.com/ivmai/bdwgc \
  \
  && ./autogen.sh \
  && ./configure --disable-debug --disable-shared --enable-large-config \
- && make -j$(nproc) CFLAGS=-DNO_GETCONTEXT
+ && make -j$(nproc) CFLAGS="-DNO_GETCONTEXT ${CFLAGS}"
 
 # This overrides default CRYSTAL_LIBRARY_PATH baked into the binary (starting with 1.2.0)
 # or configured via wrapper script (before 1.2.0) because we want to link against
