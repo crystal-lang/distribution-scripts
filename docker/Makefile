@@ -13,7 +13,7 @@ CRYSTAL_TARGZ ?=     ## Which crystal.tar.gz file to install in docker images (u
 DOCKER_TAG ?= $(CRYSTAL_VERSION) ## How to tag the docker image (examples: `0.27.2`, `nightly20190307`). `-build` will be appended for build images.
 DOCKER_REPOSITORY ?= crystallang/crystal ## Docker hub repository to commit image
 
-GC_VERSION = v8.2.0
+GC_VERSION = v8.2.2
 
 BASE_UBUNTU_DOCKER_IMAGE = ubuntu:focal
 
