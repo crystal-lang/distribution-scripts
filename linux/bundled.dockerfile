@@ -3,7 +3,7 @@ FROM debian:11 AS debian
 RUN apt-get update \
  && apt-get install -y curl build-essential git automake libtool pkg-config
 
-ENV CFLAGS="-fPIC -pipe ${release:+-O2}"
+ENV CFLAGS="-fPIC -pipe ${release:+-O3}"
 
 # build libpcre
 FROM debian AS libpcre

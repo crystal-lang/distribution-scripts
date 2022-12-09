@@ -5,8 +5,8 @@ RUN apt-get update \
  && (pkg-config || true)
 
 ARG release
-ENV CFLAGS="-fPIC -pipe ${release:+-O2}"
 ENV CC="clang-13"
+ENV CFLAGS="-fPIC -pipe ${release:+-O3}"
 
 # Build libgc
 ARG gc_version
@@ -32,7 +32,7 @@ RUN apk add --no-cache \
       git gcc g++ make automake libtool autoconf bash coreutils curl
 
 ARG release
-ENV CFLAGS="-fPIC -pipe ${release:+-O2}"
+ENV CFLAGS="-fPIC -pipe ${release:+-O3}"
 
 # Build libgc (again, this time for musl)
 ARG gc_version
