@@ -7,10 +7,10 @@
 ## Build everything for final release
 ##   $ make clean all arch=<target-platform> no_cache=true pull_images=true release=true CRYSTAL_VERSION=0.xx.y PREVIOUS_CRYSTAL_VERSION=...
 
+arch ?=        ## Architecture to build for (x86_64, aarch64)
 no_cache ?=    ## Disable the docker build cache
 pull_images ?= ## Always pull docker images to ensure they're up to date
 release ?=     ## Create an optimized build for the final release
-arch ?=        ## Architecture to build for (x86_64, aarch64)
 
 CRYSTAL_VERSION ?=                 ## How the binaries should be branded
 CRYSTAL_SHA1 ?= $(CRYSTAL_VERSION) ## Git tag/branch/sha1 to checkout and build source
