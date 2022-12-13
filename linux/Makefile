@@ -44,9 +44,10 @@ OUTPUT_BASENAME_BUNDLED = $(OUTPUT_BASENAME)-bundled
 PREVIOUS_CRYSTAL_RELEASE_TARGZ ?= $(OUTPUT_DIR)/crystal-$(PREVIOUS_CRYSTAL_VERSION)-$(PREVIOUS_CRYSTAL_PACKAGE_ITERATION)-linux-$(arch).tar.gz## Path to the bootstrap compiler
 PREVIOUS_CRYSTAL_RELEASE_TARGZ_URL ?= https://github.com/crystal-lang/crystal/releases/download/$(PREVIOUS_CRYSTAL_VERSION)/crystal-$(PREVIOUS_CRYSTAL_VERSION)-$(PREVIOUS_CRYSTAL_PACKAGE_ITERATION)-linux-$(arch).tar.gz## URL to crystal-{version}-{package}-linux-$(arch).tar.gz
 
-BOOTSTRAP_AARCH64_IMAGE="jhass/crystal:1.0.0-alpine-build"
+BOOTSTRAP_AARCH64_IMAGE=84codes/crystal:$(PREVIOUS_CRYSTAL_VERSION)-alpine
 
-DOCKER_BUILD_ARGS = $(if $(no_cache),--no-cache )$(if $(pull_images),--pull )
+DOCKER_PULL = $(if $(pull_images),--pull )
+DOCKER_BUILD_ARGS = $(if $(no_cache),--no-cache )$(DOCKER_PULL)
 
 BUILD_ARGS_LIB_VERSIONS = \
                --build-arg libpcre_version=$(LIBPCRE_VERSION) \
@@ -107,13 +108,16 @@ compress_linux: $(OUTPUT_BASENAME).tar.gz $(OUTPUT_BASENAME).tar.xz $(OUTPUT_BAS
 $(PREVIOUS_CRYSTAL_RELEASE_TARGZ): $(OUTPUT_DIR)
 	if [ "$(arch)" = "aarch64" ] && [ "$(bootstrap_aarch64)" = "true" ]; \
 	then \
-		container_id=$$(docker create --platform linux/arm64 "$(BOOTSTRAP_AARCH64_IMAGE)"); \
+		container_id=$$(docker create $(DOCKER_PULL) --platform linux/arm64 "$(BOOTSTRAP_AARCH64_IMAGE)"); \
 		workdir=$$(mktemp -d); \
-		docker cp "$$container_id:/usr/bin/crystal" "$$workdir" \
-		&& tar -C "$$workdir" -czf "$@" crystal \
+		mkdir -p "$$workdir/usr/lib/crystal/bin"; \
+		docker cp "$$container_id:/usr/bin/crystal" "$$workdir/usr/lib/crystal/bin" \
+		&& docker cp "$$container_id:/usr/bin/shards" "$$workdir/usr/lib/crystal/bin" \
+		&& tar -C "$$workdir" -czf "$@" usr/lib/crystal/bin/{crystal,shards} \
 		&& rm -r "$$workdir"; \
 	else \
-		curl --location --proto '=https' --tlsv1.2 -sSf -o "$(@)" "$(PREVIOUS_CRYSTAL_RELEASE_TARGZ_URL)"; \
+		curl --location --proto '=https' --tlsv1.2 --show-error --silent --fail \
+		-o "$(@)" "$(PREVIOUS_CRYSTAL_RELEASE_TARGZ_URL)"; \
 	fi
 
 $(OUTPUT_DIR):
