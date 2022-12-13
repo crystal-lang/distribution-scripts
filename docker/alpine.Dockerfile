@@ -14,7 +14,7 @@ RUN \
 # Build libgc
 ARG gc_version
 
-COPY build/scripts/shallow-clone.sh /tmp/shallow-clone.sh
+COPY scripts/shallow-clone.sh /tmp/shallow-clone.sh
 
 RUN /tmp/shallow-clone.sh ${gc_version} https://github.com/ivmai/bdwgc \
  && cd bdwgc \
