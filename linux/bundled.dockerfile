@@ -16,8 +16,11 @@ RUN curl https://ftp.exim.org/pub/pcre/pcre-${libpcre_version}.tar.gz | tar -zx 
 # build libevent
 
 FROM debian AS libevent
+
+ARG scripts_path=build-context/scripts
+COPY ${scripts_path}/shallow-clone.sh /tmp/shallow-clone.sh
+
 ARG libevent_version
-COPY build/scripts/shallow-clone.sh /tmp/shallow-clone.sh
 RUN /tmp/shallow-clone.sh ${libevent_version} https://github.com/libevent/libevent \
  && cd libevent \
  \

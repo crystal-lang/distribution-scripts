@@ -12,7 +12,8 @@ ENV CFLAGS="-fPIC -pipe ${release:+-O3}"
 ARG gc_version
 
 # Helper script to shallow clone a git repo and checkout a specific tag
-COPY build/scripts/shallow-clone.sh /tmp/shallow-clone.sh
+ARG scripts_path=build_context/scripts
+COPY ${scripts_path}/shallow-clone.sh /tmp/shallow-clone.sh
 
 RUN /tmp/shallow-clone.sh ${gc_version} https://github.com/ivmai/bdwgc \
  && cd bdwgc \
@@ -41,7 +42,8 @@ ENV CFLAGS="-fPIC -pipe ${release:+-O3}"
 ARG gc_version
 
 # Helper script to shallow clone a git repo and checkout a specific tag
-COPY build/scripts/shallow-clone.sh /tmp/shallow-clone.sh
+ARG scripts_path=build_context/scripts
+COPY ${scripts_path}/shallow-clone.sh /tmp/shallow-clone.sh
 
 RUN /tmp/shallow-clone.sh ${gc_version} https://github.com/ivmai/bdwgc \
  && cd bdwgc \
