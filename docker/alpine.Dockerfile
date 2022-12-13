@@ -12,7 +12,7 @@ RUN \
     autoconf automake libtool patch
 
 # Build libgc
-ARG gc_version
+ARG gc_version=8.2.2
 
 COPY scripts/shallow-clone.sh /tmp/shallow-clone.sh
 

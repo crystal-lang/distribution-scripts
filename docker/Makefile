@@ -46,6 +46,7 @@ BUILD_ARGS_COMMON := \
                       --label "crystal_version=$(CRYSTAL_VERSION)" \
                       --label "package_iteration=$(PACKAGE_ITERATION)" \
                       --label "package_maintainer=$(PACKAGE_MAINTAINER)"
+                      --build-arg llvm_version=$(LLVM_VERSION)
 
 BUILD_ARGS_UBUNTU := $(BUILD_ARGS_COMMON) \
                       --build-arg crystal_targz=crystal.tar.gz \

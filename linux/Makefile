@@ -21,6 +21,7 @@ PREVIOUS_CRYSTAL_VERSION ?=            ## Version of the bootstrap compiler
 PREVIOUS_CRYSTAL_PACKAGE_ITERATION ?= 1## Package iteration of the bootstrap compiler
 
 SHARDS_VERSION = v0.17.1
+LLVM_VERSION = 13
 GC_VERSION = v8.2.2
 LIBPCRE_VERSION = 8.45
 LIBEVENT_VERSION = release-2.1.12-stable
@@ -56,6 +57,7 @@ BUILD_ARGS_LIB_VERSIONS = \
 
 BUILD_ARGS_COMMON = $(DOCKER_BUILD_ARGS) \
                     $(if $(release),--build-arg release=true) \
+                    --build-arg llvm_version=$(LLVM_VERSION) \
                     --build-arg scripts_path=$(SCRIPTS_PATH) \
                     --build-arg crystal_version=$(CRYSTAL_VERSION) \
                     --build-arg crystal_sha1=$(CRYSTAL_SHA1) \
