@@ -4,6 +4,8 @@ omnibus/bin
 omnibus/crystal-darwin-*
 omnibus/shards-darwin-*
 
+build
+
 docs/build/
 
 darwin/build/
