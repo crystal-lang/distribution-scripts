@@ -17,9 +17,10 @@ RUN curl https://ftp.exim.org/pub/pcre/pcre-${libpcre_version}.tar.gz | tar -zx 
 
 FROM debian AS libevent
 ARG libevent_version
-RUN git clone https://github.com/libevent/libevent \
+COPY build/scripts/shallow-clone.sh /tmp/shallow-clone.sh
+RUN /tmp/shallow-clone.sh ${libevent_version} https://github.com/libevent/libevent \
  && cd libevent \
- && git checkout ${libevent_version} \
+ \
  && ./autogen.sh \
  && ./configure --disable-shared --disable-openssl \
  && make -j$(nproc)

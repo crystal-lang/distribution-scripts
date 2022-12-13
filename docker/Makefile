@@ -67,6 +67,10 @@ $(BUILD_CONTEXT)/alpine: alpine.Dockerfile $(BUILD_CONTEXT)/alpine/crystal.tar.g
 $(OUTPUT_DIR):
 	mkdir -p $(OUTPUT_DIR)
 
+.PHONY: scripts
+scripts: $(OUTPUT_DIR)
+	cp -r ../scripts $(OUTPUT_DIR)
+
 # Ubuntu x86_64
 $(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-ubuntu-x86_64.tar.gz: $(BUILD_CONTEXT)/ubuntu64 $(OUTPUT_DIR)
 	docker buildx build --platform linux/amd64 --tag $(DOCKER_TAG_UBUNTU) --target runtime -o type=docker,dest=- $(BUILD_ARGS_UBUNTU64) | gzip > $@

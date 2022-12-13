@@ -11,9 +11,12 @@ ENV CFLAGS="-fPIC -pipe ${release:+-O3}"
 # Build libgc
 ARG gc_version
 
-RUN git clone https://github.com/ivmai/bdwgc \
+# Helper script to shallow clone a git repo and checkout a specific tag
+COPY build/scripts/shallow-clone.sh /tmp/shallow-clone.sh
+
+RUN /tmp/shallow-clone.sh ${gc_version} https://github.com/ivmai/bdwgc \
  && cd bdwgc \
- && git checkout ${gc_version} \
+ \
  && ./autogen.sh \
  && ./configure --disable-debug --disable-shared --enable-large-config \
  && make -j$(nproc)
@@ -36,9 +39,12 @@ ENV CFLAGS="-fPIC -pipe ${release:+-O3}"
 
 # Build libgc (again, this time for musl)
 ARG gc_version
-RUN git clone https://github.com/ivmai/bdwgc \
+
+# Helper script to shallow clone a git repo and checkout a specific tag
+COPY build/scripts/shallow-clone.sh /tmp/shallow-clone.sh
+
+RUN /tmp/shallow-clone.sh ${gc_version} https://github.com/ivmai/bdwgc \
  && cd bdwgc \
- && git checkout ${gc_version} \
  \
  && ./autogen.sh \
  && ./configure --disable-debug --disable-shared --enable-large-config \
@@ -51,7 +57,8 @@ ENV CRYSTAL_LIBRARY_PATH=/bdwgc/.libs/
 RUN llvm-config --version
 
 ARG previous_crystal_release
-ADD ${previous_crystal_release} /tmp/crystal.tar.gz
+COPY ${previous_crystal_release} /tmp/crystal.tar.gz
+
 # TODO: Update path to new install directory /tmp/crystal/bin after migration period
 ENV PATH=${PATH}:/tmp/crystal/lib/crystal/bin/
 RUN mkdir -p /tmp/crystal \
@@ -63,9 +70,9 @@ RUN mkdir -p /tmp/crystal \
 ARG crystal_version
 ARG crystal_sha1
 ARG gnu_target
-RUN git clone https://github.com/crystal-lang/crystal \
+
+RUN /tmp/shallow-clone.sh ${crystal_sha1} https://github.com/crystal-lang/crystal \
  && cd crystal \
- && git checkout ${crystal_sha1} \
  \
  && make crystal stats=true static=true ${release:+release=true} \
                  CRYSTAL_CONFIG_TARGET=${gnu_target} \
@@ -74,9 +81,8 @@ RUN git clone https://github.com/crystal-lang/crystal \
 # Build shards
 ARG shards_version
 ARG musl_target
-RUN git clone https://github.com/crystal-lang/shards \
+RUN /tmp/shallow-clone.sh ${shards_version} https://github.com/crystal-lang/shards \
  && cd shards \
- && git checkout ${shards_version} \
  # FIXME: Remove this workaround for https://github.com/crystal-lang/crystal/issues/10861
  && touch shard.lock \
  && make SHARDS=false CRYSTAL=/crystal/bin/crystal \

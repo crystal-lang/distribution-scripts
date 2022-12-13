@@ -40,6 +40,6 @@ wget --directory-prefix="$artifacts_dir/" \
 
 ls -lh "$artifacts_dir/"
 
-step "Upload artifacts to GitHub release $VERSION" gh release -R crystal-lang/crystal upload $VERSION "$artifacts_dir/*"
+step "Upload artifacts to GitHub release $VERSION" gh release -R crystal-lang/crystal upload "$VERSION" "$artifacts_dir/*"
 
 rm -rf "$artifacts_dir"
