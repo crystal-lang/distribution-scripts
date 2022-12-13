@@ -67,7 +67,8 @@ BUILD_ARGS = $(BUILD_ARGS_COMMON) \
                --build-arg gnu_target=$(arch)-unknown-linux-gnu
 
 BUILD_ARGS_BUNDLED = $(BUILD_ARGS) \
-              $(BUILD_ARGS_LIB_VERSIONS)
+		$(BUILD_ARGS_LIB_VERSIONS) \
+		-f bundled.dockerfile
 
 .PHONY: all
 all: all_linux ## Build all distribution tarballs [default]
@@ -167,8 +168,8 @@ awk 'BEGIN {FS = "## "}; /^## [a-zA-Z_-]/ {printf "  \033[36m%s\033[0m\n", $$2};
 # - $3: Path of the artefact to copy
 # - $4: Path to copy the artefact to
 define build_in_container
-docker buildx build --platform $(1) $(2) -t crystal-build-temp .
-container_id="$$(docker create --platform $(1) crystal-build-temp)" \
-  && docker cp "$$container_id":$(3) $(4) \
+docker buildx build --platform $(1) $(2) -t crystal-build-temp . ; \
+  container_id="$$(docker create --platform $(1) crystal-build-temp)" \
+  && docker cp "$$container_id:$(3)" $(4) \
   && docker rm -v "$$container_id"
 endef
