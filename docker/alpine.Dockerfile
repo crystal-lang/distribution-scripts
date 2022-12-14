@@ -17,6 +17,7 @@ ARG gc_version=8.2.2
 COPY scripts/shallow-clone.sh /tmp/shallow-clone.sh
 
 RUN /tmp/shallow-clone.sh ${gc_version} https://github.com/ivmai/bdwgc \
+ && rm /tmp/shallow-clone.sh \
  && cd bdwgc \
  \
  && ./autogen.sh \

@@ -49,30 +49,35 @@ PREVIOUS_CRYSTAL_RELEASE_TARGZ_URL ?= https://github.com/crystal-lang/crystal/re
 BOOTSTRAP_AARCH64_IMAGE=84codes/crystal:$(PREVIOUS_CRYSTAL_VERSION)-alpine
 
 DOCKER_PULL = $(if $(pull_images),--pull )
-DOCKER_BUILD_ARGS = $(if $(no_cache),--no-cache )$(DOCKER_PULL)
+DOCKER_BUILD_ARGS = $(if $(no_cache),--no-cache )$(DOCKER_PULL) --progress=plain
+
+.SHELLFLAGS=-cx
 
 BUILD_ARGS_LIB_VERSIONS = \
-               --build-arg libpcre_version=$(LIBPCRE_VERSION) \
-               --build-arg libevent_version=$(LIBEVENT_VERSION)
+        --build-arg libpcre_version=$(LIBPCRE_VERSION) \
+        --build-arg libevent_version=$(LIBEVENT_VERSION)
 
-BUILD_ARGS_COMMON = $(DOCKER_BUILD_ARGS) \
-                    $(if $(release),--build-arg release=true) \
-                    --build-arg llvm_version=$(LLVM_VERSION) \
-                    --build-arg scripts_path=$(SCRIPTS_PATH) \
-                    --build-arg crystal_version=$(CRYSTAL_VERSION) \
-                    --build-arg crystal_sha1=$(CRYSTAL_SHA1) \
-                    --build-arg shards_version=$(SHARDS_VERSION) \
-                    --build-arg gc_version=$(GC_VERSION) \
-                    --build-arg package_iteration=$(PACKAGE_ITERATION)
+BUILD_ARGS_COMMON = \
+        $(DOCKER_BUILD_ARGS) \
+        $(if $(release),--build-arg release=true) \
+        --build-arg llvm_version=$(LLVM_VERSION) \
+        --build-arg scripts_path=$(SCRIPTS_PATH) \
+        --build-arg crystal_version=$(CRYSTAL_VERSION) \
+        --build-arg crystal_sha1=$(CRYSTAL_SHA1) \
+        --build-arg shards_version=$(SHARDS_VERSION) \
+        --build-arg gc_version=$(GC_VERSION) \
+        --build-arg package_iteration=$(PACKAGE_ITERATION)
 
-BUILD_ARGS = $(BUILD_ARGS_COMMON) \
-               --build-arg previous_crystal_release=$(PREVIOUS_CRYSTAL_RELEASE_TARGZ) \
-               --build-arg musl_target=$(arch)-linux-musl \
-               --build-arg gnu_target=$(arch)-unknown-linux-gnu
+BUILD_ARGS = \
+        $(BUILD_ARGS_COMMON) \
+        --build-arg previous_crystal_release=$(PREVIOUS_CRYSTAL_RELEASE_TARGZ) \
+        --build-arg musl_target=$(arch)-linux-musl \
+        --build-arg gnu_target=$(arch)-unknown-linux-gnu
 
-BUILD_ARGS_BUNDLED = $(BUILD_ARGS) \
-		$(BUILD_ARGS_LIB_VERSIONS) \
-		-f bundled.dockerfile
+BUILD_ARGS_BUNDLED = \
+       $(BUILD_ARGS) \
+       $(BUILD_ARGS_LIB_VERSIONS) \
+       -f bundled.dockerfile
 
 .PHONY: all
 all: all_linux ## Build all distribution tarballs [default]
@@ -174,7 +179,7 @@ awk 'BEGIN {FS = "## "}; /^## [a-zA-Z_-]/ {printf "  \033[36m%s\033[0m\n", $$2};
 # - $4: Path to copy the artefact to
 define build_in_container
 id=$$(echo '$(1)-$(2)-$(CRYSTAL_SHA1)' | md5sum | cut -c1-5); \
-docker buildx build --platform $(1) $(2) --tag "dummy.io/tmp/$$id" . || exit 1 ;\
+docker buildx build --load --platform $(1) $(2) --tag "dummy.io/tmp/$$id" . || exit 1 ;\
 container_id=$$(docker create --platform $(1) "dummy.io/tmp/$$id"); \
 docker cp "$$container_id:$(3)" $(4) \
 && docker rm -v "$$container_id"

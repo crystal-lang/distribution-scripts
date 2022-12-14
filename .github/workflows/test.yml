@@ -17,7 +17,7 @@ jobs:
       matrix:
         architecture:
           - x86_64
-          - aarch64
+          # - aarch64
     steps:
       -
         name: Checkout the distribution scripts
@@ -53,7 +53,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: linux-${{ env.CRYSTAL_VERSION }}-{{ matrix.architecture }}-${{ env.PACKAGE_VERSION }}
-          path: linux/output/*.gz
+          path: linux/build/*.gz
 
 
   test-docker-build:
@@ -64,7 +64,7 @@ jobs:
       matrix:
         architecture:
           - x86_64
-          - aarch64
+          # - aarch64
     steps:
       -
         name: Checkout the distribution scripts
@@ -106,8 +106,8 @@ jobs:
         name: Upload the docker image for use in the next step
         uses: actions/upload-artifact@v3
         with:
-          name: docker-crystal-${{ env.CRYSTAL_VERSION }}-{{ matrix.architecture }}-${{ env.PACKAGE_VERSION }}
-          path: docker/output/*.gz
+          name: docker-crystal-${{ env.CRYSTAL_VERSION }}-${{ env.PACKAGE_VERSION }}-{{ matrix.architecture }}
+          path: docker/build/*.gz
 
   test-docker-containers:
     runs-on: ubuntu-latest
@@ -117,7 +117,7 @@ jobs:
       matrix:
         architecture:
           - x86_64
-          - aarch64
+          # - aarch64
         distribution:
           - alpine
           - ubuntu
@@ -126,8 +126,8 @@ jobs:
         name: Download the docker images
         uses: actions/download-artifact@v3
         with:
-          name: docker-crystal-${{ env.CRYSTAL_VERSION }}-{{ matrix.architecture }}-${{ env.PACKAGE_VERSION }}
-          path: docker/build-context
+          name: docker-crystal-${{ env.CRYSTAL_VERSION }}-${{ env.PACKAGE_VERSION }}-{{ matrix.architecture }}
+          path: docker-artifacts
 
       -
         name: Set up QEMU
@@ -136,16 +136,23 @@ jobs:
       -
         name: Test the docker images
         run: |
-          image=crystallang/crystal:${{ env.CRYSTAL_VERSION }}${{ matrix.distribution == 'alpine' && '-alpine' }}
-          docker load -i docker/output/*.tar.gz
+          image=crystallang/crystal:${{ env.CRYSTAL_VERSION }}${{ matrix.distribution == 'alpine' && '-alpine' || '' }}
+
+          docker import \
+            docker-artifacts/docker-${{ env.CRYSTAL_VERSION }}-${{ matrix.distribution }}-${{ matrix.architecture }}.tar.gz \
+            $image
+
           docker run \
             --rm \
-            -it \
+            $image \
+            ls /usr
+
+          docker run \
+            --rm \
             $image \
             crystal --version
 
           docker run \
             --rm \
-            -it \
             $image\
             shards --version
