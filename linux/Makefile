@@ -118,7 +118,7 @@ $(PREVIOUS_CRYSTAL_RELEASE_TARGZ): $(BUILD_CONTEXT)
 		mkdir -p "$$workdir/usr/lib/crystal/bin"; \
 		docker cp "$$container_id:/usr/bin/crystal" "$$workdir/usr/lib/crystal/bin" \
 		&& docker cp "$$container_id:/usr/bin/shards" "$$workdir/usr/lib/crystal/bin" \
-		&& tar -C "$$workdir" -czf "$@" usr/lib/crystal/bin/{crystal,shards} \
+		&& tar -C "$$workdir" -czf "$@" usr/lib/crystal/bin/crystal usr/lib/crystal/bin/shards \
 		&& rm -r "$$workdir"; \
 	else \
 		curl --location --proto '=https' --tlsv1.2 --show-error --silent --fail \
@@ -173,8 +173,9 @@ awk 'BEGIN {FS = "## "}; /^## [a-zA-Z_-]/ {printf "  \033[36m%s\033[0m\n", $$2};
 # - $3: Path of the artefact to copy
 # - $4: Path to copy the artefact to
 define build_in_container
-docker buildx build --platform $(1) $(2) -t crystal-build-temp . ; \
-  container_id="$$(docker create --platform $(1) crystal-build-temp)" \
-  && docker cp "$$container_id:$(3)" $(4) \
-  && docker rm -v "$$container_id"
+id=$$(echo '$(1)-$(2)-$(CRYSTAL_SHA1)' | md5sum | cut -c1-5); \
+docker buildx build --platform $(1) $(2) --tag "dummy.io/tmp/$$id" . || exit 1 ;\
+container_id=$$(docker create --platform $(1) "dummy.io/tmp/$$id"); \
+docker cp "$$container_id:$(3)" $(4) \
+&& docker rm -v "$$container_id"
 endef
