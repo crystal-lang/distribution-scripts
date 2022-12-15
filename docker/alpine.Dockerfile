@@ -34,9 +34,9 @@ COPY ${crystal_targz} /tmp/crystal.tar.gz
 
 RUN \
   tar -xz -C /usr --strip-component=1  -f /tmp/crystal.tar.gz \
-    --exclude */lib/crystal/lib \
-    --exclude */lib/crystal/*.a \
-    --exclude */share/crystal/src/llvm/ext/llvm_ext.o && \
+    --exclude '*/lib/crystal/lib' \
+    --exclude '*/lib/crystal/*.a' \
+    --exclude '*/share/crystal/src/llvm/ext/llvm_ext.o' && \
   rm /tmp/crystal.tar.gz
 
 CMD ["/bin/sh"]

@@ -97,6 +97,17 @@ $(BUILD_CONTEXT):
 scripts: $(BUILD_CONTEXT)
 	cp -r ../scripts $(BUILD_CONTEXT)/alpine
 
+.PHONY: test
+test: test_ubuntu test_alpine
+
+.PHONY: test_ubuntu
+test_ubuntu: ubuntu
+	$(call test_crystal_image, $(DOCKER_TAG_UBUNTU), $(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-ubuntu-$(arch).tar.gz)
+
+.PHONY: test_alpine
+test_alpine: alpine
+	$(call test_crystal_image, $(DOCKER_TAG_ALPINE), $(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-alpine-$(arch).tar.gz)
+
 # Ubuntu
 $(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-ubuntu-$(arch).tar.gz: $(BUILD_CONTEXT)/ubuntu $(OUTPUT_DIR)
 	docker buildx build --tag $(DOCKER_TAG_UBUNTU) --target runtime -o type=docker,dest=- $(BUILD_ARGS_UBUNTU) | gzip > $@
@@ -132,3 +143,19 @@ help: ## Show this help
 	@printf '\033[34mrecipes:\033[0m\n'
 	@grep -hE '^##.*$$' $(MAKEFILE_LIST) |\
 awk 'BEGIN {FS = "## "}; /^## [a-zA-Z_-]/ {printf "  \033[36m%s\033[0m\n", $$2}; /^##  / {printf "  %s\n", $$2}'
+
+# Load the docker image and run `crystal` and `shards`
+# Arguments:
+#  $1: The docker image tag to load
+#  $2: The docker tar ball to load
+define test_crystal_image
+  docker import $(2) $(1) \
+  && \
+  docker run --rm \
+    $(1) \
+    crystal --version \
+  && \
+  docker run --rm \
+    $(1) \
+    shards --version
+endef
