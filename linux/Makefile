@@ -17,8 +17,8 @@ CRYSTAL_VERSION ?=                 ## How the binaries should be branded
 CRYSTAL_SHA1 ?= $(CRYSTAL_VERSION) ## Git tag/branch/sha1 to checkout and build source
 PACKAGE_ITERATION ?= 1
 
-PREVIOUS_CRYSTAL_VERSION ?=            ## Version of the bootstrap compiler
-PREVIOUS_CRYSTAL_PACKAGE_ITERATION ?= 1## Package iteration of the bootstrap compiler
+PREVIOUS_CRYSTAL_VERSION ?=    ## Version of the bootstrap compiler
+PREVIOUS_PACKAGE_ITERATION ?= 1## Package iteration of the bootstrap compiler
 
 SHARDS_VERSION = v0.17.1
 LLVM_VERSION = 13
@@ -43,8 +43,8 @@ COMPILER_OUTPUT_BASENAME = crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION)
 OUTPUT_BASENAME = $(OUTPUT_DIR)/$(COMPILER_OUTPUT_BASENAME)-linux-$(arch)
 OUTPUT_BASENAME_BUNDLED = $(OUTPUT_BASENAME)-bundled
 
-PREVIOUS_CRYSTAL_RELEASE_TARGZ ?= $(BUILD_CONTEXT)/crystal-$(PREVIOUS_CRYSTAL_VERSION)-$(PREVIOUS_CRYSTAL_PACKAGE_ITERATION)-linux-$(arch).tar.gz## Path to the bootstrap compiler
-PREVIOUS_CRYSTAL_RELEASE_TARGZ_URL ?= https://github.com/crystal-lang/crystal/releases/download/$(PREVIOUS_CRYSTAL_VERSION)/crystal-$(PREVIOUS_CRYSTAL_VERSION)-$(PREVIOUS_CRYSTAL_PACKAGE_ITERATION)-linux-$(arch).tar.gz## URL to crystal-{version}-{package}-linux-$(arch).tar.gz
+PREVIOUS_CRYSTAL_RELEASE_TARGZ ?= $(BUILD_CONTEXT)/crystal-$(PREVIOUS_CRYSTAL_VERSION)-$(PREVIOUS_PACKAGE_ITERATION)-linux-$(arch).tar.gz## Path to the bootstrap compiler
+PREVIOUS_CRYSTAL_RELEASE_TARGZ_URL ?= https://github.com/crystal-lang/crystal/releases/download/$(PREVIOUS_CRYSTAL_VERSION)/crystal-$(PREVIOUS_CRYSTAL_VERSION)-$(PREVIOUS_PACKAGE_ITERATION)-linux-$(arch).tar.gz## URL to crystal-{version}-{package}-linux-$(arch).tar.gz
 
 BOOTSTRAP_AARCH64_IMAGE=84codes/crystal:$(PREVIOUS_CRYSTAL_VERSION)-alpine
 
