@@ -1,9 +1,9 @@
 # Recipies for this Makefile
 
 ## Build all docker images for x86_64
-##   $ make arch=x86_64 DOCKER_TAG=nightly CRYSTAL_VERSION=0.xy.z CRYSTAL_DEB=... CRYSTAL_TARGZ=...
+##   $ make arch=x86_64 DOCKER_TAG=nightly CRYSTAL_VERSION=0.xy.z CRYSTAL_TARGZ=...
 ## Build all docker images for aarch64
-##   $ make arch=aarch64 DOCKER_TAG=nightly CRYSTAL_VERSION=0.xy.z CRYSTAL_DEB=... CRYSTAL_TARGZ=...
+##   $ make arch=aarch64 DOCKER_TAG=nightly CRYSTAL_VERSION=0.xy.z CRYSTAL_TARGZ=...
 ## Build ubuntu docker images for x86_64
 ##   $ make ubuntu arch=x86_64 DOCKER_TAG=nightly CRYSTAL_VERSION=0.xy.z CRYSTAL_TARGZ=...
 ## Build alpine docker images for aarch64
@@ -36,9 +36,7 @@ OUTPUT_DIR := build
 
 BUILD_CONTEXT := $(CURDIR)/build-context
 
-CRYSTAL_DEB ?=       ## Which crystal.deb file to install in debian based docker images (ubuntu32)
 CRYSTAL_TARGZ ?= $(BUILD_CONTEXT)/crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION)-linux-$(arch).tar.gz## Which crystal.tar.gz file to install in docker images (ubuntu, alpine)
-
 
 BUILD_ARGS_COMMON := \
                       $(if $(pull_images),--pull) \
@@ -84,10 +82,6 @@ $(BUILD_CONTEXT)/ubuntu: ubuntu.Dockerfile $(BUILD_CONTEXT)/ubuntu/crystal.tar.g
 $(BUILD_CONTEXT)/alpine: alpine.Dockerfile $(BUILD_CONTEXT)/alpine/crystal.tar.gz
 	cp alpine.Dockerfile $@/Dockerfile
 	mkdir $@/files/
-
-%/crystal.deb:
-	mkdir -p $(shell dirname $@)
-	cp $(CRYSTAL_DEB) $@
 
 %/crystal.tar.gz:
 	mkdir -p $(shell dirname $@)
