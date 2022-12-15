@@ -149,7 +149,7 @@ awk 'BEGIN {FS = "## "}; /^## [a-zA-Z_-]/ {printf "  \033[36m%s\033[0m\n", $$2};
 #  $1: The docker image tag to load
 #  $2: The docker tar ball to load
 define test_crystal_image
-  docker import $(2) $(1) \
+  docker load -i $(2) \
   && \
   docker run --rm \
     $(1) \
