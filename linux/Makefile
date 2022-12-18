@@ -58,7 +58,7 @@ BUILD_ARGS_COMMON = \
         --progress plain \
         $(if $(pull_images),--pull) \
         $(if $(no_cache),--no-cache) \
-        $(if $(GITHUB_ACTIONS),--cache-from type=gha --cache-to type=gha) \
+        $(if $(GITHUB_ACTIONS),--cache-from type=gha,mode=max,scope=$(arch) --cache-to type=gha,mode=max,scope=$(arch)) \
         $(if $(release),--build-arg release=true) \
         --build-arg llvm_version=$(LLVM_VERSION) \
         --build-arg scripts_path=$(SCRIPTS_PATH) \
