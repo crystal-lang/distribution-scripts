@@ -48,9 +48,6 @@ PREVIOUS_CRYSTAL_RELEASE_TARGZ_URL ?= https://github.com/crystal-lang/crystal/re
 
 BOOTSTRAP_AARCH64_IMAGE=84codes/crystal:$(PREVIOUS_CRYSTAL_VERSION)-alpine
 
-DOCKER_PULL = $(if $(pull_images),--pull )
-DOCKER_BUILD_ARGS = $(if $(no_cache),--no-cache )$(DOCKER_PULL) --progress=plain
-
 .SHELLFLAGS=-cx
 
 BUILD_ARGS_LIB_VERSIONS = \
@@ -58,7 +55,10 @@ BUILD_ARGS_LIB_VERSIONS = \
         --build-arg libevent_version=$(LIBEVENT_VERSION)
 
 BUILD_ARGS_COMMON = \
-        $(DOCKER_BUILD_ARGS) \
+        --progress plain \
+        $(if $(pull_images),--pull) \
+        $(if $(no_cache),--no-cache) \
+        $(if $(GITHUB_ACTIONS),--cache-from type=gha --cache-to type=gha) \
         $(if $(release),--build-arg release=true) \
         --build-arg llvm_version=$(LLVM_VERSION) \
         --build-arg scripts_path=$(SCRIPTS_PATH) \

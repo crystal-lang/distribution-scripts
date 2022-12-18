@@ -41,6 +41,7 @@ CRYSTAL_TARGZ ?= $(BUILD_CONTEXT)/crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION
 BUILD_ARGS_COMMON := \
                       $(if $(pull_images),--pull) \
                       $(if $(no_cache),--no-cache) \
+                      $(if $(GITHUB_ACTIONS),--cache-from type=gha --cache-to type=gha) \
                       --platform $(DOCKER_BUILD_PLATFORM) \
                       --label "crystal_version=$(CRYSTAL_VERSION)" \
                       --label "package_iteration=$(PACKAGE_ITERATION)" \
