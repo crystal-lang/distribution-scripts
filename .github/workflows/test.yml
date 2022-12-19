@@ -1,7 +1,6 @@
-name: Test that builds work
+name: CI
 
-on:
-  push:
+on: [push, pull_request]
 
 env:
   PREVIOUS_CRYSTAL_VERSION: 1.6.0
@@ -18,13 +17,11 @@ jobs:
       matrix:
         architecture:
           - x86_64
-          # - aarch64
+          - aarch64
     steps:
       -
         name: Checkout the distribution scripts
         uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
 
       -
         name: Cache Docker layers
@@ -66,13 +63,11 @@ jobs:
       matrix:
         architecture:
           - x86_64
-          # - aarch64
+          - aarch64
     steps:
       -
         name: Checkout the distribution scripts
         uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
 
       -
         name: Download the linux binaries
