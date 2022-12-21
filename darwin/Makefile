@@ -8,7 +8,12 @@ CRYSTAL_SHA1 ?= $(CRYSTAL_VERSION) ## Git tag/branch/sha1 to checkout and build 
 PACKAGE_ITERATION ?= 1
 FORCE_GIT_TAGGED ?= 1              ## Require build to be based on git tag/branch
 
-PREVIOUS_CRYSTAL_RELEASE_DARWIN_TARGZ ?= ## url to crystal-{version}-{package}-darwin-x86_64.tar.gz
+PREVIOUS_CRYSTAL_VERSION ?=    ## Version of the bootstrap compiler
+PREVIOUS_PACKAGE_ITERATION ?= 1## Package iteration of the bootstrap compiler
+
+CRYSTAL_REPOSITORY ?= crystal-lang/crystal
+
+PREVIOUS_CRYSTAL_RELEASE_DARWIN_TARGZ ?= https://github.com/$(CRYSTAL_REPOSITORY)/releases/download/$(PREVIOUS_CRYSTAL_VERSION)/crystal-$(PREVIOUS_CRYSTAL_VERSION)-$(PREVIOUS_PACKAGE_ITERATION)-darwin-universal.tar.gz## Url to crystal-{version}-{package}-darwin-universal.tar.gz
 
 OUTPUT_DIR = build
 
@@ -52,7 +57,7 @@ $(CURDIR)/../omnibus/crystal-darwin-x86_64/embedded/bin/crystal:
 $(OUTPUT_DIR)/$(DARWIN_NAME) $(OUTPUT_DIR)/$(DARWIN_PKG_NAME): ## Build omnibus crystal project
 ifeq ($(FORCE_GIT_TAGGED), 0)
 	rm -Rf $(CURDIR)/tmp && mkdir -p $(CURDIR)/tmp && cd $(CURDIR)/tmp \
-	&& git clone https://github.com/crystal-lang/crystal \
+	&& git clone https://github.com/$(CRYSTAL_REPOSITORY) \
 	&& cd crystal \
 	&& git checkout $(CRYSTAL_SHA1) \
 	&& git checkout -b $(CRYSTAL_VERSION)

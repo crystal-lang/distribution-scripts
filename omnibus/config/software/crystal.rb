@@ -73,6 +73,7 @@ build do
   env["CXXFLAGS"] << " -target arm64-apple-darwin"
   make "deps", env: env
 
+  # Compile for aarch64
   make "crystal stats=true release=true target=aarch64-apple-darwin FLAGS=\"#{crflags}\" CRYSTAL_CONFIG_TARGET=aarch64-apple-darwin CRYSTAL_CONFIG_LIBRARY_PATH= O=#{output_path}", env: env
 
   command "clang #{output_path}/crystal.o -o #{output_bin}_arm64 -target arm64-apple-darwin src/llvm/ext/llvm_ext.o `llvm-config --libs --system-libs --ldflags 2>/dev/null` -lstdc++ -lpcre -lgc -lpthread -levent -liconv -ldl -v", env: env

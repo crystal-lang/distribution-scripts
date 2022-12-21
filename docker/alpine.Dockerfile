@@ -12,36 +12,41 @@ RUN \
     autoconf automake libtool patch
 
 # Build libgc
-ARG gc_version
+ARG gc_version=8.2.2
 
-RUN git clone https://github.com/ivmai/bdwgc \
+COPY scripts/shallow-clone.sh /tmp/shallow-clone.sh
+
+RUN /tmp/shallow-clone.sh ${gc_version} https://github.com/ivmai/bdwgc \
+ && rm /tmp/shallow-clone.sh \
  && cd bdwgc \
- && git checkout ${gc_version} \
  \
  && ./autogen.sh \
  && ./configure --disable-debug --disable-shared --enable-large-config \
- && make -j$(nproc) CFLAGS=-DNO_GETCONTEXT \
+ && make -j$(nproc) CFLAGS="-DNO_GETCONTEXT -pipe -fPIC -O3" \
  && make install
 
 # Remove build tools from image now that libgc is built
 RUN apk del -r --purge autoconf automake libtool patch
 
+# Copy platform specific crystal build into container
 ARG crystal_targz
 COPY ${crystal_targz} /tmp/crystal.tar.gz
 
 RUN \
   tar -xz -C /usr --strip-component=1  -f /tmp/crystal.tar.gz \
-    --exclude */lib/crystal/lib \
-    --exclude */lib/crystal/*.a \
-    --exclude */share/crystal/src/llvm/ext/llvm_ext.o && \
+    --exclude '*/lib/crystal/lib' \
+    --exclude '*/lib/crystal/*.a' \
+    --exclude '*/share/crystal/src/llvm/ext/llvm_ext.o' && \
   rm /tmp/crystal.tar.gz
 
 CMD ["/bin/sh"]
 
 FROM runtime as build
 
+ARG llvm_version=13
+
 RUN \
   apk add --update --no-cache --force-overwrite \
-    llvm13-dev llvm13-static g++ libffi-dev
+    llvm${llvm_version}-dev llvm${llvm_version}-static g++ libffi-dev
 
 CMD ["/bin/sh"]

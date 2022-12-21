@@ -11,6 +11,7 @@ RUN \
   apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 ARG crystal_targz
+# Copy in platform specific crystal build
 COPY ${crystal_targz} /tmp/crystal.tar.gz
 
 RUN \
@@ -21,11 +22,13 @@ CMD ["/bin/sh"]
 
 FROM runtime as build
 
+ARG llvm_version=13
+
 RUN \
   apt-get update && \
-  apt-get install -y build-essential llvm-10 lld-10 libedit-dev gdb libffi-dev && \
+  apt-get install -y build-essential llvm-${llvm_version} lld-${llvm_version} libedit-dev gdb libffi-dev && \
   apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-RUN ln -sf /usr/bin/ld.lld-10 /usr/bin/ld.lld
+RUN ln -sf /usr/bin/ld.lld-${llvm_version} /usr/bin/ld.lld
 
 CMD ["/bin/sh"]

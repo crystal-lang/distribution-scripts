@@ -1,57 +1,157 @@
 # Recipes for this Makefile
 
-## Build everything
-##   $ make CRYSTAL_VERSION=0.xx.y PREVIOUS_CRYSTAL_RELEASE_LINUX64_TARGZ=...
-## Build just 64bit distribution packages
-##   $ make package64 CRYSTAL_VERSION=0.xx.y PREVIOUS_CRYSTAL_RELEASE_LINUX64_TARGZ=...
+## Build everything for x86_64
+##   $ make arch=x86_64 CRYSTAL_VERSION=0.xx.y PREVIOUS_CRYSTAL_VERSION=...
+## Build everything for aarch64
+##   $ make arch=aarch64 CRYSTAL_VERSION=0.xx.y PREVIOUS_CRYSTAL_VERSION=...
 ## Build everything for final release
-##   $ make clean all no_cache=true pull_images=true release=true CRYSTAL_VERSION=0.xx.y PREVIOUS_CRYSTAL_RELEASE_LINUX64_TARGZ=...
+##   $ make clean all arch=<target-platform> no_cache=true pull_images=true release=true CRYSTAL_VERSION=0.xx.y PREVIOUS_CRYSTAL_VERSION=...
 
+arch ?=        ## Architecture to build for (x86_64, aarch64)
 no_cache ?=    ## Disable the docker build cache
 pull_images ?= ## Always pull docker images to ensure they're up to date
 release ?=     ## Create an optimized build for the final release
+bootstrap_aarch64 ?= true## Extract the bootstrap compiler from and aarch64 image until tier-1 aarch64 artefact available
 
 CRYSTAL_VERSION ?=                 ## How the binaries should be branded
 CRYSTAL_SHA1 ?= $(CRYSTAL_VERSION) ## Git tag/branch/sha1 to checkout and build source
 PACKAGE_ITERATION ?= 1
-PACKAGE_MAINTAINER = Crystal Team <crystal@manas.tech>
 
-PREVIOUS_CRYSTAL_VERSION ?= ## Version of the bootstrap compiler
-PREVIOUS_CRYSTAL_PACKAGE_ITERATION ?= 1## Package iteration of the bootstrap compiler
-PREVIOUS_CRYSTAL_RELEASE_LINUX64_TARGZ ?= https://github.com/crystal-lang/crystal/releases/download/$(PREVIOUS_CRYSTAL_VERSION)/crystal-$(PREVIOUS_CRYSTAL_VERSION)-$(PREVIOUS_CRYSTAL_PACKAGE_ITERATION)-linux-x86_64.tar.gz ## url to crystal-{version}-{package}-linux-x86_64.tar.gz
+PREVIOUS_CRYSTAL_VERSION ?=    ## Version of the bootstrap compiler
+PREVIOUS_PACKAGE_ITERATION ?= 1## Package iteration of the bootstrap compiler
 
 SHARDS_VERSION = v0.17.1
+LLVM_VERSION = 13
 GC_VERSION = v8.2.2
 LIBPCRE_VERSION = 8.45
 LIBEVENT_VERSION = release-2.1.12-stable
 
 OUTPUT_DIR = build
-OUTPUT_BASENAME64 = $(OUTPUT_DIR)/crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION)-linux-x86_64
+BUILD_CONTEXT = build_context
+SCRIPTS_PATH = $(BUILD_CONTEXT)/scripts
 
-DOCKER_BUILD_ARGS = $(if $(no_cache),--no-cache )$(if $(pull_images),--pull )
+ifeq ($(arch),x86_64)
+  DOCKER_BUILD_PLATFORM = linux/amd64
+else ifeq ($(arch),aarch64)
+  DOCKER_BUILD_PLATFORM = linux/arm64
+else
+  $(error Expected arch to be one of 'x86_64', or 'aarch64', got: $(arch))
+endif
 
-BUILD_ARGS_COMMON = $(DOCKER_BUILD_ARGS) \
-                    $(if $(release),--build-arg release=true) \
-                    --build-arg crystal_version=$(CRYSTAL_VERSION) \
-                    --build-arg crystal_sha1=$(CRYSTAL_SHA1) \
-                    --build-arg shards_version=$(SHARDS_VERSION) \
-                    --build-arg gc_version=$(GC_VERSION) \
-                    --build-arg package_iteration=$(PACKAGE_ITERATION)
+COMPILER_OUTPUT_BASENAME = crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION)
 
-BUILD_ARGS64 = $(BUILD_ARGS_COMMON) \
-               --build-arg previous_crystal_release=$(PREVIOUS_CRYSTAL_RELEASE_LINUX64_TARGZ)	\
-               --build-arg musl_target=x86_64-linux-musl \
-               --build-arg gnu_target=x86_64-unknown-linux-gnu
+OUTPUT_BASENAME = $(OUTPUT_DIR)/$(COMPILER_OUTPUT_BASENAME)-linux-$(arch)
+OUTPUT_BASENAME_BUNDLED = $(OUTPUT_BASENAME)-bundled
 
-BUILD_ARGS64_BUNDLED = $(BUILD_ARGS64) \
-               --build-arg libpcre_version=$(LIBPCRE_VERSION) \
-               --build-arg libevent_version=$(LIBEVENT_VERSION)
+PREVIOUS_CRYSTAL_RELEASE_TARGZ ?= $(BUILD_CONTEXT)/crystal-$(PREVIOUS_CRYSTAL_VERSION)-$(PREVIOUS_PACKAGE_ITERATION)-linux-$(arch).tar.gz## Path to the bootstrap compiler
+PREVIOUS_CRYSTAL_RELEASE_TARGZ_URL ?= https://github.com/crystal-lang/crystal/releases/download/$(PREVIOUS_CRYSTAL_VERSION)/crystal-$(PREVIOUS_CRYSTAL_VERSION)-$(PREVIOUS_PACKAGE_ITERATION)-linux-$(arch).tar.gz## URL to crystal-{version}-{package}-linux-$(arch).tar.gz
+
+BOOTSTRAP_AARCH64_IMAGE=84codes/crystal:$(PREVIOUS_CRYSTAL_VERSION)-alpine
+
+.SHELLFLAGS=-cx
+
+BUILD_ARGS_LIB_VERSIONS = \
+        --build-arg libpcre_version=$(LIBPCRE_VERSION) \
+        --build-arg libevent_version=$(LIBEVENT_VERSION)
+
+BUILD_ARGS_COMMON = \
+        --progress plain \
+        $(if $(pull_images),--pull) \
+        $(if $(no_cache),--no-cache) \
+        $(if $(GITHUB_ACTIONS),--cache-from type=gha,mode=max,scope=$(arch) --cache-to type=gha,mode=max,scope=$(arch)) \
+        $(if $(release),--build-arg release=true) \
+        --build-arg llvm_version=$(LLVM_VERSION) \
+        --build-arg scripts_path=$(SCRIPTS_PATH) \
+        --build-arg crystal_version=$(CRYSTAL_VERSION) \
+        --build-arg crystal_sha1=$(CRYSTAL_SHA1) \
+        --build-arg shards_version=$(SHARDS_VERSION) \
+        --build-arg gc_version=$(GC_VERSION) \
+        --build-arg package_iteration=$(PACKAGE_ITERATION)
+
+BUILD_ARGS = \
+        $(BUILD_ARGS_COMMON) \
+        --build-arg previous_crystal_release=$(PREVIOUS_CRYSTAL_RELEASE_TARGZ) \
+        --build-arg musl_target=$(arch)-linux-musl \
+        --build-arg gnu_target=$(arch)-unknown-linux-gnu
+
+BUILD_ARGS_BUNDLED = \
+       $(BUILD_ARGS) \
+       $(BUILD_ARGS_LIB_VERSIONS) \
+       -f bundled.dockerfile
 
 .PHONY: all
-all: all64 ## Build all distribution tarballs [default]
+all: all_linux ## Build all distribution tarballs [default]
 
-.PHONY: all64
-all64: compress64 clean_tmp ## Build distribution tarballs for 64 bits
+.PHONY: all_linux
+all_linux: compress_linux clean_tmp ## Build distribution tarballs for linux binaries
+
+.PHONY: build
+build: $(OUTPUT_BASENAME).tar ## Build the raw uncompressed tarballs for all distributions
+
+.PHONY: build_linux
+build_linux: $(OUTPUT_BASENAME).tar ## Build the raw uncompressed tarball for linux
+
+# Build the compiler
+
+$(OUTPUT_BASENAME).tar: Dockerfile $(OUTPUT_DIR) $(PREVIOUS_CRYSTAL_RELEASE_TARGZ) $(SCRIPTS_PATH)
+	$(call build_in_container,$(DOCKER_BUILD_PLATFORM),$(BUILD_ARGS),/output/$(COMPILER_OUTPUT_BASENAME).tar,$@)
+
+# Build the bundled libraries
+
+$(OUTPUT_BASENAME_BUNDLED)-libs.tar: bundled.dockerfile $(OUTPUT_DIR) $(SCRIPTS_PATH)
+	$(call build_in_container,$(DOCKER_BUILD_PLATFORM),$(BUILD_ARGS_BUNDLED),/output/bundled-libs.tar,$@)
+
+# Create bundled archives
+
+$(OUTPUT_BASENAME_BUNDLED).tar: $(OUTPUT_BASENAME_BUNDLED)
+	tar -C $(OUTPUT_BASENAME_BUNDLED) -cf $@ ./
+
+$(OUTPUT_BASENAME_BUNDLED): $(OUTPUT_BASENAME).tar $(OUTPUT_BASENAME_BUNDLED)-libs.tar
+	rm -rf $@
+	mkdir -p $@
+	tar -C $@ -xf $(OUTPUT_BASENAME).tar
+	tar -C $@ -xf $(OUTPUT_BASENAME_BUNDLED)-libs.tar
+
+.PHONY: compress_linux
+compress_linux: $(OUTPUT_BASENAME).tar.gz $(OUTPUT_BASENAME).tar.xz $(OUTPUT_BASENAME_BUNDLED).tar.gz
+
+$(PREVIOUS_CRYSTAL_RELEASE_TARGZ): $(BUILD_CONTEXT)
+	if [ "$(arch)" = "aarch64" ] && [ "$(bootstrap_aarch64)" = "true" ]; \
+	then \
+		container_id=$$(docker create $(DOCKER_PULL) --platform linux/arm64 "$(BOOTSTRAP_AARCH64_IMAGE)"); \
+		workdir=$$(mktemp -d); \
+		mkdir -p "$$workdir/usr/lib/crystal/bin"; \
+		docker cp "$$container_id:/usr/bin/crystal" "$$workdir/usr/lib/crystal/bin" \
+		&& docker cp "$$container_id:/usr/bin/shards" "$$workdir/usr/lib/crystal/bin" \
+		&& tar -C "$$workdir" -czf "$@" usr/lib/crystal/bin/crystal usr/lib/crystal/bin/shards \
+		&& rm -r "$$workdir"; \
+	else \
+		curl --location --proto '=https' --tlsv1.2 --show-error --silent --fail \
+		-o "$(@)" "$(PREVIOUS_CRYSTAL_RELEASE_TARGZ_URL)"; \
+	fi
+
+$(OUTPUT_DIR):
+	mkdir -p $@
+$(BUILD_CONTEXT):
+	mkdir -p $@
+
+$(SCRIPTS_PATH): ## Copy helper scripts to build context
+	cp -r ../scripts $(BUILD_CONTEXT)
+
+$(OUTPUT_DIR)/%.gz: $(OUTPUT_DIR)/%
+	gzip -c $< > $@
+
+$(OUTPUT_DIR)/%.xz: $(OUTPUT_DIR)/%
+	xz -T 0 -c $< > $@
+
+.PHONY: clean
+clean: ## Clean up build directory
+	rm -Rf $(OUTPUT_DIR) $(BUILD_CONTEXT)
+
+.PHONY: clean_tmp
+clean_tmp: ## Clean up temporary build artifacts
+	rm -Rf $(OUTPUT_DIR)/*-bundled-libs.tar
+	rm -Rf $(OUTPUT_DIR)/*-bundled
 
 .PHONY: help
 help: ## Show this help
@@ -70,46 +170,17 @@ help: ## Show this help
 	@grep -hE '^##.*$$' $(MAKEFILE_LIST) |\
 awk 'BEGIN {FS = "## "}; /^## [a-zA-Z_-]/ {printf "  \033[36m%s\033[0m\n", $$2}; /^##  / {printf "  %s\n", $$2}'
 
-.PHONY: build
-build: $(OUTPUT_BASENAME64).tar ## Build the raw uncompressed tarball
-
-$(OUTPUT_BASENAME64).tar: Dockerfile
-	mkdir -p $(OUTPUT_DIR)
-	docker build $(BUILD_ARGS64) -t crystal-build-temp .
-	container_id="$$(docker create crystal-build-temp)" \
-	  && docker cp "$$container_id":/output/crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION).tar $@ \
-	  && docker rm -v "$$container_id"
-
-$(OUTPUT_BASENAME64)-bundled.tar: $(OUTPUT_BASENAME64)-bundled
-	tar -C $(OUTPUT_BASENAME64)-bundled -cf $@ ./
-
-$(OUTPUT_BASENAME64)-bundled: $(OUTPUT_BASENAME64).tar $(OUTPUT_DIR)/bundled-libs.tar
-	rm -rf $@
-	mkdir -p $@
-	tar -C $@ -xf $(OUTPUT_BASENAME64).tar
-	tar -C $@ -xf $(OUTPUT_DIR)/bundled-libs.tar
-
-$(OUTPUT_DIR)/bundled-libs.tar: bundled.dockerfile
-	mkdir -p $(OUTPUT_DIR)
-	docker build $(BUILD_ARGS64_BUNDLED) -t crystal-build-temp -f bundled.dockerfile .
-	container_id="$$(docker create crystal-build-temp)" \
-	  && docker cp "$$container_id":/output/bundled-libs.tar $@ \
-	  && docker rm -v "$$container_id"
-
-.PHONY: compress64
-compress64: $(OUTPUT_BASENAME64).tar.gz $(OUTPUT_BASENAME64).tar.xz $(OUTPUT_BASENAME64)-bundled.tar.gz ## Build compressed tarballs
-
-$(OUTPUT_DIR)/%.gz: $(OUTPUT_DIR)/%
-	gzip -c $< > $@
-
-$(OUTPUT_DIR)/%.xz: $(OUTPUT_DIR)/%
-	xz -T 0 -c $< > $@
-
-.PHONY: clean
-clean: ## Clean up build directory
-	rm -Rf $(OUTPUT_DIR)
-
-.PHONY: clean_tmp
-clean_tmp: ## Clean up temporary build artifacts
-	rm -Rf $(OUTPUT_DIR)/bundled-libs.tar
-	rm -Rf $(OUTPUT_BASENAME64)-bundled
+# Build an image, then copy an artefact to a path on the host
+#
+# Arguments:
+# - $1: Platform (amd64 or aarch64)
+# - $2: Build arguments
+# - $3: Path of the artefact to copy
+# - $4: Path to copy the artefact to
+define build_in_container
+id=$$(echo '$(1)-$(2)-$(CRYSTAL_SHA1)' | md5sum | cut -c1-5); \
+docker buildx build --load --platform $(1) $(2) --tag "dummy.io/tmp/$$id" . || exit 1 ;\
+container_id=$$(docker create --platform $(1) "dummy.io/tmp/$$id"); \
+docker cp "$$container_id:$(3)" $(4) \
+&& docker rm -v "$$container_id"
+endef

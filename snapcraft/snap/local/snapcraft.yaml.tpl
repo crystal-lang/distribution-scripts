@@ -21,6 +21,9 @@ apps:
   shards:
     command: bin/shards
 
+architectures:
+  - build-for: [amd64, arm64]
+
 parts:
   crystal:
     plugin: dump
