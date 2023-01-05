@@ -8,10 +8,11 @@ ENV CFLAGS="-fPIC -pipe ${release:+-O3}"
 # build libpcre
 FROM debian AS libpcre
 ARG libpcre_version
-RUN curl https://ftp.exim.org/pub/pcre/pcre-${libpcre_version}.tar.gz | tar -zx \
- && cd pcre-${libpcre_version} \
- && ./configure --disable-shared --disable-cpp --enable-jit --enable-utf --enable-unicode-properties \
- && make -j$(nproc)
+RUN set -o pipefail \
+    && curl --proto "=https" --tlsv1.2 -sSf https://ftp.exim.org/pub/pcre/pcre-${libpcre_version}.tar.gz | tar -zx \
+    && cd pcre-${libpcre_version} \
+    && ./configure --disable-shared --disable-cpp --enable-jit --enable-utf --enable-unicode-properties \
+    && make -j$(nproc)
 
 # build libevent
 
