@@ -9,7 +9,10 @@ AWS_CLI = docker run --rm -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY -v $$(pw
 S3_ENDPOINT = s3://$(AWS_BUCKET)/api
 AWS_BUCKET = crystal-api
 
-BUILD_ARGS = --build-arg crystal_docker_image=$(CRYSTAL_DOCKER_IMAGE) --build-arg output_docs_base_name=$(OUTPUT_DOCS_BASE_NAME) --build-arg crystal_sha1=$(CRYSTAL_SHA1)
+# Optional argument
+CRYSTAL_REPOSITORY ?= https://github.com/crystal-lang/crystal
+
+BUILD_ARGS = --build-arg crystal_docker_image=$(CRYSTAL_DOCKER_IMAGE) --build-arg output_docs_base_name=$(OUTPUT_DOCS_BASE_NAME) --build-arg crystal_sha1=$(CRYSTAL_SHA1) --build-arg crystal_repository=$(CRYSTAL_REPOSITORY)
 
 .PHONY: all
 all: $(OUTPUT_DIR)/$(OUTPUT_DOCS_BASE_NAME).tar.gz ## Build docs tarball

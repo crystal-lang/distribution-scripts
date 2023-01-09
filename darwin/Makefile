@@ -54,6 +54,7 @@ $(CURDIR)/../omnibus/crystal-darwin-x86_64/embedded/bin/crystal:
 	&& rm /tmp/crystal-darwin-x86_64.tar.gz \
 	&& chmod +x $(CURDIR)/../omnibus/crystal-darwin-x86_64/embedded/bin/crystal
 
+# TODO: Shallow clone
 $(OUTPUT_DIR)/$(DARWIN_NAME) $(OUTPUT_DIR)/$(DARWIN_PKG_NAME): ## Build omnibus crystal project
 ifeq ($(FORCE_GIT_TAGGED), 0)
 	rm -Rf $(CURDIR)/tmp && mkdir -p $(CURDIR)/tmp && cd $(CURDIR)/tmp \

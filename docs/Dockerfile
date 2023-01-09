@@ -4,10 +4,13 @@ FROM ${crystal_docker_image}
 RUN crystal --version
 
 ARG output_docs_base_name
+ARG crystal_repository
 ARG crystal_sha1
-RUN git clone https://github.com/crystal-lang/crystal \
+
+# TODO: Shallow clone
+RUN git clone "${crystal_repository}" \
  && cd crystal \
- && git checkout ${crystal_sha1} \
+ && git checkout "${crystal_sha1}" \
  \
  && make docs DOCS_OPTIONS='--json-config-url=/api/versions.json  --canonical-base-url="https://crystal-lang.org/api/latest/"'\
  && git describe --tags --long --always 2>/dev/null > ./docs/revision.txt \
