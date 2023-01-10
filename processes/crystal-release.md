@@ -46,11 +46,19 @@ Add an issue `Crystal release X.Y.Z` in https://github.com/crystal-lang/distribu
       * Copy the changelog section as description
       * Binaries are added later
 8. [ ] Close milestone (https://github.com/crystal-lang/crystal/milestones)
-9. [ ] Wait for the release build in GitHub Actions (https://github.com/)
+9. [ ] Wait for the release build in circle CI (https://app.circleci.com/pipelines/github/crystal-lang/crystal)
 
 ### Binary releases
 
-1. [ ] Push changes to OBS for building linux packages
+3. Publish build artifacts from CircleCI and GitHub Actions to GitHub release
+   * [ ] Upload build artifacts from CircleCI: [`scripts/publish-crystal-packages-on-github.sh`](https://github.com/crystal-lang/distribution-scripts/blob/master/processes/scripts/publish-crystal-packages-on-github.sh)
+      * `crystal-*-darwin-*.tar.gz`
+      * `crystal-*-linux-*.tar.gz`
+      * `crystal-*.pkg`
+      * `crystal-*-docs.tar.gz`
+   * [ ] Upload build artifacts from GHA (Windows):
+      * `crystal.zip` -> `crystal-$VERSION-windows-x86_64-msvc-unsupported.zip`
+4. [ ] Push changes to OBS for building linux packages
    1. Checkout https://github.com/crystal-lang/distribution-scripts and go to [`./packages`](../packages)
    2. Configure build.opensuse.org credentials in environment variables:
       * `export OBS_USER=`
@@ -69,18 +77,18 @@ Add an issue `Crystal release X.Y.Z` in https://github.com/crystal-lang/distribu
    6. When everything is green, create a submit request against the original packages (*Submit package* link in the menu bar on the package in your branch)
    7. Verify package installation
       * `OBS_PROJECT=devel:languages:crystal bats test`
-2. [ ] Tag `latest` docker images
+5. [ ] Tag `latest` docker images
    * Versioned docker images have been pushed to dockerhub.
    * Now just assign the `latest` tags:
    * `./docker/apply-latest-tags.sh ${VERSION}`
-3. [ ] Publish snap package
+6. [ ] Publish snap package
    1. You need to logged in via `$ snapcraft login`
    1. Recent tagged release is published directly to edge channel. The CI logs the snap revision number. Otherwise the .snap file is in the artifacts.
    1. Check the current status to find the revision of the tagged release otherwise:
    1. `snapcraft status crystal`
    1. `snapcraft release crystal <revision-number> beta`
    1. `snapcraft release crystal <revision-number> stable`
-4. [ ] Submit a PR to update the homebrew formula in https://github.com/Homebrew/homebrew-core/blob/master/Formula/crystal.rb .
+7. [ ] Submit a PR to update the homebrew formula in https://github.com/Homebrew/homebrew-core/blob/master/Formula/crystal.rb .
    1. Update the previous and new version (with their respective hashes).
    1. Try locally `brew install --build-from-source <source of formula>`
    1. Create PR
