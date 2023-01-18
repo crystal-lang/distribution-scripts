@@ -44,7 +44,7 @@ The following are the suggested packages to be able to use the whole standard li
 
 ```
 $ sudo apt-get install gcc pkg-config git tzdata \
-                       libpcre3-dev libevent-dev libyaml-dev \
+                       libpcre2-dev libevent-dev libyaml-dev \
                        libgmp-dev libssl-dev libxml2-dev
 ```
 
