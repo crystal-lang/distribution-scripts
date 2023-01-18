@@ -5,11 +5,11 @@ RUN apt-get update \
 
 ENV CFLAGS="-fPIC -pipe ${release:+-O2}"
 
-# build libpcre
-FROM debian AS libpcre
-ARG libpcre_version
-RUN curl https://ftp.exim.org/pub/pcre/pcre-${libpcre_version}.tar.gz | tar -zx \
- && cd pcre-${libpcre_version} \
+# build libpcre2
+FROM debian AS libpcre2
+ARG libpcre2_version
+RUN curl https://github.com/PCRE2Project/pcre2/releases/download/pcre2-${libpcre2_version}/pcre2-${libpcre2_version}.tar.gz | tar -zx \
+ && cd pcre2-${libpcre2_version} \
  && ./configure --disable-shared --disable-cpp --enable-jit --enable-utf --enable-unicode-properties \
  && make -j$(nproc)
 
@@ -27,13 +27,13 @@ RUN git clone https://github.com/libevent/libevent \
 FROM debian
 ARG crystal_version
 ARG package_iteration
-ARG libpcre_version
+ARG libpcre2_version
 ARG libevent_version
 
 RUN mkdir -p /output/lib/crystal/lib/
 
 # Copy libraries
-COPY --from=libpcre pcre-${libpcre_version}/.libs/libpcre.a /output/lib/crystal/lib/
+COPY --from=libpcre2 pcre2-${libpcre2_version}/.libs/libpcre2-8.a /output/lib/crystal/lib/
 COPY --from=libevent libevent/.libs/libevent.a libevent/.libs/libevent_pthreads.a /output/lib/crystal/lib/
 
 # Create tarball
