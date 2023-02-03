@@ -33,8 +33,8 @@ ARG libevent_version
 RUN mkdir -p /output/lib/crystal/lib/
 
 # Copy libraries
-COPY --from=libpcre pcre-${libpcre_version}/.libs/libpcre.a /output/lib/crystal/lib/
-COPY --from=libevent libevent/.libs/libevent.a libevent/.libs/libevent_pthreads.a /output/lib/crystal/lib/
+COPY --from=libpcre pcre-${libpcre_version}/.libs/libpcre.a /output/lib/crystal/
+COPY --from=libevent libevent/.libs/libevent.a libevent/.libs/libevent_pthreads.a /output/lib/crystal/
 
 # Create tarball
 RUN mv /output /crystal-${crystal_version}-${package_iteration} \
