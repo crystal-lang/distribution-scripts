@@ -40,9 +40,9 @@ else
 end
 
 if macos? || mac_os_x?
-  env["CRYSTAL_PATH"] = "/private/var/cache/omnibus/src/crystal/src"
+  env["CRYSTAL_PATH"] = "lib:/private/var/cache/omnibus/src/crystal/src"
 else
-  env["CRYSTAL_PATH"] = "#{project_dir}/src"
+  env["CRYSTAL_PATH"] = "lib:#{project_dir}/src"
 end
 
 build do

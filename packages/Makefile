@@ -5,6 +5,6 @@
 # * docker
 # * https://github.com/bats-core/bats-core
 
-.phony: test
+.PHONY: test
 test:
-	bats -j4 test
+	bats test
