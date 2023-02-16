@@ -30,6 +30,7 @@ build do
 
   command "./configure" \
           " --prefix=#{install_dir}/embedded" \
+          " --disable-cpp" \
           " --disable-shared" \
           " --enable-unicode-properties" \
           " --enable-utf", env: env
