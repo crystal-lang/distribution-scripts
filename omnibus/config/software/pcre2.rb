@@ -32,8 +32,9 @@ build do
           " --prefix=#{install_dir}/embedded" \
           " --disable-shared" \
           " --enable-unicode-properties" \
-          " --enable-jit" \
           " --enable-utf", env: env
+          # TODO: Enable JIT (Error: "Must target Big Sur or newer")
+          # " --enable-jit" \
 
   make "-j #{workers}", env: env
   make "install", env: env
