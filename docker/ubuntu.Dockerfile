@@ -7,7 +7,7 @@ RUN \
   apt-get update && \
   DEBIAN_FRONTEND=noninteractive \
   apt-get install -y tzdata gcc pkg-config libssl-dev libxml2-dev libyaml-dev libgmp-dev git make \
-                     libpcre2-dev libevent-dev libz-dev && \
+                     libpcre3-dev libpcre2-dev libevent-dev libz-dev && \
   apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 ARG crystal_targz
