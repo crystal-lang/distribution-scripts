@@ -1,7 +1,7 @@
 FROM debian:11 AS debian
 
 RUN apt-get update \
- && apt-get install -y build-essential libevent-dev libpcre3-dev automake libtool pkg-config git curl llvm-13 clang-13 \
+ && apt-get install -y build-essential libevent-dev libpcre2-dev automake libtool pkg-config git curl llvm-13 clang-13 \
  && (pkg-config || true)
 
 ARG release
@@ -25,7 +25,7 @@ RUN apk add --no-cache \
       # Statically-compiled llvm
       llvm13-dev llvm13-static \
       # Static stdlib dependencies
-      zlib-static yaml-static libxml2-dev pcre-dev libevent-static \
+      zlib-static yaml-static libxml2-dev pcre2-dev libevent-static \
       # Static compiler dependencies
       libffi-dev \
       # Build tools
