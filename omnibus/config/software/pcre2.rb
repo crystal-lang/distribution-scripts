@@ -14,14 +14,14 @@
 # limitations under the License.
 #
 
-name "pcre"
-default_version "8.40"
+name "pcre2"
+default_version "10.42"
 skip_transitive_dependency_licensing true
 
-source url: "https://ftp.exim.org/pub/pcre/pcre-#{version}.tar.gz",
-       md5: "890c808122bd90f398e6bc40ec862102"
+source url: "https://github.com/PCRE2Project/pcre2/releases/download/pcre2-#{version}/pcre2-#{version}.tar.gz",
+       md5: "37d2f77cfd411a3ddf1c64e1d72e43f7"
 
-relative_path "pcre-#{version}"
+relative_path "pcre2-#{version}"
 
 build do
   env = with_standard_compiler_flags(with_embedded_path)
@@ -32,7 +32,8 @@ build do
           " --prefix=#{install_dir}/embedded" \
           " --disable-shared" \
           " --enable-unicode-properties" \
-          " --enable-utf8", env: env
+          " --enable-jit" \
+          " --enable-utf", env: env
 
   make "-j #{workers}", env: env
   make "install", env: env
