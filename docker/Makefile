@@ -10,8 +10,10 @@
 CRYSTAL_VERSION ?=   ## How the binaries should be branded
 CRYSTAL_DEB ?=       ## Which crystal.deb file to install in debian based docker images (ubuntu32)
 CRYSTAL_TARGZ ?=     ## Which crystal.tar.gz file to install in docker images (ubuntu64, alpine)
-DOCKER_TAG ?= $(CRYSTAL_VERSION) ## How to tag the docker image (examples: `0.27.2`, `nightly20190307`). `-build` will be appended for build images.
-DOCKER_REPOSITORY ?= crystallang/crystal ## Docker hub repository to commit image
+## How to tag the docker image (examples: `0.27.2`, `nightly20190307`). `-build` will be appended for build images.
+DOCKER_TAG ?= $(CRYSTAL_VERSION)
+## Docker hub repository to commit image
+DOCKER_REPOSITORY ?= crystallang/crystal
 
 GC_VERSION = v8.2.0
 
