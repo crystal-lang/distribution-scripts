@@ -3,7 +3,7 @@ FROM alpine:3.16 as runtime
 RUN \
   apk add --update --no-cache --force-overwrite \
     # core dependencies
-    gcc gmp-dev libevent-static musl-dev pcre-dev \
+    gcc gmp-dev libevent-static musl-dev pcre-dev pcre2-dev \
     # stdlib dependencies
     libxml2-dev openssl-dev openssl-libs-static tzdata yaml-static zlib-static \
     # dev tools
