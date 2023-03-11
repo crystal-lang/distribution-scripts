@@ -18,14 +18,14 @@ RUN git clone https://github.com/ivmai/bdwgc \
  && ./configure --disable-debug --disable-shared --enable-large-config \
  && make -j$(nproc)
 
-FROM alpine:3.16
+FROM alpine:3.17
 
 # Install dependencies
 RUN apk add --no-cache \
       # Statically-compiled llvm
-      llvm13-dev llvm13-static \
+      llvm15-dev llvm15-static \
       # Static stdlib dependencies
-      zlib-static yaml-static libxml2-dev pcre2-dev libevent-static \
+      zlib-static yaml-static libxml2-static pcre2-dev libevent-static \
       # Static compiler dependencies
       libffi-dev \
       # Build tools
