@@ -3,7 +3,7 @@ version: 2
 jobs:
   omnibus_osx_llvm:
     macos:
-      xcode: 12.4.0
+      xcode: 14.2.0
     environment:
       MACOSX_DEPLOYMENT_TARGET: 10.11
     shell: /bin/bash --login -eo pipefail
