@@ -3,7 +3,7 @@ version: 2
 jobs:
   omnibus_osx_llvm:
     macos:
-      xcode: 14.2.0
+      xcode: 13.4.1
     environment:
       MACOSX_DEPLOYMENT_TARGET: 10.11
     shell: /bin/bash --login -eo pipefail
@@ -11,7 +11,14 @@ jobs:
       - run:
           name: Setup environment
           command: |
+            brew unlink python@2 || true
+
             brew update
+            # We need ruby-install >= 0.8.3
+            brew install ruby-install
+
+            ruby-install ruby 2.7.3
+
             brew install pkgconfig libtool cmake
 
             sudo mkdir -p /opt/llvm
