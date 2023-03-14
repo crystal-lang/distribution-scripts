@@ -1,4 +1,4 @@
-ARG base_docker_image
+ARG base_docker_image=ubuntu:focal
 FROM ${base_docker_image} as runtime
 
 RUN \

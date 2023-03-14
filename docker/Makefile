@@ -18,7 +18,7 @@ GC_VERSION = v8.2.0
 
 OUTPUT_DIR := build
 BUILD_CONTEXT := $(CURDIR)/build-context
-BUILD_ARGS_UBUNTU64 := --build-arg crystal_targz=crystal.tar.gz $(BUILD_CONTEXT)/ubuntu64 --build-arg base_docker_image=ubuntu:focal
+BUILD_ARGS_UBUNTU64 := --build-arg crystal_targz=crystal.tar.gz $(BUILD_CONTEXT)/ubuntu64
 BUILD_ARGS_ALPINE := --build-arg crystal_targz=crystal.tar.gz $(BUILD_CONTEXT)/alpine --build-arg gc_version=$(GC_VERSION)
 DOCKER_TAG_UBUNTU := $(DOCKER_REPOSITORY):$(DOCKER_TAG)
 DOCKER_TAG_ALPINE := $(DOCKER_REPOSITORY):$(DOCKER_TAG)-alpine

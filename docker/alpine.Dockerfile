@@ -1,4 +1,5 @@
-FROM alpine:3.16 as runtime
+ARG base_docker_image=alpine:3.16
+FROM ${base_docker_image} as runtime
 
 RUN \
   apk add --update --no-cache --force-overwrite \
