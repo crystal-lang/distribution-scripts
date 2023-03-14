@@ -1,4 +1,4 @@
-ARG base_docker_image=alpine:3.16
+ARG base_docker_image=alpine:3.17
 FROM ${base_docker_image} as runtime
 
 RUN \

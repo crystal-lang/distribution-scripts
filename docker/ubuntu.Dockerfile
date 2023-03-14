@@ -1,4 +1,4 @@
-ARG base_docker_image=ubuntu:focal
+ARG base_docker_image=ubuntu:22.04
 FROM ${base_docker_image} as runtime
 
 RUN \
