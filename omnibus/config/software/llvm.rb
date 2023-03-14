@@ -1,11 +1,16 @@
 name "llvm"
-LLVM_VERSION = (ENV['LLVM_VERSION'] || "10.0.0").strip
+LLVM_VERSION = (ENV['LLVM_VERSION'] || "15.0.0").strip
 default_version LLVM_VERSION
 skip_transitive_dependency_licensing true
 
 version "10.0.0" do
   source url: "https://github.com/llvm/llvm-project/releases/download/llvmorg-#{version}/llvm-#{version}.src.tar.xz",
          md5: "693cefdc49d618f828144486a18b473f"
+end
+
+version "15.0.0" do
+  source url: "https://github.com/llvm/llvm-project/releases/download/llvmorg-#{version}/llvm-#{version}.src.tar.xz",
+         md5: "7b406c97f87b94cda4224aa53968c9d5"
 end
 
 relative_path "llvm-#{version}.src"
