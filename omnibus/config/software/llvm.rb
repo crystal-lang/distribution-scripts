@@ -3,16 +3,6 @@ LLVM_VERSION = (ENV['LLVM_VERSION'] || "10.0.0").strip
 default_version LLVM_VERSION
 skip_transitive_dependency_licensing true
 
-version "3.9.1" do
-  source url: "http://releases.llvm.org/#{version}/llvm-#{version}.src.tar.xz",
-         md5: "3259018a7437e157f3642df80f1983ea"
-end
-
-version "6.0.1" do
-  source url: "http://releases.llvm.org/#{version}/llvm-#{version}.src.tar.xz",
-         md5: "c88c98709300ce2c285391f387fecce0"
-end
-
 version "10.0.0" do
   source url: "https://github.com/llvm/llvm-project/releases/download/llvmorg-#{version}/llvm-#{version}.src.tar.xz",
          md5: "693cefdc49d618f828144486a18b473f"
