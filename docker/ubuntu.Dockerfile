@@ -23,9 +23,9 @@ FROM runtime as build
 
 RUN \
   apt-get update && \
-  apt-get install -y build-essential llvm-10 lld-10 libedit-dev gdb libffi-dev && \
+  apt-get install -y build-essential llvm-15 lld-15 libedit-dev gdb libffi-dev && \
   apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-RUN ln -sf /usr/bin/ld.lld-10 /usr/bin/ld.lld
+RUN ln -sf /usr/bin/ld.lld-15 /usr/bin/ld.lld
 
 CMD ["/bin/sh"]
