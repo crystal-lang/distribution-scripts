@@ -1,4 +1,5 @@
-FROM alpine:3.16 as runtime
+ARG base_docker_image=alpine:3.17
+FROM ${base_docker_image} as runtime
 
 RUN \
   apk add --update --no-cache --force-overwrite \
@@ -42,6 +43,6 @@ FROM runtime as build
 
 RUN \
   apk add --update --no-cache --force-overwrite \
-    llvm13-dev llvm13-static g++ libffi-dev
+    llvm15-dev llvm15-static g++ libffi-dev
 
 CMD ["/bin/sh"]
