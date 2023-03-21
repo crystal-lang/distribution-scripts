@@ -62,7 +62,7 @@ build do
     " -DLLVM_ENABLE_ZSTD=OFF" \
     "#{' -DPYTHON_EXECUTABLE=$(which python2.7)' if centos? }"\
     " #{project_dir}", env: env, cwd: llvm_build_dir
-  command "cmake --build . --parallel $(($(sysctl -n hw.logicalcpu) - 1))", env: env, cwd: llvm_build_dir
+  command "cmake --build . --parallel $(sysctl -n hw.logicalcpu)", env: env, cwd: llvm_build_dir
   command "cmake -DCMAKE_INSTALL_PREFIX=#{install_dir} -P cmake_install.cmake", env: env, cwd: llvm_build_dir
   command "cmake --build . --target install", env: env, cwd: llvm_build_dir
 end
