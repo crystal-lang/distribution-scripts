@@ -2,6 +2,7 @@ version: 2
 
 jobs:
   omnibus_osx_llvm:
+    resource_class: macos.x86.medium.gen2
     macos:
       xcode: 13.4.1
     environment:
