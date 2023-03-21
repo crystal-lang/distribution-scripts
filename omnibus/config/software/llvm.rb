@@ -37,7 +37,7 @@ whitelist_file "lib/libRemarks.dylib"
 
 env = with_standard_compiler_flags(with_embedded_path)
 
-llvm_build_dir = "#{project_dir}/#{relative_path}/build-llvm"
+llvm_build_dir = "#{project_dir}/build-llvm"
 
 build do
   mkdir llvm_build_dir
