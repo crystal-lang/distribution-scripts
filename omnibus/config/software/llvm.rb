@@ -1,5 +1,5 @@
 name "llvm"
-LLVM_VERSION = (ENV['LLVM_VERSION'] || "10.0.0").strip
+LLVM_VERSION = (ENV['LLVM_VERSION'] || "15.0.7").strip
 default_version LLVM_VERSION
 skip_transitive_dependency_licensing true
 
@@ -18,7 +18,17 @@ version "10.0.0" do
          md5: "693cefdc49d618f828144486a18b473f"
 end
 
-relative_path "llvm-#{version}.src"
+version "15.0.7" do
+  source url: "https://github.com/llvm/llvm-project/releases/download/llvmorg-#{version}/llvm-project-#{version}.src.tar.xz",
+         md5: "bac436dbd5d37e38d3da75b03629053c"
+end
+
+if version == "15.0.7"
+  # This is bringing the whole project because flags weren't sufficient to prevent certain parts from being fetched by the build system.
+  relative_path "llvm-project-#{version}.src/llvm"
+else
+  relative_path "llvm-#{version}.src"
+end
 
 whitelist_file "lib/BugpointPasses.dylib"
 whitelist_file "lib/libLTO.dylib"
@@ -27,7 +37,7 @@ whitelist_file "lib/libRemarks.dylib"
 
 env = with_standard_compiler_flags(with_embedded_path)
 
-llvm_build_dir = "#{build_dir}/build-llvm"
+llvm_build_dir = "#{project_dir}/build-llvm"
 
 build do
   mkdir llvm_build_dir
@@ -47,9 +57,12 @@ build do
     " -DLLVM_INCLUDE_TESTS=OFF" \
     " -DLLVM_ENABLE_Z3_SOLVER=OFF" \
     " -DLLVM_ENABLE_LIBXML2=OFF" \
+    " -DLLVM_BUILD_BENCHMARKS=OFF" \
+    " -DLLVM_INCLUDE_BENCHMARKS=OFF" \
+    " -DLLVM_ENABLE_ZSTD=OFF" \
     "#{' -DPYTHON_EXECUTABLE=$(which python2.7)' if centos? }"\
     " #{project_dir}", env: env, cwd: llvm_build_dir
-  command "cmake --build .", env: env, cwd: llvm_build_dir
+  command "cmake --build . --parallel $(sysctl -n hw.logicalcpu)", env: env, cwd: llvm_build_dir
   command "cmake -DCMAKE_INSTALL_PREFIX=#{install_dir} -P cmake_install.cmake", env: env, cwd: llvm_build_dir
   command "cmake --build . --target install", env: env, cwd: llvm_build_dir
 end
