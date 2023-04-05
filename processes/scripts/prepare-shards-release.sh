@@ -49,4 +49,4 @@ case $TYPE in
 esac
 
 body=$(printf "%q" "$body")
-step "Create tracking issue in crystal-lang/distribution-scripts" gh issue create -R crystal-lang/distribution-scripts --body "\"$body\"" --label "release" --title \"Release Shards $VERSION\"
+step "Create tracking issue in crystal-lang/distribution-scripts" gh issue create -R crystal-lang/distribution-scripts --body "$body" --label "release" --title \"Release Shards $VERSION\"
