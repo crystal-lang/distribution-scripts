@@ -6,7 +6,7 @@ RUN \
     # core dependencies
     gcc gmp-dev libevent-static musl-dev pcre-dev pcre2-dev \
     # stdlib dependencies
-    libxml2-dev openssl-dev openssl-libs-static tzdata yaml-static zlib-static \
+    libxml2-dev libxml2-static openssl-dev openssl-libs-static tzdata yaml-static zlib-static xz-static \
     # dev tools
     make git \
     # build libgc dependencies
