@@ -88,10 +88,9 @@ Add an issue `Crystal release X.Y.Z` in https://github.com/crystal-lang/distribu
    1. `snapcraft status crystal`
    1. `snapcraft release crystal <revision-number> beta`
    1. `snapcraft release crystal <revision-number> stable`
-7. [ ] Submit a PR to update the homebrew formula in https://github.com/Homebrew/homebrew-core/blob/master/Formula/crystal.rb .
-   1. Update the previous and new version (with their respective hashes).
-   1. Try locally `brew install --build-from-source <source of formula>`
-   1. Create PR
+7. [ ] Submit a PR to update the homebrew formula
+   1. Run `brew bump-formula-pr crystal --version $VERSION`
+   2. In case the new compiler version is incompatible with the current boot version, bump boot version.
 
 ### Publish documentation for the release
 
