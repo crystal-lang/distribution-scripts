@@ -232,9 +232,8 @@ EOF
 }
 
 _install_dnf() {
-  _install_rpm_key
-
-  dnf config-manager --add-repo https://download.opensuse.org/repositories/${OBS_PROJECT//:/:\/}/$DISTRO_REPO/${OBS_PROJECT}.repo
+  dnf install -y 'dnf-command(config-manager)'
+  dnf config-manager --add-repo https://download.opensuse.org/repositories/${OBS_PROJECT}/$DISTRO_REPO/${OBS_PROJECT}.repo
 
   if [[ "$CRYSTAL_VERSION" == "latest" ]]; then
     dnf install -y crystal
@@ -269,7 +268,7 @@ case $DISTRO_REPO in
     _install_apt
     ;;
   Fedora*)
-    _install_yum
+    _install_dnf
     ;;
   RHEL*)
     _install_yum
