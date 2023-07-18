@@ -29,7 +29,7 @@ RUN apk add --no-cache \
       # Static compiler dependencies
       libffi-dev \
       # Build tools
-      git gcc g++ make automake libtool autoconf bash coreutils curl
+      git gcc g++ make automake libtool autoconf bash coreutils curl asciidoctor
 
 ARG release
 ENV CFLAGS="-fPIC -pipe ${release:+-O2}"
