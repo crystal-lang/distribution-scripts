@@ -28,7 +28,6 @@ Add an issue `Crystal release X.Y.Z` in https://github.com/crystal-lang/distribu
 
 ### Source release
 
-
 1. [ ] Finalize the release PR
    * Make sure all changes are mentioned in the changelog
    * Check release date
@@ -38,7 +37,7 @@ Add an issue `Crystal release X.Y.Z` in https://github.com/crystal-lang/distribu
 4. [ ] Smoke test with [test-ecosystem](https://github.com/crystal-lang/test-ecosystem)
    * Run [*Test Crystal & Shards Workflow*](https://github.com/crystal-lang/test-ecosystem/actions/workflows/test-crystal-shards.yml) with the release branch as `crystal_branch`.
 5. [ ] Merge the release PR
-6. Make the release and publish it on GitHub: [`scripts/make-crystal-release.sh`](https://github.com/crystal-lang/distribution-scripts/blob/master/processes/scripts/make-crystal-release.sh) (run from `crystallang/crystal@master` work tree). This performs these steps:
+6. [ ] Make the release and publish it on GitHub: [`../distribution-scripts/processes/scripts/make-crystal-release.sh`](https://github.com/crystal-lang/distribution-scripts/blob/master/processes/scripts/make-crystal-release.sh) (run from `crystallang/crystal@$VERSION` work tree). This performs these steps:
    1. Tag & annotate the commit with the changelog using `<M.m.p>` pattern as version
      * `git tag -s -a -m $VERSION $VERSION`
      * `git push --tags`
@@ -50,14 +49,16 @@ Add an issue `Crystal release X.Y.Z` in https://github.com/crystal-lang/distribu
 
 ### Binary releases
 
-3. Publish build artifacts from CircleCI and GitHub Actions to GitHub release
-   * [ ] Upload build artifacts from CircleCI: [`scripts/publish-crystal-packages-on-github.sh`](https://github.com/crystal-lang/distribution-scripts/blob/master/processes/scripts/publish-crystal-packages-on-github.sh)
+3. Publish build artifacts from CircleCI and GitHub Actions to GitHub release. For `URL_TO_CIRCLECI_ARTIFACT` grab the URL
+   of any of the build artifacts in circleCI (doesn't matter which).
+   * [ ] Upload build artifacts from CircleCI: [`../distribution-scripts/processes/scripts/publish-crystal-packages-on-github.sh $URL_TO_CIRCLECI_ARTIFACT`](https://github.com/crystal-lang/distribution-scripts/blob/master/processes/scripts/publish-crystal-packages-on-github.sh) (run from `crystallang/crystal@$VERSION` work tree)
       * `crystal-*-darwin-*.tar.gz`
       * `crystal-*-linux-*.tar.gz`
       * `crystal-*.pkg`
       * `crystal-*-docs.tar.gz`
    * [ ] Upload build artifacts from GHA (Windows):
-      * `crystal.zip` -> `crystal-$VERSION-windows-x86_64-msvc-unsupported.zip`
+      * `crystal-release.zip` -> `crystal-$VERSION-windows-x86_64-msvc-unsupported.zip`
+      * `crystal-installer.zip` -> unzip -> `crystal-$VERSION-windows-x86_64-msvc-unsupported.exe`
 4. [ ] Push changes to OBS for building linux packages
    1. Checkout https://github.com/crystal-lang/distribution-scripts and go to [`./packages`](../packages)
    2. Configure build.opensuse.org credentials in environment variables:
@@ -81,8 +82,8 @@ Add an issue `Crystal release X.Y.Z` in https://github.com/crystal-lang/distribu
    * Versioned docker images have been pushed to dockerhub.
    * Now just assign the `latest` tags:
    * `./docker/apply-latest-tags.sh ${VERSION}`
-6. [ ] Publish snap package
-   1. You need to logged in via `$ snapcraft login`
+6. [ ] Publish snap package (you can use the docker image `snapcore/snapcraft` for running the following commands)
+   1. You need to logged in via `snapcraft login`
    1. Recent tagged release is published directly to edge channel. The CI logs the snap revision number. Otherwise the .snap file is in the artifacts.
    1. Check the current status to find the revision of the tagged release otherwise:
    1. `snapcraft status crystal`
@@ -97,18 +98,15 @@ Add an issue `Crystal release X.Y.Z` in https://github.com/crystal-lang/distribu
 1. [ ] Publish API docs
    1. Have `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` env variables defined
       * Keys can be generated at https://console.aws.amazon.com/iam/home#/security_credentials (contact a Manas admin if you don't have access).
-   2. Run `make -C docs publish_docs CRYSTAL_VERSION=${VERSION}` to publish docs to `api/${VERSION}`
-   3. Run `make -C docs dist-redirect_latest CRYSTAL_VERSION=${VERSION}` to apply redirect from `api/latest` to `api/${VERSION}`
+   2. Run `make -C docs publish_docs dist-redirect_latest CRYSTAL_VERSION=${VERSION}` to publish docs to `api/${VERSION}` and apply redirect from `api/latest` to `api/${VERSION}`
 2. [ ] (minor) Publish Crystal book
-   1. (minor) Create `release/${VERSION%.*}` branch (deployment happens automatically in GHA)
-   2. (minor) Change default branch to `release/${VERSION%.*}`
+   1. (minor) Create `release/${VERSION%.*}` branch and push it to `crystal-lang/crystal-book` (deployment happens automatically in GHA)
    3. (minor) Verify that deployment was successfull
 
 ### Release announcements
 1. [ ] Publish release notes on the website
 2. [ ] Post announcement in https://forum.crystal-lang.org/c/news/official
-3. [ ] Tweet about the release (and pin it)
-4. [ ] Post in Reddit
+3. [ ] Announce on social media accounts (via Buffer; credentials are in Passbolt)
 5. [ ] Update https://github.com/crystal-lang/crystal-book/blob/master/crystal-version.txt
 6. [ ] (minor) Post the release in https://opencollective.com/crystal-lang
 
