@@ -31,8 +31,6 @@ relative_path "libffi-#{version}"
 
 build do
   env = with_standard_compiler_flags(with_embedded_path)
-  env["CFLAGS"] << " -fPIC -arch arm64 -arch x86_64"
-  env["CPPFLAGS"] = env["CPPFLAGS"].gsub("-arch arm64 -arch x86_64", "")
 
   env["INSTALL"] = "/opt/freeware/bin/install" if aix?
 
