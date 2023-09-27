@@ -6,26 +6,9 @@ RUN \
     # core dependencies
     gcc gmp-dev libevent-static musl-dev pcre-dev pcre2-dev \
     # stdlib dependencies
-    libxml2-dev libxml2-static openssl-dev openssl-libs-static tzdata yaml-static zlib-static xz-static \
+    gc-dev libxml2-dev libxml2-static openssl-dev openssl-libs-static tzdata yaml-static zlib-static xz-static \
     # dev tools
-    make git \
-    # build libgc dependencies
-    autoconf automake libtool patch
-
-# Build libgc
-ARG gc_version
-
-RUN git clone https://github.com/ivmai/bdwgc \
- && cd bdwgc \
- && git checkout ${gc_version} \
- \
- && ./autogen.sh \
- && ./configure --disable-debug --disable-shared --enable-large-config \
- && make -j$(nproc) CFLAGS=-DNO_GETCONTEXT \
- && make install
-
-# Remove build tools from image now that libgc is built
-RUN apk del -r --purge autoconf automake libtool patch
+    make git
 
 ARG crystal_targz
 COPY ${crystal_targz} /tmp/crystal.tar.gz
