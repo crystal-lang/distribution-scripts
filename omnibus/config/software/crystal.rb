@@ -58,8 +58,9 @@ build do
   copy "#{Dir.pwd}/crystal-#{ohai['os']}-#{ohai['kernel']['machine']}/embedded/bin/crystal", ".build/crystal"
 
   # Compile for Intel
-  command "make crystal stats=true release=true FLAGS=\"#{crflags}\" CRYSTAL_CONFIG_LIBRARY_PATH= O=#{output_path}", env: env
+  command "make crystal stats=true release=true target=x86_64-apple-darwin FLAGS=\"#{crflags}\" CRYSTAL_CONFIG_LIBRARY_PATH= O=#{output_path}", env: env
   move output_bin, "#{output_bin}_x86_64"
+  block { raise "Could not build crystal x86_64" unless File.exist?("#{output_bin}_x86_64") }
 
   # Clean up
   make "clean_cache clean", env: env
@@ -77,6 +78,7 @@ build do
 
   command "clang #{output_path}/crystal.o -o #{output_bin}_arm64 -target arm64-apple-darwin src/llvm/ext/llvm_ext.o `llvm-config --libs --system-libs --ldflags 2>/dev/null` -lstdc++ -lpcre2-8 -lgc -lpthread -levent -liconv -ldl -v", env: env
   delete "#{output_path}/crystal.o"
+  block { raise "Could not build crystal arm64" unless File.exist?("#{output_bin}_arm64") }
 
   # Lipo them up
   command "lipo -create -output #{output_bin} #{output_bin}_x86_64 #{output_bin}_arm64"
