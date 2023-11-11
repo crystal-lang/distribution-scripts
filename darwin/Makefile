@@ -9,7 +9,7 @@ CRYSTAL_SHA1 ?= $(CRYSTAL_VERSION) ## Git tag/branch/sha1 to checkout and build 
 PACKAGE_ITERATION ?= 1
 FORCE_GIT_TAGGED ?= 1              ## Require build to be based on git tag/branch
 
-PREVIOUS_CRYSTAL_RELEASE_DARWIN_TARGZ ?= ## url to crystal-{version}-{package}-darwin-x86_64.tar.gz
+PREVIOUS_CRYSTAL_RELEASE_DARWIN_TARGZ ?= ## url to crystal-{version}-{package}-darwin-universal.tar.gz . Eg: https://github.com/crystal-lang/crystal/releases/download/1.10.1/crystal-1.10.1-1-darwin-universal.tar.gz
 
 OUTPUT_DIR = build
 
@@ -40,15 +40,15 @@ help: ## Show this help
 awk 'BEGIN {FS = "## "}; /^## [a-zA-Z_-]/ {printf "  \033[36m%s\033[0m\n", $$2}; /^##  / {printf "  %s\n", $$2}'
 
 .PHONY: darwin-previous
-darwin-previous: $(CURDIR)/../omnibus/crystal-darwin-x86_64/embedded/bin/crystal ## download previous crystal darwin release
+darwin-previous: $(CURDIR)/../omnibus/crystal-darwin-universal/embedded/bin/crystal ## download previous crystal darwin release
 
 # Once there are prior builds for arm64, this can use DARWIN_ARCH
-$(CURDIR)/../omnibus/crystal-darwin-x86_64/embedded/bin/crystal:
-	curl -L -o /tmp/crystal-darwin-x86_64.tar.gz $(PREVIOUS_CRYSTAL_RELEASE_DARWIN_TARGZ) \
-	&& mkdir -p $(CURDIR)/../omnibus/crystal-darwin-x86_64 \
-	&& tar xfz /tmp/crystal-darwin-x86_64.tar.gz -C $(CURDIR)/../omnibus/crystal-darwin-x86_64 --strip-components=1 \
-	&& rm /tmp/crystal-darwin-x86_64.tar.gz \
-	&& chmod +x $(CURDIR)/../omnibus/crystal-darwin-x86_64/embedded/bin/crystal
+$(CURDIR)/../omnibus/crystal-darwin-universal/embedded/bin/crystal:
+	curl -L -o /tmp/crystal-darwin-universal.tar.gz $(PREVIOUS_CRYSTAL_RELEASE_DARWIN_TARGZ) \
+	&& mkdir -p $(CURDIR)/../omnibus/crystal-darwin-universal \
+	&& tar xfz /tmp/crystal-darwin-universal.tar.gz -C $(CURDIR)/../omnibus/crystal-darwin-universal --strip-components=1 \
+	&& rm /tmp/crystal-darwin-universal.tar.gz \
+	&& chmod +x $(CURDIR)/../omnibus/crystal-darwin-universal/embedded/bin/crystal
 
 $(OUTPUT_DIR)/$(DARWIN_NAME) $(OUTPUT_DIR)/$(DARWIN_PKG_NAME): ## Build omnibus crystal project
 ifeq ($(FORCE_GIT_TAGGED), 0)
@@ -75,6 +75,6 @@ clean: ## Clean up build directory
 	rm -Rf $(CURDIR)/tmp
 	rm -Rf $(CURDIR)/../omnibus/pkg/crystal-*
 	rm -Rf $(CURDIR)/../omnibus/pkg/version-*
-	rm -Rf $(CURDIR)/../omnibus/crystal-darwin-*
+	rm -Rf $(CURDIR)/../omnibus/crystal-darwin-universal
 	rm -Rf /var/cache/omnibus/*
 	rm -Rf /opt/crystal/*
