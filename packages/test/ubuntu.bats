@@ -1,11 +1,11 @@
 #!/usr/bin/env bats
 
-@test "Ubuntu 23.04" {
-  ./test-install-on-docker.sh ubuntu:23.04
+@test "Ubuntu 23.10" {
+  ./test-install-on-docker.sh ubuntu:23.10
 }
 
-@test "Ubuntu 22.10" {
-  ./test-install-on-docker.sh ubuntu:22.10
+@test "Ubuntu 23.04" {
+  ./test-install-on-docker.sh ubuntu:23.04
 }
 
 @test "Ubuntu 22.04" {
