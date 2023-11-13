@@ -11,6 +11,7 @@ no_cache ?=    ## Disable the docker build cache
 pull_images ?= ## Always pull docker images to ensure they're up to date
 release ?=     ## Create an optimized build for the final release
 
+CRYSTAL_REPO ?= https://github.com/crystal-lang/crystal ## Allow to override the official repo with fork or local
 CRYSTAL_VERSION ?=                 ## How the binaries should be branded
 CRYSTAL_SHA1 ?= $(CRYSTAL_VERSION) ## Git tag/branch/sha1 to checkout and build source
 PACKAGE_ITERATION ?= 1
@@ -32,6 +33,7 @@ DOCKER_BUILD_ARGS = $(if $(no_cache),--no-cache )$(if $(pull_images),--pull )
 
 BUILD_ARGS_COMMON = $(DOCKER_BUILD_ARGS) \
                     $(if $(release),--build-arg release=true) \
+                    --build-arg crystal_repo=$(CRYSTAL_REPO) \
                     --build-arg crystal_version=$(CRYSTAL_VERSION) \
                     --build-arg crystal_sha1=$(CRYSTAL_SHA1) \
                     --build-arg shards_version=$(SHARDS_VERSION) \
