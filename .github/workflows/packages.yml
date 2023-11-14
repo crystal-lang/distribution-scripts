@@ -5,10 +5,6 @@ on:
   schedule:
     - cron: "5 4 * * 0" # every sunday at 04:05
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: ${{ github.ref != 'refs/heads/master' }}
-
 jobs:
   test_packages:
     runs-on: ubuntu-latest
