@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -euxo
+set -eu
 
 DISTRO_TYPE=""
 [[ -x "/usr/bin/apt-get" ]] && DISTRO_TYPE="deb"
