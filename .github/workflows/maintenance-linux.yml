@@ -41,7 +41,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: build-linux
     env:
-      tag: "crystallang/crystal:${{ env.CRYSTAL_VERSION }}"
+      tag: "crystallang/crystal:${{ inputs.crystal_version || 'master' }}"
     steps:
       - name: Download the linux tarballs
         uses: actions/download-artifact@v3
