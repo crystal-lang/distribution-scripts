@@ -10,7 +10,7 @@ RUN \
     make git
 
 ARG crystal_targz=\*.tar.gz
-COPY --from=build-artifacts ${crystal_targz} /tmp/crystal.tar.gz
+COPY --from=tarball ${crystal_targz} /tmp/crystal.tar.gz
 
 RUN \
   tar -xz -C /usr --strip-component=1  -f /tmp/crystal.tar.gz \

@@ -15,24 +15,23 @@ on:
         type: string
 
 env:
-  DOCKER_REPOSITORY: "crystallang/crystal"
   CRYSTAL_VERSION: "${{ inputs.crystal_version || 'master' }}"
   CRYSTAL_SHA1: "${{ inputs.crystal_version || 'master' }}"
   PREVIOUS_CRYSTAL_VERSION: "${{ inputs.previous_crystal_version || '1.10.1' }}"
+  DOCKER_TAG: "${{ env.DOCKER_TAG }}"
 
 jobs:
   build-linux:
     name: Build x86 Linux tarballs
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout the distribution scripts
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-      - name: Build the linux binaries
+      - name: Build linux binaries
         working-directory: linux
-        run: make all pull_images=true release=true
+        run: make all #pull_images=true release=true
 
-      - name: Upload the binaries for use in the next step
+      - name: Upload tarballs for use in the next step
         uses: actions/upload-artifact@v3
         with:
           name: linux-${{ inputs.crystal_version }}
@@ -51,15 +50,51 @@ jobs:
 
       - run: ls linux/build/
 
-      - name: Build ubuntu
+      - name: Build ubuntu runtime image
         uses: docker/build-push-action@v5
         with:
+          target: runtime
           file: docker/ubuntu.Dockerfile
-          build-contexts: |
-            build-artifacts=linux/build/
+          build-contexts: tarball=linux/build/
           push: false
           load: true
-          tag: "${{ env.DOCKER_REPOSTIROY }}:${{ inputs.CRYSTAL_VERSION }}"
+          tags: "${{ env.DOCKER_TAG }}"
 
-      - name: Inspect
-        run: docker image inspect "${{ env.DOCKER_REPOSTIROY }}:${{ inputs.CRYSTAL_VERSION }}"
+      - name: Build ubuntu build image
+        uses: docker/build-push-action@v5
+        with:
+          target: build
+          file: docker/ubuntu.Dockerfile
+          build-contexts: tarball=linux/build/
+          push: false
+          load: true
+          tags: "${{ env.DOCKER_TAG }}-build"
+
+      - name: Build alpine runtime image
+        uses: docker/build-push-action@v5
+        with:
+          target: runtime
+          file: docker/alpine.Dockerfile
+          build-contexts: tarball=linux/build/
+          push: false
+          load: true
+          tags: "${{ env.DOCKER_TAG }}-alpine"
+
+      - name: Build alpine build image
+        uses: docker/build-push-action@v5
+        with:
+          target: build
+          file: docker/alpine.Dockerfile
+          build-contexts: tarball=linux/build/
+          push: false
+          load: true
+          tags: "${{ env.DOCKER_TAG }}-alpine-build"
+
+      - name: Inspect ubuntu
+        run: docker image inspect "${{ env.DOCKER_TAG }}"
+      - name: Inspect ubuntu
+        run: docker image inspect "${{ env.DOCKER_TAG }}-build"
+      - name: Inspect alpine
+        run: docker image inspect "${{ env.DOCKER_TAG }}-alpine"
+      - name: Inspect alpine
+        run: docker image inspect "${{ env.DOCKER_TAG }}-alpine-build"
