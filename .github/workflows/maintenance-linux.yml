@@ -30,11 +30,13 @@ jobs:
         working-directory: linux
         run: make all #pull_images=true release=true
 
-      - name: Upload tarballs for use in the next step
+      - name: Upload tarball for use in the next step
         uses: actions/upload-artifact@v3
         with:
-          name: linux-${{ env.CRYSTAL_VERSION }}
-          path: linux/build/*.gz
+          name: tarball
+          path: |
+            linux/build/*.tar.gz
+            !linux/build/*-bundled.tar.gz
 
   package-docker:
     name: Build the docker images
@@ -46,7 +48,7 @@ jobs:
       - name: Download the linux tarballs
         uses: actions/download-artifact@v3
         with:
-          name: linux-${{ inputs.CRYSTAL_VERSION }}
+          name: tarball
           path: linux/build/
 
       - run: ls linux/build/
