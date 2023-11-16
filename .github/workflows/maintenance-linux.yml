@@ -18,7 +18,6 @@ env:
   CRYSTAL_VERSION: "${{ inputs.crystal_version || 'master' }}"
   CRYSTAL_SHA1: "${{ inputs.crystal_version || 'master' }}"
   PREVIOUS_CRYSTAL_VERSION: "${{ inputs.previous_crystal_version || '1.10.1' }}"
-  DOCKER_TAG: "${{ env.DOCKER_TAG }}"
 
 jobs:
   build-linux:
@@ -41,6 +40,8 @@ jobs:
     name: Build the docker images
     runs-on: ubuntu-latest
     needs: build-linux
+    env:
+      tag: "crystallang/crystal:${{ env.CRYSTAL_VERSION }}"
     steps:
       - name: Download the linux tarballs
         uses: actions/download-artifact@v3
@@ -58,7 +59,7 @@ jobs:
           build-contexts: tarball=linux/build/
           push: false
           load: true
-          tags: "${{ env.DOCKER_TAG }}"
+          tags: "${{ env.tag }}"
 
       - name: Build ubuntu build image
         uses: docker/build-push-action@v5
@@ -68,7 +69,7 @@ jobs:
           build-contexts: tarball=linux/build/
           push: false
           load: true
-          tags: "${{ env.DOCKER_TAG }}-build"
+          tags: "${{ env.tag }}-build"
 
       - name: Build alpine runtime image
         uses: docker/build-push-action@v5
@@ -78,7 +79,7 @@ jobs:
           build-contexts: tarball=linux/build/
           push: false
           load: true
-          tags: "${{ env.DOCKER_TAG }}-alpine"
+          tags: "${{ env.tag }}-alpine"
 
       - name: Build alpine build image
         uses: docker/build-push-action@v5
@@ -88,13 +89,13 @@ jobs:
           build-contexts: tarball=linux/build/
           push: false
           load: true
-          tags: "${{ env.DOCKER_TAG }}-alpine-build"
+          tags: "${{ env.tag }}-alpine-build"
 
       - name: Inspect ubuntu
-        run: docker image inspect "${{ env.DOCKER_TAG }}"
+        run: docker image inspect "${{ env.tag }}"
       - name: Inspect ubuntu
-        run: docker image inspect "${{ env.DOCKER_TAG }}-build"
+        run: docker image inspect "${{ env.tag }}-build"
       - name: Inspect alpine
-        run: docker image inspect "${{ env.DOCKER_TAG }}-alpine"
+        run: docker image inspect "${{ env.tag }}-alpine"
       - name: Inspect alpine
-        run: docker image inspect "${{ env.DOCKER_TAG }}-alpine-build"
+        run: docker image inspect "${{ env.tag }}-alpine-build"
