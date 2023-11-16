@@ -34,7 +34,7 @@ jobs:
       - name: Upload tarballs for use in the next step
         uses: actions/upload-artifact@v3
         with:
-          name: linux-${{ inputs.crystal_version }}
+          name: linux-${{ env.CRYSTAL_VERSION }}
           path: linux/build/*.gz
 
   package-docker:
