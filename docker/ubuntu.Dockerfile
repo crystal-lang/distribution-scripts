@@ -10,7 +10,7 @@ RUN \
                      libpcre3-dev libpcre2-dev libevent-dev libz-dev && \
   apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-ARG crystal_targz
+ARG crystal_targz=crystal.tar.gz
 COPY ${crystal_targz} /tmp/crystal.tar.gz
 
 RUN \
