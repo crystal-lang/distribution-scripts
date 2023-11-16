@@ -11,7 +11,7 @@ RUN \
   apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 ARG crystal_targz=crystal.tar.gz
-COPY ${crystal_targz} /tmp/crystal.tar.gz
+COPY --from=build-artifacts ${crystal_targz} /tmp/crystal.tar.gz
 
 RUN \
   tar -xz -C /usr --strip-component=1 -f /tmp/crystal.tar.gz && \

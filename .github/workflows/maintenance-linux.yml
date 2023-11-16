@@ -47,13 +47,16 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: linux-${{ inputs.CRYSTAL_VERSION }}
-          path: docker/build-context
+          path: linux/build/
+
+      - run: ls linux/build/
 
       - name: Build ubuntu
         uses: docker/build-push-action@v5
         with:
-          context: docker/build-context
           file: docker/ubuntu.Dockerfile
+          build-contexts: |
+            build-artifacts=linux/build/
           push: false
           load: true
           tag: "${{ env.DOCKER_REPOSTIROY }}:${{ inputs.CRYSTAL_VERSION }}"
