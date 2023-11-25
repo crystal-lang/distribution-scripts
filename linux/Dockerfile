@@ -52,12 +52,9 @@ RUN llvm-config --version
 
 ARG previous_crystal_release
 ADD ${previous_crystal_release} /tmp/crystal.tar.gz
-# TODO: Update path to new install directory /tmp/crystal/bin after migration period
-ENV PATH=${PATH}:/tmp/crystal/lib/crystal/bin/
 RUN mkdir -p /tmp/crystal \
   && tar xz -f /tmp/crystal.tar.gz -C /tmp/crystal --strip-component=1 \
-  && crystal --version \
-  && shards --version
+  && /tmp/crystal/bin/crystal --version
 
 # Build crystal
 ARG crystal_ref=master
@@ -65,7 +62,7 @@ RUN git clone https://github.com/crystal-lang/crystal \
  && cd crystal \
  && git checkout ${crystal_ref} \
  \
- && make crystal stats=true static=true ${release:+release=true} \
+ && make crystal stats=true static=true ${release:+release=true} CRYSTAL=/tmp/crystal/bin/crystal \
  && ([ "$(ldd .build/crystal 2>&1 | wc -l)" -eq "1" ] || { echo './build/crystal is not statically linked'; ldd .build/crystal; exit 1; }) \
  && make install DESTDIR=/output PREFIX=
 
