@@ -30,6 +30,35 @@ jobs:
         working-directory: linux
         run: make all #pull_images=true release=true
 
+      # - name: Upload tarballs as artifacts
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: linux-${{ env.CRYSTAL_VERSION }}
+      #     path: linux/build/*.gz
+
+      - name: Upload tarball for use in the next step
+        uses: actions/upload-artifact@v3
+        with:
+          name: tarball
+          path: |
+            linux/build/*.tar.gz
+            !linux/build/*-bundled.tar.gz
+  build-arrch64:
+    name: Build aarch64 Linux tarballs
+    runs-on: [linux, ARM64]
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Build linux binaries
+        working-directory: linux
+        run: make all #pull_images=true release=true
+
+      # - name: Upload tarballs as artifacts
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: linux-${{ env.CRYSTAL_VERSION }}
+      #     path: linux/build/*.gz
+
       - name: Upload tarball for use in the next step
         uses: actions/upload-artifact@v3
         with:
