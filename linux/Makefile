@@ -30,15 +30,15 @@ BUILD_ARGS = $(DOCKER_BUILD_ARGS) \
 all: build
 
 .PHONY: build
-build: compress64 clean_tmp ## Build distribution tarballs for 64 bits
+build: compress64 ## Build distribution tarballs for 64 bits
 
 $(OUTPUT_BASENAME64).tar: Dockerfile
 	mkdir -p $(dir $@)
 	docker buildx build $(BUILD_ARGS) --build-arg previous_crystal_release=$(PREVIOUS_CRYSTAL_RELEASE_LINUX64_TARGZ) --build-arg crystal_ref=$(CRYSTAL_REF) --build-arg crystal_version=$(CRYSTAL_VERSION) -o type=tar,dest=$@ .
 
-$(OUTPUT_BASENAME64)-bundled.tar: $(OUTPUT_BASENAME64).tar
+$(OUTPUT_BASENAME64)-bundled.tar: bundled.dockerfile $(OUTPUT_BASENAME64).tar.gz
 	mkdir -p $(dir $@)
-	docker buildx build $(BUILD_ARGS) --build-context crystal_base=$(OUTPUT_BASENAME64).tar --build-arg crystal_version=$(CRYSTAL_VERSION) -f $< -o type=tar,dest=$@ .
+	docker buildx build $(BUILD_ARGS) --build-context crystal_base=$(OUTPUT_DIR) --build-arg crystal_version=$(CRYSTAL_VERSION) -f $< -o type=tar,dest=$@ .
 
 .PHONY: compress64
 compress64: $(OUTPUT_BASENAME64).tar.gz $(OUTPUT_BASENAME64).tar.xz $(OUTPUT_BASENAME64)-bundled.tar.gz ## Build compressed tarballs

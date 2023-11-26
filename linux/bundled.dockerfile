@@ -24,8 +24,13 @@ RUN git clone https://github.com/libevent/libevent \
  && ./configure --disable-shared --disable-openssl \
  && make -j$(nproc)
 
-FROM crystal_base
+FROM debian AS crystal
+COPY --from=crystal_base /crystal-${crystal_version}-${package_version}*.tar.gz /crystal.tar.gz
+RUN mkdir /output && tar -xf /crystal.tar.gz -C /output
+
+FROM scratch
 ARG crystal_version=dev
 ARG package_version=1
+COPY --from=crystal /output /
 COPY --from=libpcre2 pcre2-*/.libs/libpcre2-8.a /crystal-${crystal_version}-${package_version}/lib/crystal/
 COPY --from=libevent libevent/.libs/libevent.a libevent/.libs/libevent_pthreads.a /crystal-${crystal_version}-${package_version}/lib/crystal/
