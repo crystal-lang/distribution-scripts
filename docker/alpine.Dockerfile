@@ -1,5 +1,4 @@
-ARG base_docker_image=alpine:3.17
-FROM ${base_docker_image} as runtime
+FROM alpine:3.17 as runtime
 
 RUN \
   apk add --update --no-cache --force-overwrite \
@@ -10,8 +9,8 @@ RUN \
     # dev tools
     make git
 
-ARG crystal_targz
-COPY ${crystal_targz} /tmp/crystal.tar.gz
+ARG crystal_targz=\*.tar.gz
+COPY --from=tarball ${crystal_targz} /tmp/crystal.tar.gz
 
 RUN \
   tar -xz -C /usr --strip-component=1  -f /tmp/crystal.tar.gz \

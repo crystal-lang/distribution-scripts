@@ -1,5 +1,4 @@
-ARG base_docker_image=ubuntu:22.04
-FROM ${base_docker_image} as runtime
+FROM ubuntu:22.04 as runtime
 
 RUN \
   apt-get update && \
@@ -10,8 +9,8 @@ RUN \
                      libpcre3-dev libpcre2-dev libevent-dev libz-dev && \
   apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-ARG crystal_targz
-COPY ${crystal_targz} /tmp/crystal.tar.gz
+ARG crystal_targz=\*.tar.gz
+COPY --from=tarball ${crystal_targz} /tmp/crystal.tar.gz
 
 RUN \
   tar -xz -C /usr --strip-component=1 -f /tmp/crystal.tar.gz && \
