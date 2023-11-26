@@ -14,6 +14,7 @@ COPY --from=tarball ${crystal_targz} /tmp/crystal.tar.gz
 
 RUN \
   tar -xz -C /usr --strip-component=1 -f /tmp/crystal.tar.gz && \
+  /usr/bin/crystal --version && \
   rm /tmp/crystal.tar.gz
 
 CMD ["/bin/sh"]

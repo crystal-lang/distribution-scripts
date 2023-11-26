@@ -17,6 +17,7 @@ RUN \
     --exclude */lib/crystal/lib \
     --exclude */lib/crystal/*.a \
     --exclude */share/crystal/src/llvm/ext/llvm_ext.o && \
+  /usr/bin/crystal --version && \
   rm /tmp/crystal.tar.gz
 
 CMD ["/bin/sh"]
