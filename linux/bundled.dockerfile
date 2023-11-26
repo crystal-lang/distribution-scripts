@@ -24,6 +24,8 @@ RUN git clone https://github.com/libevent/libevent \
  && ./configure --disable-shared --disable-openssl \
  && make -j$(nproc)
 
-FROM scratch
-COPY --from=libpcre2 pcre2-*/.libs/libpcre2-8.a /lib/crystal/
-COPY --from=libevent libevent/.libs/libevent.a libevent/.libs/libevent_pthreads.a /lib/crystal/
+FROM crystal_base
+ARG crystal_version=dev
+ARG package_version=1
+COPY --from=libpcre2 pcre2-*/.libs/libpcre2-8.a /crystal-${crystal_version}-${package_version}/lib/crystal/
+COPY --from=libevent libevent/.libs/libevent.a libevent/.libs/libevent_pthreads.a /crystal-${crystal_version}-${package_version}/lib/crystal/

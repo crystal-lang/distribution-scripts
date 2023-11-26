@@ -80,5 +80,7 @@ RUN git clone https://github.com/crystal-lang/shards \
  && make install DESTDIR=/output PREFIX=
 
 FROM scratch
-COPY --from=alpine /output /
-COPY --from=debian /bdwgc/.libs/libgc.a /lib/crystal/libgc.a
+ARG crystal_version=dev
+ARG package_version=1
+COPY --from=alpine /output /crystal-${crystal_version}-${package_version}
+COPY --from=debian /bdwgc/.libs/libgc.a /crystal-${crystal_version}-${package_version}/lib/crystal/libgc.a
