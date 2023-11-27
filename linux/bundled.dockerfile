@@ -26,6 +26,7 @@ RUN git clone https://github.com/libevent/libevent \
 
 FROM debian AS crystal
 COPY --from=crystal_base . /crystal
+RUN ls /crystal
 RUN mkdir /output && tar -xf /crystal/crystal-${crystal_version}-*.tar -C /output
 
 FROM scratch
