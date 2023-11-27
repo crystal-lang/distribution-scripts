@@ -25,8 +25,9 @@ RUN git clone https://github.com/libevent/libevent \
  && make -j$(nproc)
 
 FROM debian AS crystal
-COPY --from=crystal_base /crystal-${crystal_version}-${package_version}*.tar.gz /crystal.tar.gz
-RUN mkdir /output && tar -xf /crystal.tar.gz -C /output
+ADD ${previous_crystal_release} /tmp/crystal.tar.gz
+COPY --from=crystal_base /crystal-${crystal_version}-*.tar /crystal.tar
+RUN mkdir /output && tar -xf /crystal.tar -C /output
 
 FROM scratch
 ARG crystal_version=dev
