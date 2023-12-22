@@ -25,6 +25,11 @@ fi
 
 . $(dirname $(realpath $0))/functions.sh
 
+if [[ ! "$VERSION" =~ ^[0-9] ]]; then
+  echo "Invalid VERSION: ${VERSION}"
+  exit 1
+fi
+
 case $VERSION in
   *.0.0)
     TYPE=major
