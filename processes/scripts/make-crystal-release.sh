@@ -27,7 +27,7 @@ git show
 
 step "Push tag to GitHub" git push --tags
 
-sed -E '3,/^## /!d' CHANGELOG.md | sed '$d' | sed -Ez 's/^\n+//; s/\n+$/\n/g' > CHANGELOG.$VERSION.md
+sed -E '7,/^## /!d' CHANGELOG.md | sed '$d' | sed -Ez 's/^\n+//; s/\n+$/\n/g' > CHANGELOG.$VERSION.md
 
 echo "$ more CHANGELOG.$VERSION.md"
 more CHANGELOG.$VERSION.md
