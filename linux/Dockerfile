@@ -60,10 +60,11 @@ RUN mkdir -p /tmp/crystal \
   && shards --version
 
 # Build crystal
+ARG crystal_repo=https://github.com/crystal-lang/crystal
 ARG crystal_version
 ARG crystal_sha1
 ARG gnu_target
-RUN git clone https://github.com/crystal-lang/crystal \
+RUN git clone ${crystal_repo} \
  && cd crystal \
  && git checkout ${crystal_sha1} \
  \

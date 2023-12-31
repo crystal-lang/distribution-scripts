@@ -1,3 +1,4 @@
+CRYSTAL_REPO ?= https://github.com/crystal-lang/crystal ## Allow to override the official repo with fork or local
 CRYSTAL_VERSION ?=                 ## How the binaries should be branded
 CRYSTAL_SHA1 ?= $(CRYSTAL_VERSION) ## Git tag/branch/sha1 to checkout and build source (default: `$(CRYSTAL_VERSION)`)
 CRYSTAL_DOCKER_IMAGE ?= crystallang/crystal:$(CRYSTAL_VERSION)-build ## Which crystal docker build image to use (default: `$(CRYSTAL_VERSION)-build`)
@@ -9,7 +10,7 @@ AWS_CLI = docker run --rm -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY -v $$(pw
 S3_ENDPOINT = s3://$(AWS_BUCKET)/api
 AWS_BUCKET = crystal-api
 
-BUILD_ARGS = --build-arg crystal_docker_image=$(CRYSTAL_DOCKER_IMAGE) --build-arg output_docs_base_name=$(OUTPUT_DOCS_BASE_NAME) --build-arg crystal_sha1=$(CRYSTAL_SHA1)
+BUILD_ARGS = --build-arg crystal_docker_image=$(CRYSTAL_DOCKER_IMAGE) --build-arg output_docs_base_name=$(OUTPUT_DOCS_BASE_NAME) --build-arg crystal_repo=$(CRYSTAL_REPO) --build-arg crystal_sha1=$(CRYSTAL_SHA1)
 
 .PHONY: all
 all: $(OUTPUT_DIR)/$(OUTPUT_DOCS_BASE_NAME).tar.gz ## Build docs tarball
