@@ -1,11 +1,11 @@
-# Darwin `x86_64` build
+# Darwin `universal` build
 
-The `x86_64` crystal darwin build is built natively in an osx host using omnibus.
+The `universal` crystal darwin build is built natively in an osx host using omnibus.
 The whole process is automated using a `Makefile`.
 
 # Dependencies
 
-* Ruby 2.7.3 and `bundle install --binstubs` in `./omnibus`
+* Ruby 3.2.2 and `bundle install --binstubs` in `./omnibus`
 * `pkgconfig`, `libtool` (Can be installed by `$ brew install pkgconfig libtool`)
 * Own `/opt/crystal`, `/var/cache`.
 

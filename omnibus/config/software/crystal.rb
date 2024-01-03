@@ -84,7 +84,7 @@ build do
   delete "#{output_bin}_arm64"
 
   block do
-    raise "Could not build crystal" unless File.exists?(output_bin)
+    raise "Could not build crystal" unless File.exist?(output_bin)
 
     if macos? || mac_os_x?
       otool_libs = `otool -L #{output_bin}`
