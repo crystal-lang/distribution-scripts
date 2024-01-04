@@ -54,7 +54,7 @@ build do
   mkdir ".build"
 
   block { puts "\n=== Build native crystal bin with embedded universal crystal binary\n\n" }
-  copy "#{Dir.pwd}/crystal-#{ohai['os']}-#{ohai['kernel']['machine']}/embedded/bin/crystal", ".build/crystal"
+  copy "#{Dir.pwd}/crystal-darwin-universal/embedded/bin/crystal", ".build/crystal"
   command ".build/crystal --version", env: env.dup
   command "file .build/crystal", env: env.dup
   
