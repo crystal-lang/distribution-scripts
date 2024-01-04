@@ -1,0 +1,78 @@
+name: Darwin LLVM build
+
+on:
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: 'Log level'
+        required: false
+        default: 'warn'
+        type: choice
+        options:
+          - info
+          - warn
+          - debug
+  push:
+    branches:
+      - '*build-llvm*'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  LLVM_VERSION: 15.0.7
+  MACOSX_DEPLOYMENT_TARGET: 10.11
+  LOG_LEVEL: ${{ inputs.logLevel || 'warn' }}
+
+jobs:
+  llvm-build:
+    runs-on: macos-11
+    defaults:
+      run:
+        working-directory: ./omnibus
+
+    steps:
+      - name: Select Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '13.2.1'
+
+      - name: Download sources
+        uses: actions/checkout@v4
+
+      - name: Update development environment
+        run: |
+          brew update
+          brew install --display-times pkgconfig libtool cmake
+
+      - name: Prepare folders
+        run: |
+          sudo mkdir -p /opt/llvm
+          sudo chown $(whoami) /opt/llvm/
+          sudo mkdir -p /var/cache
+          sudo chown $(whoami) /var/cache
+
+      - name: Install omnibus
+        run: bundle check || bundle install
+
+      - name: Build llvm
+        run: bundle exec omnibus build llvm --log-level ${{ env.LOG_LEVEL }} --override use_git_caching:false
+
+        # Reference: https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#environment-files
+      - name: Extract the package name to be used for the artifact name
+        run: |
+          cd pkg
+          filename=$(ls -1 llvm-*.tar.gz)
+          echo "ARTIFACT_NAME=${filename%.tar.gz}" >> "$GITHUB_ENV"
+
+        # When an Artifact is uploaded, all the files are assembled into an immutable Zip archive.
+        # https://github.com/actions/upload-artifact#zip-archives
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.ARTIFACT_NAME }}
+          path: omnibus/pkg/*.tar.gz
+          retention-days: 1
+          if-no-files-found: error
+          compression-level: 0 # package is already compressed
