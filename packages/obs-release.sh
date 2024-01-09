@@ -48,12 +48,18 @@ else
   pushd "${LOCAL_BRANCH_FOLDER}"
 fi
 
+previous_version=$(grep -o -P '(?<=version_current ).*' crystal.spec)
+
 # Update version in *.dsc and *.spec
 sed -i -e "s/^Version: .*/Version: ${VERSION}-1/" *.dsc
-sed -i -e "s/^DEBTRANSFORM-TAR: .*/DEBTRANSFORM-TAR: ${VERSION}.tar.gz/" *.dsc
-sed -i -e "s/^Version: .*/Version: ${VERSION}/" *.spec
-sed -i -e "s/VERSION=.*/VERSION=${VERSION}/" debian.rules
-sed -i -e "s/^Provides: crystal[0-9]*.[0-9]*/Provides: crystal${VERSION%.*}/" debian.control
+
+sed -i -e "s/version_suffix .*/version_suffix ${VERSION%.*}/" *.spec
+sed -i -e "s/version_current .*/version_current ${VERSION}/" *.spec
+sed -i -e "s/version_previous .*/version_previous ${previous_version}/" *.spec
+sed -i -e "/%define obsolete_crystal_versioned()/ aObsoletes:      %{1}${previous_version%.*}%{?2:-%{2}} \\\\" *.spec
+
+sed -i -e "s/^Depends: crystal[^-]*/Depends: crystal${VERSION%.*}/" debian.control
+sed -i -e "s/^Version: .*/Version: ${VERSION%.*}/" debian.control
 
 # Commit changes to OBS
 message="Release $VERSION"
