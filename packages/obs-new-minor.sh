@@ -26,6 +26,8 @@ LOCAL_BRANCH_FOLDER="home:$OBS_USER:branches:$PROJECT/$PACKAGE"
 
 osc copypac "$PROJECT" "$OLD_PACKAGE" "$PROJECT" "$PACKAGE"
 
+sleep 10
+
 if [ -d "${LOCAL_BRANCH_FOLDER}" ]; then
   pushd "${LOCAL_BRANCH_FOLDER}"
   osc up
