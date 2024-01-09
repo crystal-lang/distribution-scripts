@@ -83,12 +83,13 @@ Add an issue `Crystal release X.Y.Z` in https://github.com/crystal-lang/distribu
    * Now just assign the `latest` tags:
    * `./docker/apply-latest-tags.sh ${VERSION}`
 6. [ ] Publish snap package (you can use the docker image `snapcore/snapcraft` for running the following commands)
+   1. `docker run --pull=always --rm -it snapcore/snapcraft`
    1. You need to logged in via `snapcraft login`
-   1. Recent tagged release is published directly to edge channel. The CI logs the snap revision number. Otherwise the .snap file is in the artifacts.
-   1. Check the current status to find the revision of the tagged release otherwise:
-   1. `snapcraft status crystal`
-   1. `snapcraft release crystal <revision-number> beta`
-   1. `snapcraft release crystal <revision-number> stable`
+   2. Recent tagged release is published directly to edge channel. The CI logs the snap revision number. Otherwise the .snap file is in the artifacts.
+   3. Check the current status to find the revision of the tagged release otherwise:
+   4. `snapcraft status crystal`
+   5. `snapcraft release crystal <revision-number> beta`
+   6. `snapcraft release crystal <revision-number> stable`
 7. [ ] Check PR for homebrew: https://github.com/Homebrew/homebrew-core/pulls?q=is%3Apr+crystal+sort%3Aupdated-desc
    * It should've been automatically created
 
