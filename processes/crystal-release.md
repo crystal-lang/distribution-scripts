@@ -106,7 +106,7 @@ Add an issue `Crystal release X.Y.Z` in https://github.com/crystal-lang/distribu
 ### Release announcements
 1. [ ] Publish release notes on the website
 2. [ ] Post announcement in https://forum.crystal-lang.org/c/news/official
-3. [ ] Announce on social media accounts (via Buffer; credentials are in Passbolt)
+3. [ ] Announce on social media accounts (via Buffer; credentials are in Passbolt) and pin release posts
 5. [ ] Update https://github.com/crystal-lang/crystal-book/blob/master/crystal-version.txt
 6. [ ] (minor) Post the release in https://opencollective.com/crystal-lang
 
