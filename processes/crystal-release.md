@@ -64,12 +64,12 @@ Add an issue `Crystal release X.Y.Z` in https://github.com/crystal-lang/distribu
    2. Configure build.opensuse.org credentials in environment variables:
       * `export OBS_USER=`
       * `export OBS_PASSWORD=`
-   3. Update the `crystal` package: [`./obs-release.sh devel:languages:crystal crystal $VERSION`](../packages/obs-release.sh)
-      * Uses the docker image `crystallang/osc` to run the CLI client for OBS.
-      * The script creates a branch in you home project, updates the version and pushes it back to OBS.
-      * You can also run the commands from that file manually and check build locally with
-         * `osc build xUbuntu_20.04 x86_64`
-         * `osc build Fedora_Rawhide x86_64`
+   3. (minor) Update the `crystal` package: [`./obs-release.sh devel:languages:crystal crystal $VERSION`](../packages/obs-release.sh)
+      * (minor) Uses the docker image `crystallang/osc` to run the CLI client for OBS.
+      * (minor) The script creates a branch in you home project, updates the version and pushes it back to OBS.
+      * (minor) You can also run the commands from that file manually and check build locally with
+         * (minor) `osc build xUbuntu_20.04 x86_64`
+         * (minor) `osc build Fedora_Rawhide x86_64`
    4. (minor) Create the `crystal${VERSION%.*}` package: [`./obs-new-minor.sh devel:languages:crystal crystal${VERSION%.*} $VERSION crystal${OLD_VERSION%.*}`](../packages/obs-new-minor.sh)
    4. (patch) Update the `crystal${VERSION%.*}` package: [`./obs-release.sh devel:languages:crystal crystal${VERSION%.*} $VERSION`](../packages/obs-release.sh)
    5. Now OBS builds the packages. It’s best to follow the build status in the browser:
