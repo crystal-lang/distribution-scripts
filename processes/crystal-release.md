@@ -64,12 +64,12 @@ Add an issue `Crystal release X.Y.Z` in https://github.com/crystal-lang/distribu
    2. Configure build.opensuse.org credentials in environment variables:
       * `export OBS_USER=`
       * `export OBS_PASSWORD=`
-   3. Update the `crystal` package: [`./obs-release.sh devel:languages:crystal crystal $VERSION`](../packages/obs-release.sh)
-      * Uses the docker image `crystallang/osc` to run the CLI client for OBS.
-      * The script creates a branch in you home project, updates the version and pushes it back to OBS.
-      * You can also run the commands from that file manually and check build locally with
-         * `osc build xUbuntu_20.04 x86_64`
-         * `osc build Fedora_Rawhide x86_64`
+   3. (minor) Update the `crystal` package: [`./obs-release.sh devel:languages:crystal crystal $VERSION`](../packages/obs-release.sh)
+      * (minor) Uses the docker image `crystallang/osc` to run the CLI client for OBS.
+      * (minor) The script creates a branch in you home project, updates the version and pushes it back to OBS.
+      * (minor) You can also run the commands from that file manually and check build locally with
+         * (minor) `osc build xUbuntu_20.04 x86_64`
+         * (minor) `osc build Fedora_Rawhide x86_64`
    4. (minor) Create the `crystal${VERSION%.*}` package: [`./obs-new-minor.sh devel:languages:crystal crystal${VERSION%.*} $VERSION crystal${OLD_VERSION%.*}`](../packages/obs-new-minor.sh)
    4. (patch) Update the `crystal${VERSION%.*}` package: [`./obs-release.sh devel:languages:crystal crystal${VERSION%.*} $VERSION`](../packages/obs-release.sh)
    5. Now OBS builds the packages. It’s best to follow the build status in the browser:
@@ -83,15 +83,15 @@ Add an issue `Crystal release X.Y.Z` in https://github.com/crystal-lang/distribu
    * Now just assign the `latest` tags:
    * `./docker/apply-latest-tags.sh ${VERSION}`
 6. [ ] Publish snap package (you can use the docker image `snapcore/snapcraft` for running the following commands)
+   1. `docker run --pull=always --rm -it snapcore/snapcraft`
    1. You need to logged in via `snapcraft login`
-   1. Recent tagged release is published directly to edge channel. The CI logs the snap revision number. Otherwise the .snap file is in the artifacts.
-   1. Check the current status to find the revision of the tagged release otherwise:
-   1. `snapcraft status crystal`
-   1. `snapcraft release crystal <revision-number> beta`
-   1. `snapcraft release crystal <revision-number> stable`
-7. [ ] Submit a PR to update the homebrew formula
-   1. Run `brew bump-formula-pr crystal --version $VERSION`
-   2. In case the new compiler version is incompatible with the current boot version, bump boot version.
+   2. Recent tagged release is published directly to edge channel. The CI logs the snap revision number. Otherwise the .snap file is in the artifacts.
+   3. Check the current status to find the revision of the tagged release otherwise:
+   4. `snapcraft status crystal`
+   5. `snapcraft release crystal <revision-number> beta`
+   6. `snapcraft release crystal <revision-number> stable`
+7. [ ] Check PR for homebrew: https://github.com/Homebrew/homebrew-core/pulls?q=is%3Apr+crystal+sort%3Aupdated-desc
+   * It should've been automatically created
 
 ### Publish documentation for the release
 
@@ -106,12 +106,12 @@ Add an issue `Crystal release X.Y.Z` in https://github.com/crystal-lang/distribu
 ### Release announcements
 1. [ ] Publish release notes on the website
 2. [ ] Post announcement in https://forum.crystal-lang.org/c/news/official
-3. [ ] Announce on social media accounts (via Buffer; credentials are in Passbolt)
+3. [ ] Announce on social media accounts (via Buffer; credentials are in Passbolt) and pin release posts
 5. [ ] Update https://github.com/crystal-lang/crystal-book/blob/master/crystal-version.txt
 6. [ ] (minor) Post the release in https://opencollective.com/crystal-lang
 
 ## Post-release
-1. [ ] Update crystal `master` branch to use released version: [`crystal:scripts/release-update.sh`](https://github.com/crystal-lang/crystal/blob/master/scripts/release-update.sh)
+1. [ ] Update crystal `master` branch to use released version: [`crystal:scripts/release-update.sh ${VERSION}`](https://github.com/crystal-lang/crystal/blob/master/scripts/release-update.sh)
    * Edit PREVIOUS_CRYSTAL_BASE_URL in `.circleci/config.yml`
    * Edit DOCKER_TEST_PREFIX in `bin/ci`
    * Edit `prepare_build` on_osx download package and folder
@@ -119,4 +119,11 @@ Add an issue `Crystal release X.Y.Z` in https://github.com/crystal-lang/distribu
    * Edit `shell.nix` `latestCrystalBinary` using  `nix-prefetch-url --unpack <url>`
 2. [ ] (minor) Increment VERSION file to the next minor and -dev suffix
 3. [ ] (minor) Perform uncomment/todos left in the repo
-4. [ ] Update default base version in test-ecosystem: [`test-ecosystem:scripts/release-update.sh`](https://github.com/crystal-lang/test-ecosystem/blob/master/scripts/release-update.sh)
+4. [ ] Update default base version in test-ecosystem: [`test-ecosystem:scripts/release-update.sh ${VERSION}`](https://github.com/crystal-lang/test-ecosystem/blob/master/scripts/release-update.sh)
+5. [ ] Merge `release/${VERSION%.*}` branch into `master` (if the two have diverged)
+  - This needs to be a *merge commit*. Those are disabled in the GitHub UI.
+  - `git switch master && git pull && git merge release/${VERSION%.*}; git checkout master src/VERSION && git add src/VERSION && git commit`
+  - Double check merge commit history is as expected
+  - `git push` (GitHub branch protection rules normally prevent direct pushes to
+    `master`. This needs to be deactivated for this purpose, which can be on a
+    per-user basis.)
