@@ -120,3 +120,10 @@ Add an issue `Crystal release X.Y.Z` in https://github.com/crystal-lang/distribu
 2. [ ] (minor) Increment VERSION file to the next minor and -dev suffix
 3. [ ] (minor) Perform uncomment/todos left in the repo
 4. [ ] Update default base version in test-ecosystem: [`test-ecosystem:scripts/release-update.sh ${VERSION}`](https://github.com/crystal-lang/test-ecosystem/blob/master/scripts/release-update.sh)
+5. [ ] Merge `release/${VERSION%.*}` branch into `master` (if the two have diverged)
+  - This needs to be a *merge commit*. Those are disabled in the GitHub UI.
+  - `git switch master && git pull && git merge release/${VERSION%.*}; git checkout master src/VERSION && git add src/VERSION && git commit`
+  - Double check merge commit history is as expected
+  - `git push` (GitHub branch protection rules normally prevent direct pushes to
+    `master`. This needs to be deactivated for this purpose, which can be on a
+    per-user basis.)
