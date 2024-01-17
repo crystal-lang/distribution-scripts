@@ -1,0 +1,21 @@
+name: Test package installation
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "5 4 * * 0" # every sunday at 04:05
+
+jobs:
+  test_packages:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup BATS
+        uses: mig4/setup-bats@v1
+        with:
+          bats-version: 1.9.0
+
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Run test
+        run: make -C packages test
