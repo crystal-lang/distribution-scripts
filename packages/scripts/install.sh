@@ -70,7 +70,7 @@ _discover_distro_repo() {
 
   case "$ID" in
     debian)
-      if [[ -z "${VERSION_ID:+}" ]]; then
+      if [[ -z "${VERSION_ID:-}" ]]; then
         VERSION_ID="Unstable"
       elif [[ "$VERSION_ID" == "9" ]]; then
         VERSION_ID="$VERSION_ID.0"
