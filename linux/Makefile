@@ -11,6 +11,7 @@ no_cache ?=    ## Disable the docker build cache
 pull_images ?= ## Always pull docker images to ensure they're up to date
 release ?=     ## Create an optimized build for the final release
 
+CRYSTAL_REPO ?= https://github.com/crystal-lang/crystal ## Allow to override the official repo with fork or local
 CRYSTAL_VERSION ?=                 ## How the binaries should be branded
 CRYSTAL_SHA1 ?= $(CRYSTAL_VERSION) ## Git tag/branch/sha1 to checkout and build source
 PACKAGE_ITERATION ?= 1
@@ -20,7 +21,7 @@ PREVIOUS_CRYSTAL_VERSION ?= ## Version of the bootstrap compiler
 PREVIOUS_CRYSTAL_PACKAGE_ITERATION ?= 1## Package iteration of the bootstrap compiler
 PREVIOUS_CRYSTAL_RELEASE_LINUX64_TARGZ ?= https://github.com/crystal-lang/crystal/releases/download/$(PREVIOUS_CRYSTAL_VERSION)/crystal-$(PREVIOUS_CRYSTAL_VERSION)-$(PREVIOUS_CRYSTAL_PACKAGE_ITERATION)-linux-x86_64.tar.gz ## url to crystal-{version}-{package}-linux-x86_64.tar.gz
 
-SHARDS_VERSION = v0.17.3
+SHARDS_VERSION = v0.17.4
 GC_VERSION = v8.2.2
 LIBPCRE2_VERSION = 10.42
 LIBEVENT_VERSION = release-2.1.12-stable
@@ -32,6 +33,7 @@ DOCKER_BUILD_ARGS = $(if $(no_cache),--no-cache )$(if $(pull_images),--pull )
 
 BUILD_ARGS_COMMON = $(DOCKER_BUILD_ARGS) \
                     $(if $(release),--build-arg release=true) \
+                    --build-arg crystal_repo=$(CRYSTAL_REPO) \
                     --build-arg crystal_version=$(CRYSTAL_VERSION) \
                     --build-arg crystal_sha1=$(CRYSTAL_SHA1) \
                     --build-arg shards_version=$(SHARDS_VERSION) \

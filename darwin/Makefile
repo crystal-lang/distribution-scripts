@@ -3,6 +3,7 @@
 ## Build everything
 ##   $ make
 
+CRYSTAL_REPO ?= https://github.com/crystal-lang/crystal ## Allow to override the official repo with fork or local
 CRYSTAL_VERSION ?=                 ## How the binaries should be branded
 CRYSTAL_SHA1 ?= $(CRYSTAL_VERSION) ## Git tag/branch/sha1 to checkout and build source
 PACKAGE_ITERATION ?= 1
@@ -52,7 +53,7 @@ $(CURDIR)/../omnibus/crystal-darwin-x86_64/embedded/bin/crystal:
 $(OUTPUT_DIR)/$(DARWIN_NAME) $(OUTPUT_DIR)/$(DARWIN_PKG_NAME): ## Build omnibus crystal project
 ifeq ($(FORCE_GIT_TAGGED), 0)
 	rm -Rf $(CURDIR)/tmp && mkdir -p $(CURDIR)/tmp && cd $(CURDIR)/tmp \
-	&& git clone https://github.com/crystal-lang/crystal \
+	&& git clone "$(CRYSTAL_REPO)" \
 	&& cd crystal \
 	&& git checkout $(CRYSTAL_SHA1) \
 	&& git checkout -b $(CRYSTAL_VERSION)
@@ -61,7 +62,7 @@ endif
 	mkdir -p $(OUTPUT_DIR) \
 	&& cd ../omnibus \
 	&& if [ "$(FORCE_GIT_TAGGED)" -eq "0" ]; then export CRYSTAL_SRC=$(CURDIR)/tmp/crystal/.git; fi \
-	&& export MACOSX_DEPLOYMENT_TARGET=10.11 \
+	&& export MACOSX_DEPLOYMENT_TARGET=11.0 \
 	&& export SDKROOT=$(shell xcrun --sdk macosx --show-sdk-path) \
 	&& bundle exec omnibus clean crystal shards \
 	&& bundle exec omnibus build crystal \
