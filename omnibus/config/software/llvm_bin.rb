@@ -18,7 +18,11 @@ else
   raise "llvm_bin not supported"
 end
 
-source url: "http://crystal-lang.s3.amazonaws.com/llvm/llvm-#{version}-#{ohai['os']}-#{ohai['kernel']['machine']}.tar.gz",
+platform = ohai['os']
+# Currently, it is considered `universal` based on the alterations made in the commit 'ed5f1f97e0a67157d886dd6675902e35199a1ab3'
+arch = "x86_64"
+
+source url: "http://crystal-lang.s3.amazonaws.com/llvm/llvm-#{version}-#{platform}-#{arch}.tar.gz",
        md5: source_md5
 
 relative_path "llvm-#{version}"
