@@ -3,7 +3,7 @@
 ## Build everything
 ##   $ make
 
-CRYSTAL_REPO ?= https://github.com/crystal-lang/crystal ## Allow to override the official repo with fork or local
+CRYSTAL_REPO ?= https://github.com/crystal-lang/crystal## Allow to override the official repo with fork or local
 CRYSTAL_VERSION ?=                 ## How the binaries should be branded
 CRYSTAL_SHA1 ?= $(CRYSTAL_VERSION) ## Git tag/branch/sha1 to checkout and build source
 PACKAGE_ITERATION ?= 1
