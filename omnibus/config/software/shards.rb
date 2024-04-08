@@ -96,9 +96,10 @@ build do
   make "clean", env: env
 
   # Build for ARM64
-  crflags += " --cross-compile --target aarch64-apple-darwin"
+  crtarget = "arm64-apple-macosx#{ENV["MACOSX_DEPLOYMENT_TARGET"]}"
+  crflags += " --cross-compile --target #{crtarget}"
   make "bin/shards SHARDS=false CRYSTAL=#{install_dir}/bin/crystal FLAGS='#{crflags}'", env: env
-  command "clang bin/shards.o -o bin/shards_arm64 -target arm64-apple-darwin -L#{install_dir}/embedded/lib -lyaml -lpcre2-8 -lgc -lpthread -levent -liconv -ldl", env: env
+  command "clang bin/shards.o -o bin/shards_arm64 -target #{crtarget} -L#{install_dir}/embedded/lib -lyaml -lpcre2-8 -lgc -lpthread -levent -liconv -ldl", env: env
 
   # Lipo them up
   command "lipo -create -output bin/shards bin/shards_x86_64 bin/shards_arm64"

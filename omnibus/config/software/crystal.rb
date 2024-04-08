@@ -68,14 +68,12 @@ build do
   mkdir ".build"
   copy "#{output_bin}_x86_64", ".build/crystal"
 
-  # Compile for ARM64. Apple's clang only understands arm64, LLVM uses aarch64,
-  # so we need to sub out aarch64 in our calls to Apple tools
-  env["CXXFLAGS"] << " -target arm64-apple-darwin"
   make "deps", env: env
 
-  make "crystal stats=true release=true target=aarch64-apple-darwin FLAGS=\"#{crflags}\" CRYSTAL_CONFIG_TARGET=aarch64-apple-darwin CRYSTAL_CONFIG_LIBRARY_PATH= O=#{output_path}", env: env
+  crtarget = "arm64-apple-macosx#{ENV["MACOSX_DEPLOYMENT_TARGET"]}"
+  make "crystal stats=true release=true target=#{crtarget} FLAGS=\"#{crflags}\" CRYSTAL_CONFIG_TARGET=#{crtarget} CRYSTAL_CONFIG_LIBRARY_PATH= O=#{output_path}", env: env
 
-  command "clang #{output_path}/crystal.o -o #{output_bin}_arm64 -target arm64-apple-darwin src/llvm/ext/llvm_ext.o `llvm-config --libs --system-libs --ldflags 2>/dev/null` -lstdc++ -lpcre2-8 -lgc -lpthread -levent -liconv -ldl -v", env: env
+  command "clang #{output_path}/crystal.o -o #{output_bin}_arm64 -target #{crtarget} src/llvm/ext/llvm_ext.o `llvm-config --libs --system-libs --ldflags 2>/dev/null` -lstdc++ -lpcre2-8 -lgc -lpthread -levent -liconv -ldl -v", env: env
   delete "#{output_path}/crystal.o"
 
   # Lipo them up
