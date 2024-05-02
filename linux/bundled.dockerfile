@@ -5,6 +5,16 @@ RUN apt-get update \
 
 ENV CFLAGS="-fPIC -pipe ${release:+-O2}"
 
+# Build libgc
+FROM debian AS bdwgc
+ARG gc_version
+RUN curl -L https://github.com/ivmai/bdwgc/archive/refs/tags/${gc_version}.tar.gz | tar -zx \
+ && mv bdwgc-* bdwgc-${gc_version} \
+ && cd bdwgc-${gc_version} \
+ && ./autogen.sh \
+ && ./configure --disable-debug --disable-shared --enable-large-config \
+ && make -j$(nproc)
+
 # build libpcre2
 FROM debian AS libpcre2
 ARG libpcre2_version
@@ -27,12 +37,14 @@ RUN git clone https://github.com/libevent/libevent \
 FROM debian
 ARG crystal_version
 ARG package_iteration
+ARG gc_version
 ARG libpcre2_version
 ARG libevent_version
 
 RUN mkdir -p /output/lib/crystal/lib/
 
 # Copy libraries
+COPY --from=bdwgc bdwgc-${gc_version}/.libs/libgc.a /output/lib/crystal/
 COPY --from=libpcre2 pcre2-${libpcre2_version}/.libs/libpcre2-8.a /output/lib/crystal/
 COPY --from=libevent libevent/.libs/libevent.a libevent/.libs/libevent_pthreads.a /output/lib/crystal/
 
