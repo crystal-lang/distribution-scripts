@@ -50,8 +50,6 @@ ARG musl_target
 RUN git clone https://github.com/crystal-lang/shards \
  && cd shards \
  && git checkout ${shards_version} \
- # FIXME: Remove this workaround for https://github.com/crystal-lang/crystal/issues/10861
- && touch shard.lock \
  && make SHARDS=false CRYSTAL=/crystal/bin/crystal \
          FLAGS="--stats --target ${musl_target} --static ${release:+--release}" \
  \
