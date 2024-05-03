@@ -72,10 +72,6 @@ RUN \
  # Install crystal
  && make -C /crystal install DESTDIR=/output PREFIX= \
  \
- # TODO: Remove legacy paths to previous install directories after migration period
- && ln -s ../../bin /output/lib/crystal/bin \
- && ln -s .. /output/lib/crystal/lib \
- \
  # Install shards
  && make -C /shards install DESTDIR=/output PREFIX= \
  \
