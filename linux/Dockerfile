@@ -5,7 +5,7 @@ RUN apk add --no-cache \
       # Statically-compiled llvm
       llvm15-dev llvm15-static \
       # Static stdlib dependencies
-      zlib-static yaml-static libxml2-static pcre2-dev libevent-static \
+      gc-dev zlib-static yaml-static libxml2-static pcre2-dev libevent-static \
       # Static compiler dependencies
       libffi-dev \
       # Build tools
@@ -14,20 +14,12 @@ RUN apk add --no-cache \
 ARG release
 ENV CFLAGS="-fPIC -pipe ${release:+-O2}"
 
-# Build libgc (again, this time for musl)
-ARG gc_version
-RUN git clone https://github.com/ivmai/bdwgc \
- && cd bdwgc \
- && git checkout ${gc_version} \
- \
- && ./autogen.sh \
- && ./configure --disable-debug --disable-shared --enable-large-config \
- && make -j$(nproc) CFLAGS=-DNO_GETCONTEXT
-
 # This overrides default CRYSTAL_LIBRARY_PATH baked into the binary (starting with 1.2.0)
 # or configured via wrapper script (before 1.2.0) because we want to link against
-# the newly-built libraries, not the ones shipped with the bootstrap compiler.
-ENV CRYSTAL_LIBRARY_PATH=/bdwgc/.libs/
+# the regularly installed libraries, not the ones shipped with the bootstrap compiler.
+# This particularly affects libgc which was bundled upto Crystal 1.12
+ENV CRYSTAL_LIBRARY_PATH=""
+
 RUN llvm-config --version
 
 ARG previous_crystal_release
