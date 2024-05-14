@@ -1,8 +1,7 @@
 FROM debian:12 AS bdwgc
 
 RUN apt-get update \
- && apt-get install -y build-essential libevent-dev libpcre2-dev automake libtool pkg-config git curl llvm-13 clang-13 \
- && (pkg-config || true)
+ && apt-get install -y build-essential automake libtool git clang-13
 
 ARG release
 ENV CFLAGS="-fPIC -pipe ${release:+-O2}"
