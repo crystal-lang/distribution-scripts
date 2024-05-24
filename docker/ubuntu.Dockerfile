@@ -23,7 +23,7 @@ FROM runtime as build
 
 RUN \
   apt-get update && \
-  apt-get install -y build-essential llvm-15 lld-15 libedit-dev gdb libffi-dev && \
+  apt-get install -y build-essential llvm-18 lld-18 libedit-dev gdb libffi-dev && \
   apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 RUN ln -sf /usr/bin/ld.lld-15 /usr/bin/ld.lld
