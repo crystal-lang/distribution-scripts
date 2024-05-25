@@ -18,14 +18,14 @@ RUN git clone https://github.com/ivmai/bdwgc \
  && ./configure --disable-debug --disable-shared --enable-large-config \
  && make -j$(nproc)
 
-FROM alpine:3.17
+FROM alpine:3.20
 
 # Install dependencies
 RUN apk add --no-cache \
       # Statically-compiled llvm
       llvm15-dev llvm15-static \
       # Static stdlib dependencies
-      gc-dev zlib-static yaml-static libxml2-static pcre2-dev libevent-static \
+      gc-dev zlib-static yaml-static libxml2-static pcre2-dev libevent-static zstd-static \
       # Static compiler dependencies
       libffi-dev \
       # Build tools
@@ -40,7 +40,7 @@ ENV CFLAGS="-fPIC -pipe ${release:+-O2}"
 # This particularly affects libgc which was bundled upto Crystal 1.12
 ENV CRYSTAL_LIBRARY_PATH=""
 
-RUN llvm-config --version
+RUN llvm15-config --version
 
 ARG previous_crystal_release
 ADD ${previous_crystal_release} /tmp/crystal.tar.gz
