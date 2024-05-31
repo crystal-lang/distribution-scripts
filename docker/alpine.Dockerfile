@@ -26,6 +26,6 @@ FROM runtime as build
 
 RUN \
   apk add --update --no-cache --force-overwrite \
-    llvm15-dev llvm15-static g++ libffi-dev
+    llvm18-dev llvm18-static g++ libffi-dev
 
 CMD ["/bin/sh"]
