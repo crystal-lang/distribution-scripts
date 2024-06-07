@@ -34,7 +34,10 @@ publish_docs: dist-docs dist-docs_versions ## Publish API docs to S3
 
 .PHONY: dist-docs
 dist-docs: $(OUTPUT_DIR)/api-$(CRYSTAL_VERSION) ## Sync API docs to `s3://$(AWS_BUCKET)/api/$(CRYSTAL_VERSION)`
+	gzip $(OUTPUT_DIR)/api-$(CRYSTAL_VERSION)/index.json
+	mv $(OUTPUT_DIR)/api-$(CRYSTAL_VERSION)/index.json.gz $(OUTPUT_DIR)/
 	$(AWS_CLI) s3 sync "$</" "$(S3_ENDPOINT)/$(CRYSTAL_VERSION)/"
+	$(AWS_CLI) s3 cp --content-encoding gzip --content-type 'application/json' $(OUTPUT_DIR)/index.json.gz "$(S3_ENDPOINT)/$(CRYSTAL_VERSION)/index.json"
 
 $(OUTPUT_DIR)/api-$(CRYSTAL_VERSION): $(OUTPUT_DIR)/$(OUTPUT_DOCS_BASE_NAME).tar.gz
 	mkdir -p $@
