@@ -60,7 +60,7 @@ jobs:
           sudo chown $(whoami) /var/cache
 
       -
-        name: Build Dawin package
+        name: Build Darwin package
         run: |
           make -C distribution-scripts/darwin \
             OMNIBUS_OPTS="--log-level ${{ env.LOG_LEVEL }} --override use_git_caching:false" \
