@@ -46,7 +46,7 @@ jobs:
             ${{ runner.os }}-
 
       -
-        name: Install Omnibus Depenedcies
+        name: Install Omnibus Dependencies
         run: |
           cd distribution-scripts/omnibus
           bundle install --path vendor/bundler
