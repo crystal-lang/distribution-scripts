@@ -11,6 +11,7 @@ FORCE_GIT_TAGGED ?= 1              ## Require build to be based on git tag/branc
 
 PREVIOUS_CRYSTAL_RELEASE_DARWIN_TARGZ ?= ## url to crystal-{version}-{package}-darwin-x86_64.tar.gz
 
+OMNIBUS_OPTS ?=                    ## Build arguments for omnibus command line
 OUTPUT_DIR = build
 
 # mimics the tgz_package.rb version mangling
@@ -65,7 +66,7 @@ endif
 	&& export MACOSX_DEPLOYMENT_TARGET=11.0 \
 	&& export SDKROOT=$(shell xcrun --sdk macosx --show-sdk-path) \
 	&& bundle exec omnibus clean crystal shards \
-	&& bundle exec omnibus build crystal \
+	&& bundle exec omnibus build crystal $(OMNIBUS_OPTS) \
 	&& cp ./pkg/$(DARWIN_NAME) $(CURDIR)/$(OUTPUT_DIR)/$(subst x86_64,universal,$(DARWIN_NAME)) \
 	&& cp ./pkg/$(DARWIN_PKG_NAME) $(CURDIR)/$(OUTPUT_DIR)/$(subst x86_64,universal,$(DARWIN_PKG_NAME))
 
