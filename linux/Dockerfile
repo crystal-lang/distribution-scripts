@@ -1,12 +1,11 @@
-FROM debian:11 AS debian
+FROM debian:12 AS bdwgc
 
 RUN apt-get update \
- && apt-get install -y build-essential libevent-dev libpcre2-dev automake libtool pkg-config git curl llvm-13 clang-13 \
- && (pkg-config || true)
+ && apt-get install -y build-essential automake libtool git clang-16
 
 ARG release
 ENV CFLAGS="-fPIC -pipe ${release:+-O2}"
-ENV CC="clang-13"
+ENV CC="clang-16"
 
 # Build libgc
 ARG gc_version
@@ -75,7 +74,7 @@ RUN git clone https://github.com/crystal-lang/shards \
  \
  && ([ "$(ldd bin/shards 2>&1 | wc -l)" -eq "1" ] || { echo 'shards is not statically linked'; ldd bin/shards; exit 1; })
 
-COPY --from=debian /bdwgc/.libs/libgc.a /libgc-debian.a
+COPY --from=bdwgc /bdwgc/.libs/libgc.a /libgc-debian.a
 
 ARG package_iteration
 
