@@ -8,7 +8,20 @@
     "RoutingRules": [
         {
             "Condition": {
-                "KeyPrefixEquals": "api/latest/${CRYSTAL_VERSION}/"
+                "HttpErrorCodeReturnedEquals": "404",
+                "KeyPrefixEquals": "api/1"
+            },
+            "Redirect": {
+                "HostName": "crystal-lang.org",
+                "HttpRedirectCode": "302",
+                "Protocol": "https",
+                "ReplaceKeyWith": "api/${CRYSTAL_VERSION}/404.html"
+            }
+        },
+        {
+            "Condition": {
+                "HttpErrorCodeReturnedEquals": "404",
+                "KeyPrefixEquals": "api/0"
             },
             "Redirect": {
                 "HostName": "crystal-lang.org",
