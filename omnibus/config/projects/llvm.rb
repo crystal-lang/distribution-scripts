@@ -18,6 +18,9 @@ end
 
 dependency 'cmake' unless valid_cmake_version?
 dependency 'llvm'
+
+# Requires for tgz_package to generate a proper archive name with sufix universal.
+ohai['target_arch'] = 'universal'
 dependency 'tgz_package' if macos? || mac_os_x? || centos?
 
 exclude '\.git*'

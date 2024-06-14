@@ -9,11 +9,17 @@ The whole process is automated using a `Makefile`.
 * `pkgconfig`, `libtool` (Can be installed by `$ brew install pkgconfig libtool`)
 * Own `/opt/crystal`, `/var/cache`.
 
-```
+```shell
 sudo mkdir -p /opt/crystal
 sudo chown $(whoami) /opt/crystal/
 sudo mkdir -p /var/cache
 sudo chown $(whoami) /var/cache
+```
+* Optional: If you need to build LLVM, ensure the existence of the /opt/llvm directory.
+
+```shell
+sudo mkdir -p /opt/llvm
+sudo chown $(whoami) /opt/llvm/
 ```
 
 # Getting started
