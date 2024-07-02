@@ -71,7 +71,7 @@ build do
   command "file #{output_bin}", env: env.dup
   command "#{output_bin} --version", env: env.dup
 
-  make "clean_cache clean", env: env
+  make "clean_cache", env: env
 
   # Restore compiler w/ cross-compile support
   block { puts "\n\n=== Restore compiler with cross-compile support ===\n\n" }
