@@ -55,7 +55,7 @@ build do
 
   crflags = "--no-debug"
 
-  copy "#{Dir.pwd}/crystal-#{ohai['os']}-#{ohai['kernel']['machine']}/embedded/bin/crystal", ".build/crystal"
+  copy "#{Dir.pwd}/crystal-#{ohai['os']}-x86_64/embedded/bin/crystal", ".build/crystal"
 
   # Compile for Intel
   command "make crystal stats=true release=true FLAGS=\"#{crflags}\" CRYSTAL_CONFIG_LIBRARY_PATH= O=#{output_path}", env: env
