@@ -58,7 +58,7 @@ build do
   copy "#{Dir.pwd}/crystal-#{ohai['os']}-#{ohai['kernel']['machine']}/embedded/bin/crystal", ".build/crystal"
 
   # Compile for Intel
-  command "make crystal stats=true release=true FLAGS=\"#{crflags}\" CRYSTAL_CONFIG_LIBRARY_PATH= O=#{output_path}", env: env
+  command "make crystal stats=true release=true target=x86_64-apple-darwin FLAGS=\"#{crflags}\" CRYSTAL_CONFIG_LIBRARY_PATH= O=#{output_path}", env: env
   move output_bin, "#{output_bin}_x86_64"
   block { raise "Could not build crystal x86_64" unless File.exist?("#{output_bin}_x86_64") }
 
