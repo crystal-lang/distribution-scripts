@@ -71,11 +71,11 @@ build do
   command "file #{output_bin}", env: env.dup
   command "#{output_bin} --version", env: env.dup
 
+  make "clean_cache clean", env: env
+
   # Restore compiler w/ cross-compile support
   block { puts "\n\n=== Restore compiler with cross-compile support ===\n\n" }
   move "#{output_bin}", ".build/crystal"
-
-  make "clean_cache clean", env: env
 
   # x86_64 crystal binary
   block { puts "\n\n=== Building x86_64 binary ===\n\n" }
