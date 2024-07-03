@@ -88,18 +88,19 @@ env["CPPFLAGS"] = env["CPPFLAGS"].gsub("-arch arm64 -arch x86_64", "")
 build do
   crflags = "--no-debug --release"
 
-  # Build for Intel
+  # Build native
   make "bin/shards SHARDS=false CRYSTAL=#{install_dir}/bin/crystal FLAGS='#{crflags}'", env: env
-  move "bin/shards", "bin/shards_x86_64"
+  move "bin/shards", "bin/shards_#{ohai['kernel']['machine']}"
 
   # Clean
   make "clean", env: env
 
-  # Build for ARM64
-  crtarget = "arm64-apple-macosx#{ENV["MACOSX_DEPLOYMENT_TARGET"]}"
-  crflags += " --cross-compile --target #{crtarget}"
+  # Cross-compile for other arch
+  other_machine = ohai['kernel']['machine'] == "x86_64" ? "arm64" : "x86_64"
+  other_target = "#{other_machine}-apple-macosx#{ENV["MACOSX_DEPLOYMENT_TARGET"]}"
+  crflags += " --cross-compile --target #{other_target}"
   make "bin/shards SHARDS=false CRYSTAL=#{install_dir}/bin/crystal FLAGS='#{crflags}'", env: env
-  command "clang bin/shards.o -o bin/shards_arm64 -target #{crtarget} -L#{install_dir}/embedded/lib -lyaml -lpcre2-8 -lgc -lpthread -levent -liconv -ldl", env: env
+  command "clang bin/shards.o -o bin/shards_#{other_machine} -target #{other_target} -L#{install_dir}/embedded/lib -lyaml -lpcre2-8 -lgc -lpthread -levent -liconv -ldl", env: env
 
   # Lipo them up
   command "lipo -create -output bin/shards bin/shards_x86_64 bin/shards_arm64"
