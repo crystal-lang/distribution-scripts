@@ -55,25 +55,29 @@ build do
 
   crflags = "--no-debug"
 
-  copy "#{Dir.pwd}/crystal-#{ohai['os']}-#{ohai['kernel']['machine']}/embedded/bin/crystal", ".build/crystal"
+  copy "#{Dir.pwd}/crystal-#{ohai['os']}-x86_64/embedded/bin/crystal", ".build/crystal"
 
-  # Compile for Intel
-  command "make crystal stats=true release=true FLAGS=\"#{crflags}\" CRYSTAL_CONFIG_LIBRARY_PATH= O=#{output_path}", env: env
-  move output_bin, "#{output_bin}_x86_64"
+  # Compile native
+  native_target = "#{ohai['kernel']['machine']}-apple-macosx#{ENV["MACOSX_DEPLOYMENT_TARGET"]}"
+  make "crystal stats=true release=true FLAGS=\"#{crflags}\" CRYSTAL_CONFIG_TARGET=#{native_target} CRYSTAL_CONFIG_LIBRARY_PATH= O=#{output_path}", env: env
+  move output_bin, "#{output_bin}_#{ohai['kernel']['machine']}"
 
   # Clean up
   make "clean_cache clean", env: env
 
-  # Restore x86_64 compiler w/ cross-compile support
+  # Restore native compiler w/ cross-compile support
   mkdir ".build"
-  copy "#{output_bin}_x86_64", ".build/crystal"
+  copy "#{output_bin}_#{ohai['kernel']['machine']}", ".build/crystal"
+
+  # Cross-compile for other arch
 
   make "deps", env: env
 
-  crtarget = "arm64-apple-macosx#{ENV["MACOSX_DEPLOYMENT_TARGET"]}"
-  make "crystal stats=true release=true target=#{crtarget} FLAGS=\"#{crflags}\" CRYSTAL_CONFIG_TARGET=#{crtarget} CRYSTAL_CONFIG_LIBRARY_PATH= O=#{output_path}", env: env
+  other_machine = ohai['kernel']['machine'] == "x86_64" ? "arm64" : "x86_64"
+  other_target = "#{other_machine}-apple-macosx#{ENV["MACOSX_DEPLOYMENT_TARGET"]}"
+  make "crystal stats=true release=true target=#{other_target} FLAGS=\"#{crflags}\" CRYSTAL_CONFIG_TARGET=#{other_target} CRYSTAL_CONFIG_LIBRARY_PATH= O=#{output_path}", env: env
 
-  command "clang #{output_path}/crystal.o -o #{output_bin}_arm64 -target #{crtarget} src/llvm/ext/llvm_ext.o `llvm-config --libs --system-libs --ldflags 2>/dev/null` -lstdc++ -lpcre2-8 -lgc -lpthread -levent -liconv -ldl -v", env: env
+  command "clang #{output_path}/crystal.o -o #{output_bin}_#{other_machine} -target #{other_target} src/llvm/ext/llvm_ext.o `llvm-config --libs --system-libs --ldflags 2>/dev/null` -lstdc++ -lpcre2-8 -lgc -lpthread -levent -liconv -ldl -v", env: env
   delete "#{output_path}/crystal.o"
 
   # Lipo them up

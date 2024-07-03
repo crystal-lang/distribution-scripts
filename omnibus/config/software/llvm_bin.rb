@@ -18,7 +18,7 @@ else
   raise "llvm_bin not supported"
 end
 
-source url: "http://crystal-lang.s3.amazonaws.com/llvm/llvm-#{version}-#{ohai['os']}-#{ohai['kernel']['machine']}.tar.gz",
+source url: "http://crystal-lang.s3.amazonaws.com/llvm/llvm-#{version}-#{ohai['os']}-x86_64.tar.gz",
        md5: source_md5
 
 relative_path "llvm-#{version}"

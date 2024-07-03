@@ -66,8 +66,8 @@ endif
 	&& export SDKROOT=$(shell xcrun --sdk macosx --show-sdk-path) \
 	&& bundle exec omnibus clean crystal shards \
 	&& bundle exec omnibus build crystal \
-	&& cp ./pkg/$(DARWIN_NAME) $(CURDIR)/$(OUTPUT_DIR)/$(subst x86_64,universal,$(DARWIN_NAME)) \
-	&& cp ./pkg/$(DARWIN_PKG_NAME) $(CURDIR)/$(OUTPUT_DIR)/$(subst x86_64,universal,$(DARWIN_PKG_NAME))
+	&& cp ./pkg/$(DARWIN_NAME) $(CURDIR)/$(OUTPUT_DIR)/$(subst x86_64,universal,$(subst arm64,universal,$(DARWIN_NAME))) \
+	&& cp ./pkg/$(DARWIN_PKG_NAME) $(CURDIR)/$(OUTPUT_DIR)/$(subst x86_64,universal,$(subst arm64,universal,$(DARWIN_PKG_NAME)))
 
 .PHONY: clean
 clean: ## Clean up build directory
