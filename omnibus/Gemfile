@@ -7,3 +7,5 @@ end
 
 gem 'omnibus', github: 'chef/omnibus', ref: '1d97cd9e79a062dfc12f0c047215f3a9e4d65b09'
 gem 'omnibus-software', github: 'chef/omnibus-software', ref: '76b31d11c1fbbc43a4ed1a1990a2662d05b28644'
+
+gem 'ffi-yajl', '>=2.6'
