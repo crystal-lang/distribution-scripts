@@ -2,7 +2,6 @@ omnibus/pkg/
 omnibus/.bundle
 omnibus/bin
 omnibus/crystal-darwin-*
-omnibus/shards-darwin-*
 omnibus/vendor
 
 docs/build/
