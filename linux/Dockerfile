@@ -43,8 +43,7 @@ RUN llvm18-config --version
 
 ARG previous_crystal_release
 ADD ${previous_crystal_release} /tmp/crystal.tar.gz
-# TODO: Update path to new install directory /tmp/crystal/bin after migration period
-ENV PATH=${PATH}:/tmp/crystal/lib/crystal/bin/
+ENV PATH=${PATH}:/tmp/crystal/bin/
 RUN mkdir -p /tmp/crystal \
   && tar xz -f /tmp/crystal.tar.gz -C /tmp/crystal --strip-component=1 \
   && crystal --version \
