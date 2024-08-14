@@ -215,9 +215,7 @@ _install_rpm_key() {
   rpm --verbose --import https://build.opensuse.org/projects/${OBS_PROJECT}/signing_keys/download?kind=gpg
 }
 
-_install_yum() {
-  _install_rpm_key
-
+_add_yum_repo() {
   cat > /etc/yum.repos.d/crystal.repo <<EOF
 [crystal]
 name=Crystal (${DISTRO_REPO})
@@ -227,6 +225,11 @@ gpgcheck=1
 gpgkey=https://download.opensuse.org/repositories/${OBS_PROJECT//:/:\/}/${DISTRO_REPO}/repodata/repomd.xml.key
 enabled=1
 EOF
+}
+
+_install_yum() {
+  _install_rpm_key
+  _add_yum_repo
 
   if [[ "$CRYSTAL_VERSION" == "latest" ]]; then
     yum install -y crystal
@@ -236,8 +239,8 @@ EOF
 }
 
 _install_dnf() {
-  dnf install -y 'dnf-command(config-manager)'
-  dnf config-manager --add-repo https://download.opensuse.org/repositories/${OBS_PROJECT}/$DISTRO_REPO/${OBS_PROJECT}.repo
+  _install_rpm_key
+  _add_yum_repo
 
   if [[ "$CRYSTAL_VERSION" == "latest" ]]; then
     dnf install -y crystal
