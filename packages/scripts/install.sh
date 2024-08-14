@@ -113,17 +113,20 @@ _discover_distro_repo() {
       ;;
     *)
       # If there's no dedicated repository for the distro, try to figure out
-      # if the distro is apt or rpm based and use a default repository.
-      _discover_distro_type
+      # if the distro is apt, dnf or rpm based and use a default repository.
+      _discover_package_manager
 
-      case "$DISTRO_TYPE" in
-      deb)
+      case "$PACKAGE_MANAGER" in
+      apt)
         DISTRO_REPO="Debian_Unstable"
         ;;
-      rpm)
+      dnf)
+        DISTRO_REPO="Fedora_Rawhide"
+        ;;
+      yum)
         DISTRO_REPO="RHEL_7"
         ;;
-      *)
+      unsupported_package_manager)
         _error "Unable to identify distribution type ($ID). You may specify a repository with the environment variable DISTRO_REPO"
         _error "Please, report to https://forum.crystal-lang.org/c/help-support/11"
         exit 1
@@ -132,10 +135,11 @@ _discover_distro_repo() {
   esac
 }
 
-_discover_distro_type() {
-  DISTRO_TYPE=""
-  [[ $(command -v apt-get) ]] && DISTRO_TYPE="deb" && return
-  [[ $(command -v yum) ]]     && DISTRO_TYPE="rpm" && return
+_discover_package_manager() {
+  [[ $(command -v apt-get) ]] && PACKAGE_MANAGER="apt" && return
+  [[ $(command -v dnf) ]]     && PACKAGE_MANAGER="dnf" && return
+  [[ $(command -v yum) ]]     && PACKAGE_MANAGER="yum" && return
+  PACKAGE_MANAGER="unsupported_package_manager"
 }
 
 if [[ $EUID -ne 0 ]]; then
