@@ -15,7 +15,7 @@ Add an issue `Crystal release X.Y.Z` in https://github.com/crystal-lang/distribu
    * (minor) Either no merging of features into `master` or split off release branch for backporting bugfixes.
 4. [ ] Publish release PR draft
    * (minor) It should contain the expected date of the release.
-   * It should be populated with updates to `CHANGELOG.md` and `VERSION`.
+   * It should be populated with updates to `CHANGELOG.md`, `src/VERSION` and the version in `shard.yml`.
 5. [ ] (minor) Ensure documentation for language and compiler changes and other relevant changes is up to date.
    * (minor) [Crystal Book](https://github.com/crystal-lang/crystal-book/)
       * (minor) Update language specification
@@ -117,7 +117,7 @@ Add an issue `Crystal release X.Y.Z` in https://github.com/crystal-lang/distribu
    * Edit `prepare_build` on_osx download package and folder
    * Edit ` .github/workflows/*.yml` to point to docker image
    * Edit `shell.nix` `latestCrystalBinary` using  `nix-prefetch-url --unpack <url>`
-2. [ ] (minor) Increment VERSION file to the next minor and -dev suffix
+2. [ ] (minor) Increment `src/VERSION` and version in `shard.yml` to the next minor plus `-dev` suffix
 3. [ ] (minor) Perform uncomment/todos left in the repo
 4. [ ] Update default base version in test-ecosystem: [`test-ecosystem:scripts/release-update.sh ${VERSION}`](https://github.com/crystal-lang/test-ecosystem/blob/master/scripts/release-update.sh)
 5. [ ] Merge `release/${VERSION%.*}` branch into `master` (if the two have diverged)
