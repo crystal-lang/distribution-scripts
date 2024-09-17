@@ -73,6 +73,12 @@ $(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-alpine-build.tar.gz: $(BUILD_CONTEXT)/al
 	docker build -t $(DOCKER_TAG_ALPINE)-build --target build $(BUILD_ARGS_ALPINE)
 	docker save $(DOCKER_TAG_ALPINE)-build | gzip > $@
 
+alpine-84codes: ## Build and push docker build images based on the base images from 84codes
+	docker buildx build --build-arg crystal_version=$(CRYSTAL_VERSION) -f alpine-84codes.Dockerfile --platform linux/amd64,linux/arm64 --tag crystallang/crystal:$(CRYSTAL_VERSION)-alpine-84codes-build --push .
+
+ubuntu-84codes: ## Build and push docker build images based on the base images from 84codes
+	docker buildx build --build-arg crystal_version=$(CRYSTAL_VERSION) -f ubuntu-84codes.Dockerfile --platform linux/amd64,linux/arm64 --tag crystallang/crystal:$(CRYSTAL_VERSION)-ubuntu-84codes-build --push .
+
 .PHONY: clean
 clean: ## Clean up build and output directories
 	rm -Rf $(OUTPUT_DIR)
