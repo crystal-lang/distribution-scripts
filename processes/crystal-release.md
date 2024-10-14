@@ -4,27 +4,27 @@ Add an issue `Crystal release X.Y.Z` in https://github.com/crystal-lang/distribu
 
 ## Release preparation
 
-1. [ ] (minor) Announce expected release date and time span for feature freeze
+1. [ ] (minor) Announce expected release date (${RELEASE_DATE}) and time span for feature freeze (starting on ${FREEZE_PERIOD})
    * (minor) Feature freeze is about two weeks before release
    * (minor) Set date on milestone
 2. [ ] Prepare the changelog entry: [`crystal:scripts/github-changelog.cr`](https://github.com/crystal-lang/crystal/blob/master/scripts/github-changelog.cr)
    * Ensure that all merged PRs are added to the milestone (check [`is:pr is:merged sort:updated-desc no:milestone`](https://github.com/crystal-lang/crystal/pulls?q=is%3Apr+is%3Amerged+sort%3Aupdated-desc+no%3Amilestone+-label%3Astatus%3Areverted+base%3Amaster+merged%3A%3E%3D2023-01-01)).
    * Ensure that all milestoned PRs are properly labelled (check [`is:pr is:merged sort:updated-desc no:label milestone:${VERSION}`](https://github.com/crystal-lang/crystal/pulls?q=is%3Apr+is%3Amerged+sort%3Aupdated-desc+milestone%3A${VERSION}+no%3Alabel)).
 3. [ ] Start preparing release notes
-3. [ ] (minor) Start feature freeze period
+4. [ ] (minor) Start feature freeze period (on ${FREEZE_PERIOD})
    * (minor) Either no merging of features into `master` or split off release branch for backporting bugfixes.
-4. [ ] Publish release PR draft
+5. [ ] Publish release PR draft
    * (minor) It should contain the expected date of the release.
    * It should be populated with updates to `CHANGELOG.md`, `src/VERSION` and the version in `shard.yml`.
-5. [ ] (minor) Ensure documentation for language and compiler changes and other relevant changes is up to date.
+6. [ ] (minor) Ensure documentation for language and compiler changes and other relevant changes is up to date.
    * (minor) [Crystal Book](https://github.com/crystal-lang/crystal-book/)
       * (minor) Update language specification
       * (minor) Update compiler manual
       * (minor) Add or update guides / tutorials?
-6. [ ] Ensure that [test-ecosystem](https://github.com/crystal-lang/test-ecosystem) functions and succeeeds on master
+7. [ ] Ensure that [test-ecosystem](https://github.com/crystal-lang/test-ecosystem) functions and succeeeds on master
    * Run [*Test Crystal & Shards Workflow*](https://github.com/crystal-lang/test-ecosystem/actions/workflows/test-crystal-shards.yml)
 
-## Release process
+## Release process (on ${RELEASE_DATE})
 
 ### Source release
 

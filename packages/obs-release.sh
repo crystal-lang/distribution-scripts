@@ -56,7 +56,7 @@ sed -i -e "s/^Version: .*/Version: ${VERSION}-1/" *.dsc
 sed -i -e "s/version_suffix .*/version_suffix ${VERSION%.*}/" *.spec
 sed -i -e "s/version_current .*/version_current ${VERSION}/" *.spec
 sed -i -e "s/version_previous .*/version_previous ${previous_version}/" *.spec
-sed -i -e "/%define obsolete_crystal_versioned()/  Obsoletes:      %{1}${previous_version%.*}%{?2:-%{2}} \\\\" *.spec
+sed -i -e "/%define obsolete_crystal_versioned()/ n;iObsoletes:      %{1}${previous_version%.*}%{?2:-%{2}} \\\\" *.spec
 
 sed -i -e "s/^Depends: crystal[^-]*/Depends: crystal${VERSION%.*}/" debian.control
 sed -i -e "s/^Version: .*/Version: ${VERSION%.*}/" debian.control
