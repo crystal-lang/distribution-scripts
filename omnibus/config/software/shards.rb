@@ -1,4 +1,4 @@
-SHARDS_VERSION = "0.18.0"
+SHARDS_VERSION = "0.19.0"
 
 name "shards"
 default_version SHARDS_VERSION
@@ -73,6 +73,10 @@ end
 
 version "0.18.0" do
   source md5: "dbc0f55af7751e2ab231a9a441ff27d4"
+end
+
+version "0.19.0" do
+  source md5: "3546c3a716eda641e629441eb38eac43"
 end
 
 source url: "https://github.com/crystal-lang/shards/archive/v#{version}.tar.gz"
