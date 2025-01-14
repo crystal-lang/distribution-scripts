@@ -21,7 +21,8 @@ Add an issue `Crystal release X.Y.Z` in https://github.com/crystal-lang/distribu
       * (minor) Update language specification
       * (minor) Update compiler manual
       * (minor) Add or update guides / tutorials?
-7. [ ] Ensure that [test-ecosystem](https://github.com/crystal-lang/test-ecosystem) functions and succeeeds on master
+7. [ ] (minor) Look for library updates, check and document compatibility at https://crystal-lang.org/reference/man/required_libraries.html and in lib bindings
+8. [ ] Ensure that [test-ecosystem](https://github.com/crystal-lang/test-ecosystem) functions and succeeds on master
    * Run [*Test Crystal & Shards Workflow*](https://github.com/crystal-lang/test-ecosystem/actions/workflows/test-crystal-shards.yml)
 
 ## Release process (on ${RELEASE_DATE})
@@ -37,9 +38,9 @@ Add an issue `Crystal release X.Y.Z` in https://github.com/crystal-lang/distribu
 4. [ ] Smoke test with [test-ecosystem](https://github.com/crystal-lang/test-ecosystem)
    * Run [*Test Crystal & Shards Workflow*](https://github.com/crystal-lang/test-ecosystem/actions/workflows/test-crystal-shards.yml) with the release branch as `crystal_branch`.
 5. [ ] Merge the release PR
-6. [ ] Make the release and publish it on GitHub: [`../distribution-scripts/processes/scripts/make-crystal-release.sh`](https://github.com/crystal-lang/distribution-scripts/blob/master/processes/scripts/make-crystal-release.sh) (run from `crystallang/crystal@$VERSION` work tree). This performs these steps:
+6. [ ] Make the release and publish it on GitHub: [`../distribution-scripts/processes/scripts/make-crystal-release.sh`](https://github.com/crystal-lang/distribution-scripts/blob/master/processes/scripts/make-crystal-release.sh) (run from `crystallang/crystal@${VERSION}` work tree). This performs these steps:
    1. Tag & annotate the commit with the changelog using `<M.m.p>` pattern as version
-     * `git tag -s -a -m $VERSION $VERSION`
+     * `git tag -s -a -m ${VERSION} ${VERSION}`
      * `git push --tags`
    2. Publish Github release (https://github.com/crystal-lang/crystal/releases/new)
       * Copy the changelog section as description
@@ -51,27 +52,27 @@ Add an issue `Crystal release X.Y.Z` in https://github.com/crystal-lang/distribu
 
 3. Publish build artifacts from CircleCI and GitHub Actions to GitHub release. For `URL_TO_CIRCLECI_ARTIFACT` grab the URL
    of any of the build artifacts in circleCI (doesn't matter which).
-   * [ ] Upload build artifacts from CircleCI: [`../distribution-scripts/processes/scripts/publish-crystal-packages-on-github.sh $URL_TO_CIRCLECI_ARTIFACT`](https://github.com/crystal-lang/distribution-scripts/blob/master/processes/scripts/publish-crystal-packages-on-github.sh) (run from `crystallang/crystal@$VERSION` work tree)
+   * [ ] Upload build artifacts from CircleCI: [`../distribution-scripts/processes/scripts/publish-crystal-packages-on-github.sh $URL_TO_CIRCLECI_ARTIFACT`](https://github.com/crystal-lang/distribution-scripts/blob/master/processes/scripts/publish-crystal-packages-on-github.sh) (run from `crystallang/crystal@${VERSION}` work tree)
       * `crystal-*-darwin-*.tar.gz`
       * `crystal-*-linux-*.tar.gz`
       * `crystal-*.pkg`
       * `crystal-*-docs.tar.gz`
    * [ ] Upload build artifacts from GHA (Windows):
-      * `crystal-release.zip` -> `crystal-$VERSION-windows-x86_64-msvc-unsupported.zip`
-      * `crystal-installer.zip` -> unzip -> `crystal-$VERSION-windows-x86_64-msvc-unsupported.exe`
+      * `crystal-release.zip` -> `crystal-${VERSION}-windows-x86_64-msvc-unsupported.zip`
+      * `crystal-installer.zip` -> unzip -> `crystal-${VERSION}-windows-x86_64-msvc-unsupported.exe`
 4. [ ] Push changes to OBS for building linux packages
    1. Checkout https://github.com/crystal-lang/distribution-scripts and go to [`./packages`](../packages)
    2. Configure build.opensuse.org credentials in environment variables:
       * `export OBS_USER=`
       * `export OBS_PASSWORD=`
-   3. (minor) Update the `crystal` package: [`./obs-release.sh devel:languages:crystal crystal $VERSION`](../packages/obs-release.sh)
+   3. (minor) Update the `crystal` package: [`./obs-release.sh devel:languages:crystal crystal ${VERSION}`](../packages/obs-release.sh)
       * (minor) Uses the docker image `crystallang/osc` to run the CLI client for OBS.
       * (minor) The script creates a branch in you home project, updates the version and pushes it back to OBS.
       * (minor) You can also run the commands from that file manually and check build locally with
          * (minor) `osc build xUbuntu_20.04 x86_64`
          * (minor) `osc build Fedora_Rawhide x86_64`
-   4. (minor) Create the `crystal${VERSION%.*}` package: [`./obs-new-minor.sh devel:languages:crystal crystal${VERSION%.*} $VERSION crystal${OLD_VERSION%.*}`](../packages/obs-new-minor.sh)
-   4. (patch) Update the `crystal${VERSION%.*}` package: [`./obs-release.sh devel:languages:crystal crystal${VERSION%.*} $VERSION`](../packages/obs-release.sh)
+   4. (minor) Create the `crystal${VERSION%.*}` package: [`./obs-new-minor.sh devel:languages:crystal crystal${VERSION%.*} ${VERSION} crystal${OLD_VERSION%.*}`](../packages/obs-new-minor.sh)
+   4. (patch) Update the `crystal${VERSION%.*}` package: [`./obs-release.sh devel:languages:crystal crystal${VERSION%.*} ${VERSION}`](../packages/obs-release.sh)
    5. Now OBS builds the packages. It’s best to follow the build status in the browser:
       1. `open https://build.opensuse.org/project/show/home:$OBS_USER:branches:devel:langauges:crystal/crystal`
       1. Wait for all package build jobs to finish and succeed
@@ -82,14 +83,8 @@ Add an issue `Crystal release X.Y.Z` in https://github.com/crystal-lang/distribu
    * Versioned docker images have been pushed to dockerhub.
    * Now just assign the `latest` tags:
    * `./docker/apply-latest-tags.sh ${VERSION}`
-6. [ ] Publish snap package (you can use the docker image `snapcore/snapcraft` for running the following commands)
-   1. `docker run --pull=always --rm -it snapcore/snapcraft`
-   1. You need to logged in via `snapcraft login`
-   2. Recent tagged release is published directly to edge channel. The CI logs the snap revision number. Otherwise the .snap file is in the artifacts.
-   3. Check the current status to find the revision of the tagged release otherwise:
-   4. `snapcraft status crystal`
-   5. `snapcraft release crystal <revision-number> beta`
-   6. `snapcraft release crystal <revision-number> stable`
+6. [ ] Publish snap package
+   - On https://snapcraft.io/crystal/releases promote the `latest/edge` release to `latest/beta` and then `latest/stable`
 7. [ ] Check PR for homebrew: https://github.com/Homebrew/homebrew-core/pulls?q=is%3Apr+crystal+sort%3Aupdated-desc
    * It should've been automatically created
 

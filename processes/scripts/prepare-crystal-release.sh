@@ -37,17 +37,22 @@ case $VERSION in
   ;;
 esac
 
+if [ $# -lt 2 ]; then
+  printf "Scheduled release date: "
+  read RELEASE_DATE
+else
+  RELEASE_DATE=$2
+fi
+
 if [ "$TYPE" != "patch" ]; then
   if [ $# -lt 3 ]; then
-    printf "Scheduled release date: "
-    read RELEASE_DATE
-
     printf "Freeze period begin: "
     read FREEZE_PERIOD
   else
-    RELEASE_DATE=$2
     FREEZE_PERIOD=$3
   fi
+else
+  FREEZE_PERIOD=""
 fi
 
 dist_scripts_root=$(dirname $(dirname $(dirname $(realpath $0))))
