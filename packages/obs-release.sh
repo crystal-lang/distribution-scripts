@@ -74,6 +74,8 @@ fi
 
 sed -i -e "s/^Depends: crystal[^-]*/Depends: crystal${VERSION%.*}/" debian.control
 
+sed -i -r -e "s/((Provides|Conflicts|Replaces): .*) \((=|<<).*\)/\\1 (${VERSION%.*})/" debian.control
+
 # Commit changes to OBS
 message="Release $VERSION"
 osc vc -m "$message"
