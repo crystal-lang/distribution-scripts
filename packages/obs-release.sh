@@ -50,16 +50,29 @@ fi
 
 previous_version=$(grep -o -P '(?<=version_current ).*' crystal.spec)
 
-# Update version in *.dsc and *.spec
-sed -i -e "s/^Version: .*/Version: ${VERSION}-1/" *.dsc
+if [ "$PACKAGE" != "crystal"  ]; then
+  sed -i -e "s/^Version:.*/Version: ${VERSION}/" *.spec
+fi
 
-sed -i -e "s/version_suffix .*/version_suffix ${VERSION%.*}/" *.spec
-sed -i -e "s/version_current .*/version_current ${VERSION}/" *.spec
-sed -i -e "s/version_previous .*/version_previous ${previous_version}/" *.spec
-sed -i -e "/%define obsolete_crystal_versioned()/ n;iObsoletes:      %{1}${previous_version%.*}%{?2:-%{2}} \\\\" *.spec
+sed -i -e "s/^Version:.*/Version: ${VERSION}-1/" *.dsc
+sed -i -e "s/^Version: .*/Version: ${VERSION%.*}/" debian.control
+sed -i -e "s/^export VERSION=.*/export VERSION=${VERSION}/" debian.rules
+
+sed -i -e "s/^export PACKAGE_ITERATION=.*/export PACKAGE_ITERATION=1/" debian.rules
+sed -i -e "s/^%global package_iteration .*/%global package_iteration 1/" *.spec
+
+if [ "$PACKAGE" == "crystal"  ]; then
+  previous_version=$(grep -o -P '(?<=version_current ).*' crystal.spec)
+
+  sed -i -e "s/version_suffix .*/version_suffix ${VERSION%.*}/" *.spec
+  sed -i -e "s/version_current .*/version_current ${VERSION}/" *.spec
+  sed -i -e "s/version_previous .*/version_previous ${previous_version}/" *.spec
+  sed -i -e "/%define obsolete_crystal_versioned/a Obsoletes:      %{1}${previous_version%.*}%{?2:-%{2}} \\\\" *.spec
+else
+  sed -i -e "s/^DEBTRANSFORM-TAR: .*/DEBTRANSFORM-TAR: ${VERSION}.tar.gz/" *.dsc
+fi
 
 sed -i -e "s/^Depends: crystal[^-]*/Depends: crystal${VERSION%.*}/" debian.control
-sed -i -e "s/^Version: .*/Version: ${VERSION%.*}/" debian.control
 
 # Commit changes to OBS
 message="Release $VERSION"
