@@ -21,7 +21,8 @@ Add an issue `Crystal release X.Y.Z` in https://github.com/crystal-lang/distribu
       * (minor) Update language specification
       * (minor) Update compiler manual
       * (minor) Add or update guides / tutorials?
-7. [ ] Ensure that [test-ecosystem](https://github.com/crystal-lang/test-ecosystem) functions and succeeeds on master
+7. [ ] (minor) Look for library updates, check and document compatibility at https://crystal-lang.org/reference/man/required_libraries.html and in lib bindings
+8. [ ] Ensure that [test-ecosystem](https://github.com/crystal-lang/test-ecosystem) functions and succeeds on master
    * Run [*Test Crystal & Shards Workflow*](https://github.com/crystal-lang/test-ecosystem/actions/workflows/test-crystal-shards.yml)
 
 ## Release process (on ${RELEASE_DATE})
@@ -82,14 +83,8 @@ Add an issue `Crystal release X.Y.Z` in https://github.com/crystal-lang/distribu
    * Versioned docker images have been pushed to dockerhub.
    * Now just assign the `latest` tags:
    * `./docker/apply-latest-tags.sh ${VERSION}`
-6. [ ] Publish snap package (you can use the docker image `snapcore/snapcraft` for running the following commands)
-   1. `docker run --pull=always --rm -it snapcore/snapcraft`
-   1. You need to logged in via `snapcraft login`
-   2. Recent tagged release is published directly to edge channel. The CI logs the snap revision number. Otherwise the .snap file is in the artifacts.
-   3. Check the current status to find the revision of the tagged release otherwise:
-   4. `snapcraft status crystal`
-   5. `snapcraft release crystal <revision-number> beta`
-   6. `snapcraft release crystal <revision-number> stable`
+6. [ ] Publish snap package
+   - On https://snapcraft.io/crystal/releases promote the `latest/edge` release to `latest/beta` and then `latest/stable`
 7. [ ] Check PR for homebrew: https://github.com/Homebrew/homebrew-core/pulls?q=is%3Apr+crystal+sort%3Aupdated-desc
    * It should've been automatically created
 
