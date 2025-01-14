@@ -60,7 +60,8 @@ RUN git clone ${crystal_repo} \
  \
  && make crystal stats=true static=true ${release:+release=true} \
                  CRYSTAL_CONFIG_TARGET=${gnu_target} \
- && ([ "$(ldd .build/crystal 2>&1 | wc -l)" -eq "1" ] || { echo './build/crystal is not statically linked'; ldd .build/crystal; exit 1; })
+ && ( (readelf --program-headers .build/crystal | grep -q "Elf file type is EXEC") || { echo 'crystal is not statically linked'; exit 1; }) \
+ && .build/crystal --version
 
 # Build shards
 ARG shards_version
@@ -71,7 +72,9 @@ RUN git clone https://github.com/crystal-lang/shards \
  && make SHARDS=false CRYSTAL=/crystal/bin/crystal \
          FLAGS="--stats --target ${musl_target} --static ${release:+--release}" \
  \
- && ([ "$(ldd bin/shards 2>&1 | wc -l)" -eq "1" ] || { echo 'shards is not statically linked'; ldd bin/shards; exit 1; })
+ && bin/shards --version \
+ && ( (readelf --program-headers bin/shards | grep -q "Elf file type is EXEC") || { echo 'shards is not statically linked'; exit 1; }) \
+ && readelf --program-headers bin/shards
 
 COPY --from=bdwgc /bdwgc/.libs/libgc.a /libgc-debian.a
 
