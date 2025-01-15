@@ -13,28 +13,15 @@ RUN curl -L https://github.com/PCRE2Project/pcre2/releases/download/pcre2-${libp
  && ./configure --disable-shared --disable-cpp --enable-jit --enable-utf --enable-unicode-properties \
  && make -j$(nproc)
 
-# build libevent
-
-FROM debian AS libevent
-ARG libevent_version
-RUN git clone https://github.com/libevent/libevent \
- && cd libevent \
- && git checkout ${libevent_version} \
- && ./autogen.sh \
- && ./configure --disable-shared --disable-openssl \
- && make -j$(nproc)
-
 FROM debian
 ARG crystal_version
 ARG package_iteration
 ARG libpcre2_version
-ARG libevent_version
 
 RUN mkdir -p /output/lib/crystal/lib/
 
 # Copy libraries
 COPY --from=libpcre2 pcre2-${libpcre2_version}/.libs/libpcre2-8.a /output/lib/crystal/
-COPY --from=libevent libevent/.libs/libevent.a libevent/.libs/libevent_pthreads.a /output/lib/crystal/
 
 # Create tarball
 RUN mv /output /crystal-${crystal_version}-${package_iteration} \
