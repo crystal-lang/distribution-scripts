@@ -25,7 +25,7 @@ RUN apk add --no-cache \
       # Statically-compiled llvm
       llvm${llvm_version}-dev llvm${llvm_version}-static \
       # Static stdlib dependencies
-      gc-dev gc-static zlib-static yaml-static libxml2-static pcre2-dev pcre2-static libevent-static zstd-static \
+      gc-dev gc-static zlib-static yaml-static libxml2-static pcre2-dev pcre2-static zstd-static \
       # Static compiler dependencies
       libffi-dev \
       # Build tools
