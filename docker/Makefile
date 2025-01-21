@@ -8,7 +8,6 @@
 ##   $ make alpine DOCKER_TAG=nightly CRYSTAL_VERSION=0.xy.z CRYSTAL_TARGZ=...
 
 CRYSTAL_VERSION ?=   ## How the binaries should be branded
-CRYSTAL_DEB ?=       ## Which crystal.deb file to install in debian based docker images (ubuntu32)
 CRYSTAL_TARGZ ?=     ## Which crystal.tar.gz file to install in docker images (ubuntu64, alpine)
 
 DOCKER_TAG ?= $(CRYSTAL_VERSION)## How to tag the docker image (examples: `0.27.2`, `nightly20190307`). `-build` will be appended for build images.
@@ -43,10 +42,6 @@ $(BUILD_CONTEXT)/ubuntu64: ubuntu.Dockerfile $(BUILD_CONTEXT)/ubuntu64/crystal.t
 $(BUILD_CONTEXT)/alpine: alpine.Dockerfile $(BUILD_CONTEXT)/alpine/crystal.tar.gz
 	cp alpine.Dockerfile $@/Dockerfile
 	mkdir $@/files/
-
-%/crystal.deb:
-	mkdir -p $(shell dirname $@)
-	cp $(CRYSTAL_DEB) $@
 
 %/crystal.tar.gz:
 	mkdir -p $(shell dirname $@)
