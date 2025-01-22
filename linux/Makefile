@@ -29,7 +29,7 @@ LIBEVENT_VERSION = release-2.1.12-stable
 OUTPUT_DIR = build
 OUTPUT_BASENAME64 = $(OUTPUT_DIR)/crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION)-linux-x86_64
 
-DOCKER_BUILD_ARGS = $(if $(no_cache),--no-cache )$(if $(pull_images),--pull )
+DOCKER_BUILD_ARGS = $(if $(no_cache),--no-cache )$(if $(pull_images),--pull ) --progress=plain
 
 BUILD_ARGS_COMMON = $(DOCKER_BUILD_ARGS) \
                     $(if $(release),--build-arg release=true) \
