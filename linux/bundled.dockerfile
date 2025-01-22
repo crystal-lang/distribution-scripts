@@ -39,4 +39,4 @@ COPY --from=libevent libevent/.libs/libevent.a libevent/.libs/libevent_pthreads.
 # Create tarball
 RUN mv /output /crystal-${crystal_version}-${package_iteration} \
  && mkdir /output \
- && tar -cvf /output/bundled-libs.tar /crystal-${crystal_version}-${package_iteration}
+ && tar -cf /output/bundled-libs.tar /crystal-${crystal_version}-${package_iteration}
