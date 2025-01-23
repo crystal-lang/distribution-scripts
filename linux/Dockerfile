@@ -94,4 +94,4 @@ RUN \
  # Create tarball
  && mv /output /crystal-${crystal_version}-${package_iteration} \
  && mkdir /output \
- && tar -cvf /output/crystal-${crystal_version}-${package_iteration}.tar /crystal-${crystal_version}-${package_iteration}
+ && tar -cf /output/crystal-${crystal_version}-${package_iteration}.tar /crystal-${crystal_version}-${package_iteration}
