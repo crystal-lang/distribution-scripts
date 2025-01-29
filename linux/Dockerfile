@@ -73,8 +73,7 @@ RUN git clone https://github.com/crystal-lang/shards \
          FLAGS="--stats --target ${musl_target} --static ${release:+--release}" \
  \
  && bin/shards --version \
- && ( (readelf --program-headers bin/shards | grep -q "Elf file type is EXEC") || { echo 'shards is not statically linked'; exit 1; }) \
- && readelf --program-headers bin/shards
+ && ( (readelf --program-headers bin/shards | grep -q "Elf file type is EXEC") || { echo 'shards is not statically linked'; exit 1; })
 
 COPY --from=bdwgc /bdwgc/.libs/libgc.a /libgc-debian.a
 
