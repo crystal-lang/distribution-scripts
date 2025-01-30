@@ -69,6 +69,9 @@ ARG musl_target
 RUN git clone https://github.com/crystal-lang/shards \
  && cd shards \
  && git checkout ${shards_version} \
+ # FIXME: This is a workaround for shards' Makefile not touching `shard.lock`
+ # when SHARDS=false
+ && touch shard.lock \
  && make SHARDS=false CRYSTAL=/crystal/bin/crystal \
          FLAGS="--stats --target ${musl_target} --static ${release:+--release}" \
  \
