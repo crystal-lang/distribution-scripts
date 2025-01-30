@@ -69,12 +69,14 @@ ARG musl_target
 RUN git clone https://github.com/crystal-lang/shards \
  && cd shards \
  && git checkout ${shards_version} \
+ # FIXME: This is a workaround for shards' Makefile not touching `shard.lock`
+ # when SHARDS=false
+ && touch shard.lock \
  && make SHARDS=false CRYSTAL=/crystal/bin/crystal \
          FLAGS="--stats --target ${musl_target} --static ${release:+--release}" \
  \
  && bin/shards --version \
- && ( (readelf --program-headers bin/shards | grep -q "Elf file type is EXEC") || { echo 'shards is not statically linked'; exit 1; }) \
- && readelf --program-headers bin/shards
+ && ( (readelf --program-headers bin/shards | grep -q "Elf file type is EXEC") || { echo 'shards is not statically linked'; exit 1; })
 
 COPY --from=bdwgc /bdwgc/.libs/libgc.a /libgc-debian.a
 
