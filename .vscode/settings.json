@@ -1,0 +1,13 @@
+{
+    "workbench.editor.enablePreviewFromCodeNavigation": true,
+    "workbench.editor.enablePreviewFromQuickOpen": true,
+    "git.branchWhitespaceChar": "",
+    "git.closeDiffOnOperation": true,
+    "git.mergeEditor": true,
+    "git.pullBeforeCheckout": true,
+    "git.supportCancellation": true,
+    "git.terminalGitEditor": true,
+    "git.useCommitInputAsStashMessage": true,
+    "window.density.editorTabHeight": "compact",
+    "workbench.editor.showTabs": "single"
+}
