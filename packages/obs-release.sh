@@ -48,8 +48,6 @@ else
   pushd "${LOCAL_BRANCH_FOLDER}"
 fi
 
-previous_version=$(grep -o -P '(?<=version_current ).*' crystal.spec)
-
 if [ "$PACKAGE" != "crystal"  ]; then
   sed -i -e "s/^Version:.*/Version: ${VERSION}/" *.spec
 fi
@@ -74,7 +72,7 @@ fi
 
 sed -i -e "s/^Depends: crystal[^-]*/Depends: crystal${VERSION%.*}/" debian.control
 
-sed -i -r -e "s/((Provides|Conflicts|Replaces): .*) \((=|<<).*\)/\\1 (${VERSION%.*})/" debian.control
+sed -i -r -e "s/((Provides|Conflicts|Replaces): .* \((=|<<)).*\)/\\1 ${VERSION%.*})/" debian.control
 
 # Commit changes to OBS
 message="Release $VERSION"
