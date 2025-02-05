@@ -58,8 +58,9 @@ Add an issue `Crystal release X.Y.Z` in https://github.com/crystal-lang/distribu
       * `crystal-*.pkg`
       * `crystal-*-docs.tar.gz`
    * [ ] Upload build artifacts from GHA (Windows):
-      * `crystal-release.zip` -> `crystal-${VERSION}-windows-x86_64-msvc-unsupported.zip`
-      * `crystal-installer.zip` -> unzip -> `crystal-${VERSION}-windows-x86_64-msvc-unsupported.exe`
+      * Windows CI: `crystal-release.zip` -> `crystal-${VERSION}-windows-x86_64-msvc-unsupported.zip`
+      * Windows CI: `crystal-installer.zip` -> unzip -> `crystal-${VERSION}-windows-x86_64-msvc-unsupported.exe`
+      * MinGW-w64 CI: `x86_64-mingw-w64-crystal.zip` -> `crystal-${VERSION}-windows-x86_64-gnu-unsupported.zip`
 4. [ ] Push changes to OBS for building linux packages
    1. Checkout https://github.com/crystal-lang/distribution-scripts and go to [`./packages`](../packages)
    2. Configure build.opensuse.org credentials in environment variables:
