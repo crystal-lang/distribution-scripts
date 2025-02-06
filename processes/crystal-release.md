@@ -118,8 +118,27 @@ Add an issue `Crystal release X.Y.Z` in https://github.com/crystal-lang/distribu
 4. [ ] Update default base version in test-ecosystem: [`test-ecosystem:scripts/release-update.sh ${VERSION}`](https://github.com/crystal-lang/test-ecosystem/blob/master/scripts/release-update.sh)
 5. [ ] Merge `release/${VERSION%.*}` branch into `master` (if the two have diverged)
   - This needs to be a *merge commit*. Those are disabled in the GitHub UI.
-  - `git switch master && git pull && git merge release/${VERSION%.*}; git checkout master src/VERSION && git add src/VERSION && git commit`
-  - Double check merge commit history is as expected
-  - `git push` (GitHub branch protection rules normally prevent direct pushes to
+  - Create branch and PR:
+    ```sh
+    git fetch upstream release/${VERSION%.*} master
+    git switch -c merge/${VERSION} upstream/master
+    git merge upstream/release/${VERSION%.*}
+    # resolve conflicts
+    git commit -m 'Merge `release/${VERSION%.*}` into master'
+    git log --graph --decorate --pretty=oneline --abbrev-commit
+    git push -u upstream merge/${VERSION}
+    gh pr create --title 'Merge `release/${VERSION%.*}` into master' --label 'topic:infrastructure'
+    ```
+  - Merge PR **locally**:
+    ```sh
+    git switch master
+    git merge --ff-only merge/${VERSION}
+    # double check history
+    git log --graph --decorate --pretty=oneline --abbrev-commit
+    git push
+    ```
+  - GitHub branch protection rules normally prevent direct pushes to
     `master`. This needs to be deactivated for this purpose, which can be on a
-    per-user basis.)
+    per-user basis.
+  - In case master has diverged, `--ff-only` merge will fail. Then you can
+    first rebase `merge/${VERSION}` on current master with `git rebase master --rebase-merges`.
