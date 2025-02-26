@@ -34,11 +34,12 @@ Add an issue `Shards release ${VERSION}` in https://github.com/crystal-lang/dist
 ## Post-release
 
 1. [ ] (minor) Increment VERSION file to the next minor and -dev suffix
-2. [ ] Update distribution-scripts (*Helper script: [`scripts/update-shards.sh`](https://github.com/crystal-lang/distribution-scripts/blob/master/scripts/prepare-shards-release.sh)*)
+2. [ ] Update distribution-scripts (*Helper script: [`scripts/update-shards.sh`](https://github.com/crystal-lang/distribution-scripts/blob/master/scripts/update-shards.sh)*)
    * Edit [linux/Makefile](../linux/Makefile)
    * Edit [omnibus/config/software/shards.rb](../omnibus/config/software/shards.rb)
-3. [ ] Update https://github.com/crystal-lang/crystal
+3. [ ] Update https://github.com/crystal-lang/crystal (*Helper script: [`scripts/update-shards.sh`](https://github.com/crystal-lang/crystal/blob/master/scripts/update-shards.sh)*)
    * Edit [`.github/workflows/win_build_portable.yml`](https://github.com/crystal-lang/crystal/blob/master/.github/workflows/win_build_portable.yml)
+   * Edit [`.github/workflows/mingw-w64.yml`](https://github.com/crystal-lang/crystal/blob/master/.github/workflows/mingw-w64.yml)
 3. [ ] Submit a PR to update the homebrew formula in https://github.com/Homebrew/homebrew-core/blob/master/Formula/crystal.rb . Or do it on Crystal release.
 4. [ ] Update default base version in test-ecosystem
 6. [ ] (minor) Perform uncomment/todos left in the repo
