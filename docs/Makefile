@@ -50,8 +50,8 @@ dist-docs_versions: $(OUTPUT_DIR)/versions-$(CRYSTAL_VERSION).json ## Update `/v
 
 $(OUTPUT_DIR)/versions-$(CRYSTAL_VERSION).json: $(OUTPUT_DIR)/$(OUTPUT_DOCS_BASE_NAME).tar.gz
 
-.PHONY: cloudfront-redirect_latest
-cloudfront-redirect_latest: $(OUTPUT_DIR)/aws-cloudfront-redirect.js ## Apply redirect from `api/latest` to `api/$(CRYSTAL_VERSION)` in CloudFront (needs to be manually applied)
+.PHONY: dist-redirect_latest
+dist-redirect_latest: $(OUTPUT_DIR)/aws-cloudfront-redirect.js ## Apply redirect from `api/latest` to `api/$(CRYSTAL_VERSION)` in CloudFront (needs to be manually applied)
 	$(AWS_CLI) cloudfront update-function --name crystal-api-docs-redirects --if-match "$$($(AWS_CLI) cloudfront describe-function --name crystal-api-docs-redirects --output text --query 'ETag')" --function-config '{"Runtime":"cloudfront-js-2.0","Comment":"Redirects for Crystal API docs $(CRYSTAL_VERSION)"}' --function-code "$(shell base64 -i $(OUTPUT_DIR)/aws-cloudfront-redirect.js)"
 
 .PHONY: $(OUTPUT_DIR)/aws-cloudfront-redirect.js
