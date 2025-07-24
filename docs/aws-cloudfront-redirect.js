@@ -7,6 +7,8 @@ function redirect(path) {
   }
 }
 
+const LATEST_INDEX_REDIRECTION_PATHS = [ '/api', '/api/', '/api/index.html', '/api/latest']
+
 function handler(event) {
   if (event.response.statusCode != 404) {
     // We'll only handle some 404 errors
@@ -15,7 +17,7 @@ function handler(event) {
 
   var requestPath = event.request.uri
 
-  if(requestPath == '/api' || requestPath == '/api/') {
+  if(LATEST_INDEX_REDIRECTION_PATHS.includes(requestPath)) {
     return redirect('/api/${CRYSTAL_VERSION}/')
   }
 
