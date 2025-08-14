@@ -29,7 +29,7 @@ $(OUTPUT_DIR):
 clean: ## Clean up build directory
 	rm -Rf $(OUTPUT_DIR)
 
-.PHONE: publish_docs
+.PHONY: publish_docs
 publish_docs: dist-docs dist-docs_versions ## Publish API docs to S3
 
 .PHONY: dist-docs
