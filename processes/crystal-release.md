@@ -95,6 +95,7 @@ Add an issue `Crystal release X.Y.Z` in https://github.com/crystal-lang/distribu
    1. Have `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` env variables defined
       * Keys can be generated at https://console.aws.amazon.com/iam/home#/security_credentials (contact a Manas admin if you don't have access).
    2. Run `make -C docs publish_docs dist-redirect_latest CRYSTAL_VERSION=${VERSION}` to publish docs to `api/${VERSION}` and apply redirect from `api/latest` to `api/${VERSION}`
+   3. Update API docs' 404 page to add `<base href="/api/${VERSION}/" />` in the `<head>`
 2. [ ] (minor) Publish Crystal book
    1. (minor) Create `release/${VERSION%.*}` branch and push it to `crystal-lang/crystal-book` (deployment happens automatically in GHA)
    3. (minor) Verify that deployment was successfull
