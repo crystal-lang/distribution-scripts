@@ -25,14 +25,14 @@ step "Tag master commit as version ${VERSION}" git tag -s -a -m $VERSION $VERSIO
 
 git show
 
-step "Push tag to GitHub" git push --tags
+step "Push tag to GitHub" git push upstream --tags
 
-sed -E '7,/^## /!d' CHANGELOG.md | sed '$d' | sed -Ez 's/^\n+//; s/\n+$/\n/g' > CHANGELOG.$VERSION.md
+sed -E '7,/^## /!d' CHANGELOG.md | sed '$d' | sed -E 's/^\n+//; s/\n+$/\n/g' > CHANGELOG.$VERSION.md
 
 echo "$ more CHANGELOG.$VERSION.md"
 more CHANGELOG.$VERSION.md
 
-step "Create GitHub release" gh release -R crystal-lang/crystal create $VERSION --title $VERSION --notes-file CHANGELOG.$VERSION.md
+step "Create GitHub release" gh release -R crystal-lang/crystal create $VERSION --draft --title $VERSION --notes-file CHANGELOG.$VERSION.md
 
 rm CHANGELOG.$VERSION.md
 
