@@ -50,14 +50,22 @@ dist-docs_versions: $(OUTPUT_DIR)/versions-$(CRYSTAL_VERSION).json ## Update `/v
 
 $(OUTPUT_DIR)/versions-$(CRYSTAL_VERSION).json: $(OUTPUT_DIR)/$(OUTPUT_DOCS_BASE_NAME).tar.gz
 
-.PHONY: dist-redirect_latest
-dist-redirect_latest: MATCH_CURRENT_ETAG = --name crystal-api-docs-redirects --if-match "$$($(AWS_CLI) cloudfront describe-function --name crystal-api-docs-redirects --output text --query 'ETag')"
-dist-redirect_latest: $(OUTPUT_DIR)/aws-cloudfront-redirect.js ## Apply redirect from `api/latest` to `api/$(CRYSTAL_VERSION)` in CloudFront (needs to be manually applied)
+.PHONY: release_latest_docs
+release_latest_docs: MATCH_CURRENT_ETAG = --name crystal-api-docs-redirects --if-match "$$($(AWS_CLI) cloudfront describe-function --name crystal-api-docs-redirects --output text --query 'ETag')"
+release_latest_docs: $(OUTPUT_DIR)/aws-cloudfront-redirect.js $(OUTPUT_DIR)/aws-config.json ## Redirect `api/latest` in CloudFront, and set the 404 page (needs to be manually applied)
 	$(AWS_CLI) cloudfront update-function $(MATCH_CURRENT_ETAG) --function-config '{"Runtime":"cloudfront-js-2.0","Comment":"Redirects for Crystal API docs $(CRYSTAL_VERSION)"}' --function-code "$(shell base64 -i $(OUTPUT_DIR)/aws-cloudfront-redirect.js)"
 	$(AWS_CLI) cloudfront publish-function $(MATCH_CURRENT_ETAG)
+	$(AWS_CLI) s3api put-bucket-website --bucket "$(AWS_BUCKET)" --website-configuration "file://$<"
 
 .PHONY: $(OUTPUT_DIR)/aws-cloudfront-redirect.js
 $(OUTPUT_DIR)/aws-cloudfront-redirect.js: aws-cloudfront-redirect.js $(OUTPUT_DIR)
+
+.PHONY: get-website-configuration
+get-website-configuration: ## Pull website configuration from S3 bucket (run as `make pull-website-configuration -s > aws-config.json`)
+	$(AWS_CLI) s3api get-bucket-website --bucket "$(AWS_BUCKET)"
+
+.PHONY: $(OUTPUT_DIR)/aws-config.json
+$(OUTPUT_DIR)/aws-config.json: aws-config.json $(OUTPUT_DIR)
 	sed 's/$${CRYSTAL_VERSION}/$(CRYSTAL_VERSION)/g' "$<" > $@
 
 .PHONY: help

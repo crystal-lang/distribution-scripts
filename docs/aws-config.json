@@ -1,0 +1,10 @@
+{
+    "IndexDocument": {
+        "Suffix": "index.html"
+    },
+    "ErrorDocument": {
+        "Key": "api/${CRYSTAL_VERSION}/404.html"
+    },
+    "RoutingRules": [
+    ]
+}
