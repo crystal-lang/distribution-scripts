@@ -75,7 +75,7 @@ IFS='.' read -r major minor patch <<< "$VERSION"
 ((minor--))
 OLD_VERSION="$major.$minor.$patch"
 
-body=$(echo "$body" | sed -E "s/\\$\{RELEASE_DATE\}/$RELEASE_DATE/g; s/\\$\{FREEZE_PERIOD\}/$FREEZE_PERIOD/g; s/\\$\{VERSION\}/$VERSION/g; s/\\$\{VERSION%\.\*\}/${VERSION%.*}/g s/\\$\{OLD_VERSION%\.\*\}/${OLD_VERSION%.*}")
+body=$(echo "$body" | sed -E "s/\\$\{RELEASE_DATE\}/$RELEASE_DATE/g; s/\\$\{FREEZE_PERIOD\}/$FREEZE_PERIOD/g; s/\\$\{VERSION\}/$VERSION/g; s/\\$\{VERSION%\.\*\}/${VERSION%.*}/g; s/\\$\{OLD_VERSION%\.\*\}/${OLD_VERSION%.*}/g")
 
 body=$(printf "%q" "$body")
 step "Create tracking issue in crystal-lang/distribution-scripts" gh issue create -R crystal-lang/distribution-scripts --body "$body" --label "release" --title \"Release Crystal $VERSION\"
