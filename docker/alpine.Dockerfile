@@ -1,12 +1,13 @@
-ARG base_docker_image=alpine:3.20
+ARG base_docker_image=alpine:3.22
 FROM ${base_docker_image} as runtime
+ARG llvm_version=20
 
 RUN \
   apk add --update --no-cache --force-overwrite \
     # core dependencies
-    gcc gmp-dev libevent-static musl-dev pcre-dev pcre2-dev \
+    gcc gmp-dev libevent-static musl-dev pcre-dev pcre2-dev pcre2-static \
     # stdlib dependencies
-    gc-dev libxml2-dev libxml2-static openssl-dev openssl-libs-static tzdata yaml-static zlib-static xz-static \
+    gc-dev gc-static libxml2-dev libxml2-static openssl-dev openssl-libs-static tzdata yaml-static zlib-static xz-static \
     # dev tools
     make git
 
@@ -26,6 +27,7 @@ FROM runtime as build
 
 RUN \
   apk add --update --no-cache --force-overwrite \
-    llvm18-dev llvm18-static g++ libffi-dev
+    llvm${llvm_version}-dev llvm${llvm_version}-static \
+    g++ libffi-dev
 
 CMD ["/bin/sh"]
