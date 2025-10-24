@@ -59,6 +59,7 @@ release_latest_docs: $(OUTPUT_DIR)/aws-cloudfront-redirect.js $(OUTPUT_DIR)/aws-
 
 .PHONY: $(OUTPUT_DIR)/aws-cloudfront-redirect.js
 $(OUTPUT_DIR)/aws-cloudfront-redirect.js: aws-cloudfront-redirect.js $(OUTPUT_DIR)
+	sed 's/$${CRYSTAL_VERSION}/$(CRYSTAL_VERSION)/g' "$<" > $@
 
 .PHONY: get-website-configuration
 get-website-configuration: ## Pull website configuration from S3 bucket (run as `make pull-website-configuration -s > aws-config.json`)
