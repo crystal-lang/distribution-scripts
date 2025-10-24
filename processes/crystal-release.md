@@ -3,7 +3,7 @@
 Add an issue `Crystal release X.Y.Z` in
 https://github.com/crystal-lang/distribution-scripts/issues with a copy of this
 document. In this way it's easy to track the progress of the release (*Helper:
-(`distribttion-scripts`)
+(`distribution-scripts`)
 [`scripts/prepare-crystal-release.sh`](./scripts/prepare-crystal-release.sh)*)
 
 ## Release preparation
@@ -14,6 +14,7 @@ document. In this way it's easy to track the progress of the release (*Helper:
 3. [ ] Prepare the changelog entry: (`crystal`) [`scripts/update-changelog.cr ${VERSION}`](https://github.com/crystal-lang/crystal/blob/master/scripts/update-changelog.cr)
    * Ensure that all merged PRs are added to the milestone (check [`is:pr is:merged sort:updated-desc no:milestone`](https://github.com/crystal-lang/crystal/pulls?q=is%3Apr+is%3Amerged+sort%3Aupdated-desc+no%3Amilestone+-label%3Astatus%3Areverted+base%3Amaster+merged%3A%3E%3D2023-01-01)).
    * Ensure that all milestoned PRs are properly labelled (check [`is:pr is:merged sort:updated-desc no:label milestone:${VERSION}`](https://github.com/crystal-lang/crystal/pulls?q=is%3Apr+is%3Amerged+sort%3Aupdated-desc+milestone%3A${VERSION}+no%3Alabel)).
+   * Ensure the milestone has `Due date` set.
 4. [ ] Start preparing release notes, publish draft in [`crystal-lang/crystal-website`](https://github.com/crystal-lang/crystal-website/)
 5. [ ] (minor) Start feature freeze period (on ${FREEZE_PERIOD})
    * (minor) Either no merging of features into `master` or split off release branch for backporting bugfixes.
