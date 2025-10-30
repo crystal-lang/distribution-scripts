@@ -15,7 +15,7 @@
 #
 
 name "libffi"
-default_version "3.4.2"
+default_version "3.4.8"
 
 license "MIT"
 license_file "LICENSE"
@@ -23,7 +23,7 @@ skip_transitive_dependency_licensing true
 
 # version_list: url=https://github.com/libffi/libffi/releases filter=*.tar.gz
 
-version("3.4.2") { source sha256: "540fb721619a6aba3bdeef7d940d8e9e0e6d2c193595bc243241b77ff9e93620" }
+version("3.4.8") { source sha256: "bc9842a18898bfacb0ed1252c4febcc7e78fa139fd27fdc7a3e30d9d9356119b" }
 
 source url: "https://github.com/libffi/libffi/releases/download/v#{version}/libffi-#{version}.tar.gz"
 
