@@ -64,7 +64,7 @@ endif
 	&& if [ "$(FORCE_GIT_TAGGED)" -eq "0" ]; then export CRYSTAL_SRC=$(CURDIR)/tmp/crystal/.git; fi \
 	&& export MACOSX_DEPLOYMENT_TARGET=11.0 \
 	&& export SDKROOT=$(shell xcrun --sdk macosx --show-sdk-path) \
-	&& bundle exec omnibus clean crystal shards \
+	&& bundle exec omnibus clean crystal shards --log-level=warn \
 	&& bundle exec omnibus build crystal \
 	&& cp ./pkg/$(DARWIN_NAME) $(CURDIR)/$(OUTPUT_DIR)/$(subst x86_64,universal,$(subst arm64,universal,$(DARWIN_NAME))) \
 	&& cp ./pkg/$(DARWIN_PKG_NAME) $(CURDIR)/$(OUTPUT_DIR)/$(subst x86_64,universal,$(subst arm64,universal,$(DARWIN_PKG_NAME)))
