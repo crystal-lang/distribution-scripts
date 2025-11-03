@@ -28,6 +28,6 @@ FROM runtime as build
 RUN \
   apk add --update --no-cache --force-overwrite \
     llvm${llvm_version}-dev llvm${llvm_version}-static \
-    g++ libffi-dev
+    libevent-static g++ libffi-dev
 
 CMD ["/bin/sh"]
