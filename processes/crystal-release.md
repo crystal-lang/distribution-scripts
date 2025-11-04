@@ -11,11 +11,11 @@ document. In this way it's easy to track the progress of the release (*Helper:
 1. [ ] (minor) Announce expected release date (${RELEASE_DATE}) and time span for feature freeze (starting on ${FREEZE_PERIOD})
    * (minor) Feature freeze is about two weeks before release
 2. Set date on the milestone
-3. [ ] Prepare the changelog entry: (`crystal`) [`scripts/update-changelog.cr ${VERSION}`](https://github.com/crystal-lang/crystal/blob/master/scripts/update-changelog.cr)
+3. [ ] Prepare the changelog entry: (`crystal`) [`scripts/update-changelog.cr ${VERSION}`](https://github.com/crystal-lang/crystal/blob/master/scripts/update-changelog.cr) from the HEAD of the release branch (or `master`)
    * Ensure that all merged PRs are added to the milestone (check [`is:pr is:merged sort:updated-desc no:milestone`](https://github.com/crystal-lang/crystal/pulls?q=is%3Apr+is%3Amerged+sort%3Aupdated-desc+no%3Amilestone+-label%3Astatus%3Areverted+base%3Amaster+merged%3A%3E%3D2023-01-01)).
    * Ensure that all milestoned PRs are properly labelled (check [`is:pr is:merged sort:updated-desc no:label milestone:${VERSION}`](https://github.com/crystal-lang/crystal/pulls?q=is%3Apr+is%3Amerged+sort%3Aupdated-desc+milestone%3A${VERSION}+no%3Alabel)).
    * Ensure the milestone has `Due date` set.
-4. [ ] Start preparing release notes, publish draft in [`crystal-lang/crystal-website`](https://github.com/crystal-lang/crystal-website/)
+4. [ ] Start preparing release notes, publish draft in [`crystal-lang/crystal-website`](https://github.com/crystal-lang/crystal-website/) (summary of changes that are most relevant for users)
 5. [ ] (minor) Start feature freeze period (on ${FREEZE_PERIOD})
    * (minor) Either no merging of features into `master` or split off release branch for backporting bugfixes.
 6. [ ] Publish release PR draft
@@ -57,7 +57,7 @@ document. In this way it's easy to track the progress of the release (*Helper:
 
 ### Binary releases
 
-3. Publish build artifacts from CircleCI and GitHub Actions to GitHub release. For `URL_TO_CIRCLECI_ARTIFACT` grab the URL
+1. Publish build artifacts from CircleCI and GitHub Actions to GitHub release. For `URL_TO_CIRCLECI_ARTIFACT` grab the URL
    of any of the build artifacts in circleCI (doesn't matter which).
    * [ ] Upload build artifacts from CircleCI: (`crystal`) [`../distribution-scripts/processes/scripts/publish-crystal-packages-on-github.sh $URL_TO_CIRCLECI_ARTIFACT`](https://github.com/crystal-lang/distribution-scripts/blob/master/processes/scripts/publish-crystal-packages-on-github.sh) (run from `crystallang/crystal@${VERSION}` work tree)
       * `crystal-*-darwin-*.tar.gz`
@@ -146,7 +146,7 @@ document. In this way it's easy to track the progress of the release (*Helper:
      git commit -m 'Merge `release/${VERSION%.*}` into master'
      git log --graph --decorate --pretty=oneline --abbrev-commit
      git push -u upstream merge/${VERSION}
-     gh pr create --title 'Merge `release/${VERSION%.*}` into master' --label 'topic:infrastructure'
+     gh pr create --title 'Merge `release/${VERSION%.*}`@`%{VERSION} into `master`' --label 'topic:infrastructure'
      ```
    - Merge PR **locally**:
      ```sh
