@@ -10,6 +10,8 @@
 no_cache ?=    ## Disable the docker build cache
 pull_images ?= ## Always pull docker images to ensure they're up to date
 release ?=     ## Create an optimized build for the final release
+arch ?= $(shell uname -m)## Target arch to build (x86_64, aarch64)
+#                        ^-- no space before comment otherwise it's appended to $arch!
 
 CRYSTAL_REPO ?= https://github.com/crystal-lang/crystal ## Allow to override the official repo with fork or local
 CRYSTAL_VERSION ?=                 ## How the binaries should be branded
@@ -19,7 +21,7 @@ PACKAGE_MAINTAINER = Crystal Team <crystal@manas.tech>
 
 PREVIOUS_CRYSTAL_VERSION ?= ## Version of the bootstrap compiler
 PREVIOUS_CRYSTAL_PACKAGE_ITERATION ?= 1## Package iteration of the bootstrap compiler
-PREVIOUS_CRYSTAL_RELEASE_LINUX64_TARGZ ?= https://github.com/crystal-lang/crystal/releases/download/$(PREVIOUS_CRYSTAL_VERSION)/crystal-$(PREVIOUS_CRYSTAL_VERSION)-$(PREVIOUS_CRYSTAL_PACKAGE_ITERATION)-linux-x86_64.tar.gz ## url to crystal-{version}-{package}-linux-x86_64.tar.gz
+PREVIOUS_CRYSTAL_RELEASE_LINUX64_TARGZ ?= https://github.com/crystal-lang/crystal/releases/download/$(PREVIOUS_CRYSTAL_VERSION)/crystal-$(PREVIOUS_CRYSTAL_VERSION)-$(PREVIOUS_CRYSTAL_PACKAGE_ITERATION)-linux-$(arch).tar.gz ## url to crystal-{version}-{package}-linux-{arch}.tar.gz
 
 SHARDS_VERSION = v0.19.1
 GC_VERSION = v8.2.8
@@ -27,7 +29,7 @@ LIBPCRE2_VERSION = 10.44
 LIBEVENT_VERSION = release-2.1.12-stable
 
 OUTPUT_DIR = build
-OUTPUT_BASENAME64 = $(OUTPUT_DIR)/crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION)-linux-x86_64
+OUTPUT_BASENAME64 = $(OUTPUT_DIR)/crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION)-linux-$(arch)
 
 DOCKER_BUILD_ARGS = $(if $(no_cache),--no-cache )$(if $(pull_images),--pull ) --progress=plain
 
@@ -42,8 +44,8 @@ BUILD_ARGS_COMMON = $(DOCKER_BUILD_ARGS) \
 
 BUILD_ARGS64 = $(BUILD_ARGS_COMMON) \
                --build-arg previous_crystal_release=$(PREVIOUS_CRYSTAL_RELEASE_LINUX64_TARGZ)	\
-               --build-arg musl_target=x86_64-linux-musl \
-               --build-arg gnu_target=x86_64-unknown-linux-gnu
+               --build-arg musl_target=$(arch)-linux-musl \
+               --build-arg gnu_target=$(arch)-unknown-linux-gnu
 
 BUILD_ARGS64_BUNDLED = $(BUILD_ARGS64) \
                --build-arg libpcre2_version=$(LIBPCRE2_VERSION) \
