@@ -16,7 +16,6 @@ end
 dependency "pcre2"
 dependency "bdw-gc"
 dependency "llvm_bin" unless FIRST_RUN
-dependency "libevent"
 dependency "libffi"
 
 env = with_standard_compiler_flags(with_embedded_path(

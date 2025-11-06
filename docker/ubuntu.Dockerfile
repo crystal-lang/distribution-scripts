@@ -8,7 +8,7 @@ RUN \
   apt-get update && \
   DEBIAN_FRONTEND=noninteractive \
   apt-get install -y tzdata gcc pkg-config libssl-dev libxml2-dev libyaml-dev libgmp-dev git make \
-                     libpcre3-dev libpcre2-dev libevent-dev libz-dev libgc-dev && \
+                     libpcre3-dev libpcre2-dev libz-dev libgc-dev && \
   apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 ARG crystal_targz
@@ -24,7 +24,7 @@ FROM runtime as build
 
 RUN \
   apt-get update && \
-  apt-get install -y build-essential llvm-${llvm_version} lld-${llvm_version} libedit-dev gdb libffi-dev && \
+  apt-get install -y build-essential llvm-${llvm_version} lld-${llvm_version} libedit-dev libevent-dev gdb libffi-dev && \
   apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 RUN ln -sf /usr/bin/ld.lld-${llvm_version} /usr/bin/ld.lld

@@ -26,7 +26,6 @@ PREVIOUS_CRYSTAL_RELEASE_LINUX64_TARGZ ?= https://github.com/crystal-lang/crysta
 SHARDS_VERSION = v0.19.1
 GC_VERSION = v8.2.8
 LIBPCRE2_VERSION = 10.44
-LIBEVENT_VERSION = release-2.1.12-stable
 
 OUTPUT_DIR = build
 OUTPUT_BASENAME64 = $(OUTPUT_DIR)/crystal-$(CRYSTAL_VERSION)-$(PACKAGE_ITERATION)-linux-$(arch)
@@ -48,8 +47,7 @@ BUILD_ARGS64 = $(BUILD_ARGS_COMMON) \
                --build-arg gnu_target=$(arch)-unknown-linux-gnu
 
 BUILD_ARGS64_BUNDLED = $(BUILD_ARGS64) \
-               --build-arg libpcre2_version=$(LIBPCRE2_VERSION) \
-               --build-arg libevent_version=$(LIBEVENT_VERSION)
+               --build-arg libpcre2_version=$(LIBPCRE2_VERSION)
 
 .PHONY: all
 all: all64 ## Build all distribution tarballs [default]
