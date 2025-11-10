@@ -35,6 +35,8 @@ wget --directory-prefix="$artifacts_dir/" \
   "${circle_artifact_url%/*}/crystal-$VERSION-1-darwin-universal.tar.gz" \
   "${circle_artifact_url%/*}/crystal-$VERSION-1-linux-x86_64-bundled.tar.gz" \
   "${circle_artifact_url%/*}/crystal-$VERSION-1-linux-x86_64.tar.gz" \
+  "${circle_artifact_url%/*}/crystal-$VERSION-1-linux-aarch64-bundled.tar.gz" \
+  "${circle_artifact_url%/*}/crystal-$VERSION-1-linux-aarch64.tar.gz" \
   "${circle_artifact_url%/*}/crystal-$VERSION-1.universal.pkg" \
   "${circle_artifact_url%/*}/crystal-$VERSION-docs.tar.gz" | more
 
