@@ -15,7 +15,10 @@ DOCKER_TAG ?= $(CRYSTAL_VERSION)## How to tag the docker image (examples: `0.27.
 DOCKER_REPOSITORY ?= crystallang/crystal## Docker hub repository to commit image (default: `crystallang/crystal`)
 
 OUTPUT_DIR := build
-BUILD_CONTEXT := $(CURDIR)/build-context
+BUILD_CONTEXT := build-context
+
+comma:=,
+BUILD_CONTEXT_TARBALLS := $(addprefix $(BUILD_CONTEXT)/crystal-$(CRYSTAL_VERSION)-1-linux-,$(addsuffix .tar.gz,$(patsubst linux/%,%,$(subst $(comma), ,$(PLATFORM)))))
 
 .PHONY: all
 all: ubuntu alpine ## Build all images
@@ -30,13 +33,14 @@ alpine: ## Build alpine images
 alpine: $(OUTPUT_DIR)/crystal-$(CRYSTAL_VERSION)-alpine.tar.gz
 alpine: $(OUTPUT_DIR)/crystal-$(CRYSTAL_VERSION)-alpine-build.tar.gz
 
-$(OUTPUT_DIR)/crystal-$(CRYSTAL_VERSION)-%.tar: %.Dockerfile build-context | $(OUTPUT_DIR)
+
+$(OUTPUT_DIR)/crystal-$(CRYSTAL_VERSION)-%.tar: %.Dockerfile $(BUILD_CONTEXT_TARBALLS) | $(OUTPUT_DIR)
 	docker buildx build --build-arg crystal_version=$(CRYSTAL_VERSION) --platform=$(PLATFORM) \
 		-f $< --target=runtime --tag=$(DOCKER_REPOSITORY):$(DOCKER_TAG)-$* \
 		--output type=tar,dest=$@ \
 		$(BUILD_CONTEXT)
 
-$(OUTPUT_DIR)/crystal-$(CRYSTAL_VERSION)-%-build.tar: %.Dockerfile build-context | $(OUTPUT_DIR)
+$(OUTPUT_DIR)/crystal-$(CRYSTAL_VERSION)-%-build.tar: %.Dockerfile $(BUILD_CONTEXT_TARBALLS) | $(OUTPUT_DIR)
 	docker buildx build --build-arg crystal_version=$(CRYSTAL_VERSION) --platform=$(PLATFORM) \
 		-f $< --target=build --tag=$(DOCKER_REPOSITORY):$(DOCKER_TAG)-$*-build \
 		--output type=tar,dest=$@ \
@@ -48,14 +52,8 @@ $(OUTPUT_DIR)/crystal-%.tar.gz: $(OUTPUT_DIR)/crystal-%.tar
 $(OUTPUT_DIR) $(BUILD_CONTEXT):
 	mkdir -p $@
 
-comma:=,
-BUILD_CONTEXT_TARBALLS := $(addprefix $(BUILD_CONTEXT)/crystal-$(CRYSTAL_VERSION)-1-,$(addsuffix .tar.gz,$(patsubst linux/%,%,$(subst $(comma), ,$(PLATFORMS)))))
-
-.PHONY: build-context
-build-context: $(BUILD_CONTEXT_TARBALLS)
-
-$(BUILD_CONTEXT)/crystal-$(CRYSTAL_VERSION)-1-amd64.tar.gz: $(TARBALLS)/crystal-$(CRYSTAL_VERSION)-1-x86_64.tar.gz
-$(BUILD_CONTEXT)/crystal-$(CRYSTAL_VERSION)-1-arm64.tar.gz: $(TARBALLS)/crystal-$(CRYSTAL_VERSION)-1-aarch64.tar.gz
+$(BUILD_CONTEXT)/crystal-$(CRYSTAL_VERSION)-1-linux-amd64.tar.gz: $(TARBALLS)/crystal-$(CRYSTAL_VERSION)-1-linux-x86_64.tar.gz
+$(BUILD_CONTEXT)/crystal-$(CRYSTAL_VERSION)-1-linux-arm64.tar.gz: $(TARBALLS)/crystal-$(CRYSTAL_VERSION)-1-linux-aarch64.tar.gz
 $(BUILD_CONTEXT)/crystal-$(CRYSTAL_VERSION)-1-%.tar.gz: | $(BUILD_CONTEXT)
 	cp $< $@
 
