@@ -8,65 +8,56 @@
 ##   $ make alpine DOCKER_TAG=nightly CRYSTAL_VERSION=0.xy.z CRYSTAL_TARGZ=...
 
 CRYSTAL_VERSION ?=   ## How the binaries should be branded
-CRYSTAL_TARGZ ?=     ## Which crystal.tar.gz file to install in docker images (ubuntu64, alpine)
+TARBARLLS ?=     ## Folder which contains the Crystal tarballs to install in docker images.
+PLATFORM ?= linux/amd64,linux/arm64## Which platforms to build for (default: `linux/amd64,linux/arm64`)
 
 DOCKER_TAG ?= $(CRYSTAL_VERSION)## How to tag the docker image (examples: `0.27.2`, `nightly20190307`). `-build` will be appended for build images.
-DOCKER_REPOSITORY ?= crystallang/crystal## Docker hub repository to commit image
+DOCKER_REPOSITORY ?= crystallang/crystal## Docker hub repository to commit image (default: `crystallang/crystal`)
 
 OUTPUT_DIR := build
 BUILD_CONTEXT := $(CURDIR)/build-context
-BUILD_ARGS_UBUNTU64 := --build-arg crystal_targz=crystal.tar.gz $(BUILD_CONTEXT)/ubuntu64
-BUILD_ARGS_ALPINE := --build-arg crystal_targz=crystal.tar.gz $(BUILD_CONTEXT)/alpine
-DOCKER_TAG_UBUNTU := $(DOCKER_REPOSITORY):$(DOCKER_TAG)
-DOCKER_TAG_ALPINE := $(DOCKER_REPOSITORY):$(DOCKER_TAG)-alpine
 
-.PHONY: all64
-all64: ubuntu64 alpine ## Build all x86_64 images
+.PHONY: all
+all: ubuntu alpine ## Build all images
 
-.PHONY: all_ubuntu
-all_ubuntu: ubuntu64  ## Build all ubuntu images
-
-.PHONY: ubuntu64
-ubuntu64: ## Build ubuntu x86_64 images
-ubuntu64: $(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-ubuntu-x86_64.tar.gz
-ubuntu64: $(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-ubuntu-x86_64-build.tar.gz
+.PHONY: ubuntu
+ubuntu: ## Build ubuntu images
+ubuntu: $(OUTPUT_DIR)/crystal-$(CRYSTAL_VERSION)-ubuntu.tar.gz
+ubuntu: $(OUTPUT_DIR)/crystal-$(CRYSTAL_VERSION)-ubuntu-build.tar.gz
 
 .PHONY: alpine
 alpine: ## Build alpine images
-alpine: $(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-alpine.tar.gz
-alpine: $(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-alpine-build.tar.gz
+alpine: $(OUTPUT_DIR)/crystal-$(CRYSTAL_VERSION)-alpine.tar.gz
+alpine: $(OUTPUT_DIR)/crystal-$(CRYSTAL_VERSION)-alpine-build.tar.gz
 
-$(BUILD_CONTEXT)/ubuntu64: ubuntu.Dockerfile $(BUILD_CONTEXT)/ubuntu64/crystal.tar.gz
-	cp ubuntu.Dockerfile $@/Dockerfile
+$(OUTPUT_DIR)/crystal-$(CRYSTAL_VERSION)-%.tar: %.Dockerfile build-context | $(OUTPUT_DIR)
+	docker buildx build --build-arg crystal_version=$(CRYSTAL_VERSION) --platform=$(PLATFORM) \
+		-f $< --target=runtime --tag=$(DOCKER_REPOSITORY):$(DOCKER_TAG)-$* \
+		--output type=tar,dest=$@ \
+		$(BUILD_CONTEXT)
 
-$(BUILD_CONTEXT)/alpine: alpine.Dockerfile $(BUILD_CONTEXT)/alpine/crystal.tar.gz
-	cp alpine.Dockerfile $@/Dockerfile
-	mkdir $@/files/
+$(OUTPUT_DIR)/crystal-$(CRYSTAL_VERSION)-%-build.tar: %.Dockerfile build-context | $(OUTPUT_DIR)
+	docker buildx build --build-arg crystal_version=$(CRYSTAL_VERSION) --platform=$(PLATFORM) \
+		-f $< --target=build --tag=$(DOCKER_REPOSITORY):$(DOCKER_TAG)-$*-build \
+		--output type=tar,dest=$@ \
+		$(BUILD_CONTEXT)
 
-%/crystal.tar.gz:
-	mkdir -p $(shell dirname $@)
-	cp $(CRYSTAL_TARGZ) $@
+$(OUTPUT_DIR)/crystal-%.tar.gz: $(OUTPUT_DIR)/crystal-%.tar
+	gzip --keep $<
 
-$(OUTPUT_DIR):
-	mkdir -p $(OUTPUT_DIR)
+$(OUTPUT_DIR) $(BUILD_CONTEXT):
+	mkdir -p $@
 
-# Ubuntu x86_64
-$(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-ubuntu-x86_64.tar.gz: $(BUILD_CONTEXT)/ubuntu64 $(OUTPUT_DIR)
-	docker build -t $(DOCKER_TAG_UBUNTU) --target runtime $(BUILD_ARGS_UBUNTU64)
-	docker save $(DOCKER_TAG_UBUNTU) | gzip > $@
+comma:=,
+BUILD_CONTEXT_TARBALLS := $(addprefix $(BUILD_CONTEXT)/crystal-$(CRYSTAL_VERSION)-1-,$(addsuffix .tar.gz,$(patsubst linux/%,%,$(subst $(comma), ,$(PLATFORMS)))))
 
-$(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-ubuntu-x86_64-build.tar.gz: $(BUILD_CONTEXT)/ubuntu64 $(OUTPUT_DIR)
-	docker build -t $(DOCKER_TAG_UBUNTU)-build --target build  $(BUILD_ARGS_UBUNTU64)
-	docker save $(DOCKER_TAG_UBUNTU)-build | gzip > $@
+.PHONY: build-context
+build-context: $(BUILD_CONTEXT_TARBALLS)
 
-# Alpine x86_64
-$(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-alpine.tar.gz: $(BUILD_CONTEXT)/alpine $(OUTPUT_DIR)
-	docker build -t $(DOCKER_TAG_ALPINE) --target runtime $(BUILD_ARGS_ALPINE)
-	docker save $(DOCKER_TAG_ALPINE) | gzip > $@
-
-$(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-alpine-build.tar.gz: $(BUILD_CONTEXT)/alpine $(OUTPUT_DIR)
-	docker build -t $(DOCKER_TAG_ALPINE)-build --target build $(BUILD_ARGS_ALPINE)
-	docker save $(DOCKER_TAG_ALPINE)-build | gzip > $@
+$(BUILD_CONTEXT)/crystal-$(CRYSTAL_VERSION)-1-amd64.tar.gz: $(TARBALLS)/crystal-$(CRYSTAL_VERSION)-1-x86_64.tar.gz
+$(BUILD_CONTEXT)/crystal-$(CRYSTAL_VERSION)-1-arm64.tar.gz: $(TARBALLS)/crystal-$(CRYSTAL_VERSION)-1-aarch64.tar.gz
+$(BUILD_CONTEXT)/crystal-$(CRYSTAL_VERSION)-1-%.tar.gz: | $(BUILD_CONTEXT)
+	cp $< $@
 
 alpine-84codes: ## Build and push docker build images based on the base images from 84codes
 	docker buildx build --build-arg crystal_version=$(CRYSTAL_VERSION) -f alpine-84codes.Dockerfile --platform linux/amd64,linux/arm64 --tag crystallang/crystal:$(CRYSTAL_VERSION)-alpine-84codes-build --push .
