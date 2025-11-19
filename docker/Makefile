@@ -40,7 +40,7 @@ $(O)/crystal-$(CRYSTAL_VERSION)-%.tar: $(BUILD_CONTEXT)/crystal-$(CRYSTAL_VERSIO
 	$(eval base := $(word 1,$(parts)))
 	$(eval target := $(word 2,$(parts)))
 	$(eval arch := $(word 3,$(parts)))
-	$(eval tag=$(DOCKER_REPOSITORY):$(DOCKER_TAG)-$(base)-$(target))
+	$(eval tag=$(DOCKER_REPOSITORY):$(DOCKER_TAG)-$(base)$(subst -runtime,,-$(target)))
 
 	docker buildx build \
 		--file $(base).Dockerfile\
