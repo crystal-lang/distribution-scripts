@@ -1,5 +1,5 @@
 ARG base_docker_image=ubuntu:24.04
-FROM ${base_docker_image} as runtime
+FROM ${base_docker_image} AS runtime
 ARG llvm_version=20
 
 RUN \
@@ -11,8 +11,8 @@ RUN \
                      libpcre3-dev libpcre2-dev libz-dev libgc-dev && \
   apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-ARG crystal_targz
-COPY ${crystal_targz} /tmp/crystal.tar.gz
+ARG TARGETPLATFORM
+COPY crystal-${TARGETPLATFORM#linux/}.tar.gz /tmp/crystal.tar.gz
 
 RUN \
   tar -xz -C /usr --strip-component=1 -f /tmp/crystal.tar.gz && \
@@ -20,7 +20,7 @@ RUN \
 
 CMD ["/bin/sh"]
 
-FROM runtime as build
+FROM runtime AS build
 
 RUN \
   apt-get update && \

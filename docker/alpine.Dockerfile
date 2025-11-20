@@ -1,5 +1,5 @@
 ARG base_docker_image=alpine:3.22
-FROM ${base_docker_image} as runtime
+FROM ${base_docker_image} AS runtime
 ARG llvm_version=20
 
 RUN \
@@ -11,8 +11,8 @@ RUN \
     # dev tools
     make git
 
-ARG crystal_targz
-COPY ${crystal_targz} /tmp/crystal.tar.gz
+ARG TARGETPLATFORM
+COPY crystal-${TARGETPLATFORM#linux/}.tar.gz /tmp/crystal.tar.gz
 
 RUN \
   tar -xz -C /usr --strip-component=1  -f /tmp/crystal.tar.gz \
@@ -23,7 +23,7 @@ RUN \
 
 CMD ["/bin/sh"]
 
-FROM runtime as build
+FROM runtime AS build
 
 RUN \
   apk add --update --no-cache --force-overwrite \
