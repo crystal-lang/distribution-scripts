@@ -11,8 +11,8 @@ RUN \
                      libpcre3-dev libpcre2-dev libz-dev libgc-dev && \
   apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-ARG TARGETPLATFORM
-COPY crystal-${TARGETPLATFORM#linux/}.tar.gz /tmp/crystal.tar.gz
+ARG TARGETARCH
+COPY crystal-${TARGETARCH}.tar.gz /tmp/crystal.tar.gz
 
 RUN \
   tar -xz -C /usr --strip-component=1 -f /tmp/crystal.tar.gz && \
