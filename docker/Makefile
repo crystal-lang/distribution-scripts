@@ -2,15 +2,14 @@
 
 ## Build all docker images
 ##   $ make DOCKER_TAG=nightly CRYSTAL_VERSION=0.xy.z
-##
 ## Build specific docker images
-##   $ make build-ubuntu-runtime DOCKER_TAG=nightly CRYSTAL_VERSION=0.xy.z
+##   $ make build-ubuntu DOCKER_TAG=nightly CRYSTAL_VERSION=0.xy.z
 ##   $ make build-alpine-build DOCKER_TAG=nightly CRYSTAL_VERSION=0.xy.z
 ##
 ## Push all docker images to registry
 ##   $ make push DOCKER_TAG=nightly CRYSTAL_VERSION=0.xy.z
 ## Push a specific docker image to registry
-##   $ make push-ubuntu-runtime DOCKER_TAG=nightly CRYSTAL_VERSION=0.xy.z
+##   $ make push-ubuntu DOCKER_TAG=nightly CRYSTAL_VERSION=0.xy.z
 ##   $ make push-alpine-build DOCKER_TAG=nightly CRYSTAL_VERSION=0.xy.z
 ##
 ## Run smoke tests
@@ -28,16 +27,16 @@ BUILD_CONTEXT := build-context
 
 .PHONY: all
 all: ## Build all images
-all: build-ubuntu-runtime
+all: build-ubuntu
 all: build-ubuntu-build
-all: build-alpine-runtime
+all: build-alpine
 all: build-alpine-build
 
 .PHONY: push
 push: ## Push all images to the registry
-push: push-ubuntu-runtime
+push: push-ubuntu
 push: push-ubuntu-build
-push: push-alpine-runtime
+push: push-alpine
 push: push-alpine-build
 
 .PHONY: push-%
@@ -50,8 +49,8 @@ $(BUILD_CONTEXT)/crystal-amd64.tar.gz: $(TARBALLS)/crystal-$(CRYSTAL_VERSION)-1-
 $(BUILD_CONTEXT):
 	mkdir -p $@
 
-.PHONY: build-%-runtime
-build-%-runtime: %.Dockerfile $(BUILD_CONTEXT)/crystal-amd64.tar.gz
+.PHONY: build-%
+build-%: %.Dockerfile $(BUILD_CONTEXT)/crystal-amd64.tar.gz
 	docker build --file $*.Dockerfile -t $(DOCKER_REPOSITORY):$(DOCKER_TAG)$(subst -ubuntu,,-$*) --target runtime $(BUILD_CONTEXT)
 
 .PHONY: build-%-build
