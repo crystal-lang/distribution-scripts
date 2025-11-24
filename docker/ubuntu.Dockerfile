@@ -18,6 +18,9 @@ RUN \
   tar -xz -C /usr --strip-component=1 -f /tmp/crystal.tar.gz && \
   rm /tmp/crystal.tar.gz
 
+# Smoke test
+RUN crystal eval 'puts "Hello World"' | grep --quiet "Hello World" && shards --version
+
 CMD ["/bin/sh"]
 
 FROM runtime AS build

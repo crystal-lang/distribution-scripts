@@ -21,6 +21,9 @@ RUN \
     --exclude */share/crystal/src/llvm/ext/llvm_ext.o && \
   rm /tmp/crystal.tar.gz
 
+# Smoke test
+RUN crystal eval 'puts "Hello World"' | grep -q "Hello World" && shards --version
+
 CMD ["/bin/sh"]
 
 FROM runtime AS build
