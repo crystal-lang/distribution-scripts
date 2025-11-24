@@ -6,6 +6,11 @@
 ##   $ make ubuntu64 DOCKER_TAG=nightly CRYSTAL_VERSION=0.xy.z
 ## Build alpine docker images
 ##   $ make alpine DOCKER_TAG=nightly CRYSTAL_VERSION=0.xy.z
+##
+## Run smoke tests
+##   $ make smoke-all
+##   $ make smoke-ubuntu-build
+##   $ make smoke-alpine-runtime
 
 CRYSTAL_VERSION ?=   ## How the binaries should be branded
 TARBALLS ?= tarballs## Path to folder which contains the Crystal tarballs to install in docker images.
