@@ -7,6 +7,12 @@
 ##   $ make build-ubuntu-runtime DOCKER_TAG=nightly CRYSTAL_VERSION=0.xy.z
 ##   $ make build-alpine-build DOCKER_TAG=nightly CRYSTAL_VERSION=0.xy.z
 ##
+## Push all docker images to registry
+##   $ make push DOCKER_TAG=nightly CRYSTAL_VERSION=0.xy.z
+## Push a specific docker image to registry
+##   $ make push-ubuntu-runtime DOCKER_TAG=nightly CRYSTAL_VERSION=0.xy.z
+##   $ make push-alpine-build DOCKER_TAG=nightly CRYSTAL_VERSION=0.xy.z
+##
 ## Run smoke tests
 ##   $ make smoke-all
 ##   $ make smoke-ubuntu-build
@@ -26,6 +32,17 @@ all: build-ubuntu-runtime
 all: build-ubuntu-build
 all: build-alpine-runtime
 all: build-alpine-build
+
+.PHONY: push
+push: ## Push all images to the registry
+push: push-ubuntu-runtime
+push: push-ubuntu-build
+push: push-alpine-runtime
+push: push-alpine-build
+
+.PHONY: push-%
+push-%: build-%
+	docker push $(DOCKER_REPOSITORY):$(DOCKER_TAG)$(subst -ubuntu,,-$*)
 
 $(BUILD_CONTEXT)/crystal-amd64.tar.gz: $(TARBALLS)/crystal-$(CRYSTAL_VERSION)-1-linux-x86_64.tar.gz | $(BUILD_CONTEXT)
 	cp $< $@
