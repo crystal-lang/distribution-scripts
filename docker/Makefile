@@ -18,7 +18,7 @@ TARBALLS ?= tarballs## Path to folder which contains the Crystal tarballs to ins
 DOCKER_TAG ?= $(CRYSTAL_VERSION)## How to tag the docker image (examples: `0.27.2`, `nightly20190307`). `-build` will be appended for build images.
 DOCKER_REPOSITORY ?= crystallang/crystal## Docker hub repository to commit image (default: `crystallang/crystal`)
 
-OUTPUT_DIR := build
+O := build
 BUILD_CONTEXT := build-context
 DOCKER_TAG_UBUNTU := $(DOCKER_REPOSITORY):$(DOCKER_TAG)
 DOCKER_TAG_ALPINE := $(DOCKER_REPOSITORY):$(DOCKER_TAG)-alpine
@@ -31,35 +31,35 @@ all_ubuntu: ubuntu64  ## Build all ubuntu images
 
 .PHONY: ubuntu64
 ubuntu64: ## Build ubuntu x86_64 images
-ubuntu64: $(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-ubuntu-x86_64.tar.gz
-ubuntu64: $(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-ubuntu-x86_64-build.tar.gz
+ubuntu64: $(O)/docker-$(CRYSTAL_VERSION)-ubuntu-x86_64.tar.gz
+ubuntu64: $(O)/docker-$(CRYSTAL_VERSION)-ubuntu-x86_64-build.tar.gz
 
 .PHONY: alpine
 alpine: ## Build alpine images
-alpine: $(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-alpine.tar.gz
-alpine: $(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-alpine-build.tar.gz
+alpine: $(O)/docker-$(CRYSTAL_VERSION)-alpine.tar.gz
+alpine: $(O)/docker-$(CRYSTAL_VERSION)-alpine-build.tar.gz
 
 $(BUILD_CONTEXT)/crystal-amd64.tar.gz: $(TARBALLS)/crystal-$(CRYSTAL_VERSION)-1-linux-x86_64.tar.gz | $(BUILD_CONTEXT)
 	cp $< $@
 
-$(OUTPUT_DIR) $(BUILD_CONTEXT):
+$(O) $(BUILD_CONTEXT):
 	mkdir -p $@
 
 # Ubuntu x86_64
-$(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-ubuntu-x86_64.tar.gz: ubuntu.Dockerfile $(BUILD_CONTEXT)/crystal-amd64.tar.gz $(OUTPUT_DIR)
+$(O)/docker-$(CRYSTAL_VERSION)-ubuntu-x86_64.tar.gz: ubuntu.Dockerfile $(BUILD_CONTEXT)/crystal-amd64.tar.gz $(O)
 	docker build --file ubuntu.Dockerfile -t $(DOCKER_TAG_UBUNTU) --target runtime $(BUILD_CONTEXT)
 	docker save $(DOCKER_TAG_UBUNTU) | gzip > $@
 
-$(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-ubuntu-x86_64-build.tar.gz: ubuntu.Dockerfile $(BUILD_CONTEXT)/crystal-amd64.tar.gz $(OUTPUT_DIR)
+$(O)/docker-$(CRYSTAL_VERSION)-ubuntu-x86_64-build.tar.gz: ubuntu.Dockerfile $(BUILD_CONTEXT)/crystal-amd64.tar.gz $(O)
 	docker build --file ubuntu.Dockerfile -t $(DOCKER_TAG_UBUNTU)-build --target build  $(BUILD_CONTEXT)
 	docker save $(DOCKER_TAG_UBUNTU)-build | gzip > $@
 
 # Alpine x86_64
-$(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-alpine.tar.gz: alpine.Dockerfile $(BUILD_CONTEXT)/crystal-amd64.tar.gz $(OUTPUT_DIR)
+$(O)/docker-$(CRYSTAL_VERSION)-alpine.tar.gz: alpine.Dockerfile $(BUILD_CONTEXT)/crystal-amd64.tar.gz $(O)
 	docker build --file alpine.Dockerfile -t $(DOCKER_TAG_ALPINE) --target runtime $(BUILD_CONTEXT)
 	docker save $(DOCKER_TAG_ALPINE) | gzip > $@
 
-$(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-alpine-build.tar.gz: alpine.Dockerfile $(BUILD_CONTEXT)/crystal-amd64.tar.gz $(OUTPUT_DIR)
+$(O)/docker-$(CRYSTAL_VERSION)-alpine-build.tar.gz: alpine.Dockerfile $(BUILD_CONTEXT)/crystal-amd64.tar.gz $(O)
 	docker build --file alpine.Dockerfile -t $(DOCKER_TAG_ALPINE)-build --target build $(BUILD_CONTEXT)
 	docker save $(DOCKER_TAG_ALPINE)-build | gzip > $@
 
@@ -82,7 +82,7 @@ smoke-%: # Run smoke tests on docker images
 
 .PHONY: clean
 clean: ## Clean up build and output directories
-	rm -Rf $(OUTPUT_DIR)
+	rm -Rf $(O)
 	rm -Rf $(BUILD_CONTEXT)
 
 .PHONY: help
