@@ -64,6 +64,17 @@ alpine-84codes: ## Build and push docker build images based on the base images f
 ubuntu-84codes: ## Build and push docker build images based on the base images from 84codes
 	docker buildx build --build-arg crystal_version=$(CRYSTAL_VERSION) -f ubuntu-84codes.Dockerfile --platform linux/amd64,linux/arm64 --tag crystallang/crystal:$(CRYSTAL_VERSION)-ubuntu-84codes-build --push .
 
+.PHONY: smoke-all
+smoke-all: ## Run smoke tests on all docker images
+smoke-all: smoke-alpine
+smoke-all: smoke-alpine-build
+smoke-all: smoke-ubuntu
+smoke-all: smoke-ubuntu-build
+
+.PHONY: smoke-%
+smoke-%: # Run smoke tests on docker images
+	docker run --rm -v $(CURDIR)/smoke.sh:/smoke.sh -e CRYSTAL_VERSION=$(CRYSTAL_VERSION) $(DOCKER_REPOSITORY):$(DOCKER_TAG)-$(subst -ubuntu,,$*) /smoke.sh $*
+
 .PHONY: clean
 clean: ## Clean up build and output directories
 	rm -Rf $(OUTPUT_DIR)
