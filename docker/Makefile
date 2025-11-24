@@ -49,13 +49,11 @@ $(BUILD_CONTEXT)/crystal-amd64.tar.gz: $(TARBALLS)/crystal-$(CRYSTAL_VERSION)-1-
 $(BUILD_CONTEXT):
 	mkdir -p $@
 
-.PHONY: build-%
-build-%: %.Dockerfile $(BUILD_CONTEXT)/crystal-amd64.tar.gz
-	docker build --file $*.Dockerfile -t $(DOCKER_REPOSITORY):$(DOCKER_TAG)$(subst -ubuntu,,-$*) --target runtime $(BUILD_CONTEXT)
+.SECONDEXPANSION:
 
-.PHONY: build-%-build
-build-%-build: %.Dockerfile $(BUILD_CONTEXT)/crystal-amd64.tar.gz
-	docker build --file $*.Dockerfile -t $(DOCKER_REPOSITORY):$(DOCKER_TAG)$(subst -ubuntu,,-$*)-build --target build $(BUILD_CONTEXT)
+.PHONY: build-%
+build-%: $$(subst -build,,$$*).Dockerfile $(BUILD_CONTEXT)/crystal-amd64.tar.gz
+	docker build --file $(subst -build,,$*).Dockerfile -t $(DOCKER_REPOSITORY):$(DOCKER_TAG)$(subst -ubuntu,,-$*) --target runtime $(BUILD_CONTEXT)
 
 alpine-84codes: ## Build and push docker build images based on the base images from 84codes
 	docker buildx build --build-arg crystal_version=$(CRYSTAL_VERSION) -f alpine-84codes.Dockerfile --platform linux/amd64,linux/arm64 --tag crystallang/crystal:$(CRYSTAL_VERSION)-alpine-84codes-build --push .
