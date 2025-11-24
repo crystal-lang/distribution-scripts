@@ -18,7 +18,6 @@ TARBALLS ?= tarballs## Path to folder which contains the Crystal tarballs to ins
 DOCKER_TAG ?= $(CRYSTAL_VERSION)## How to tag the docker image (examples: `0.27.2`, `nightly20190307`). `-build` will be appended for build images.
 DOCKER_REPOSITORY ?= crystallang/crystal## Docker hub repository to commit image
 
-OUTPUT_DIR := build
 BUILD_CONTEXT := build-context
 
 .PHONY: all
@@ -31,22 +30,8 @@ all: build-alpine-build
 $(BUILD_CONTEXT)/crystal-amd64.tar.gz: $(TARBALLS)/crystal-$(CRYSTAL_VERSION)-1-linux-x86_64.tar.gz | $(BUILD_CONTEXT)
 	cp $< $@
 
-$(OUTPUT_DIR) $(BUILD_CONTEXT):
+$(BUILD_CONTEXT):
 	mkdir -p $@
-
-# Ubuntu x86_64
-$(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-ubuntu-x86_64.tar.gz: build-ubuntu-runtime | $(OUTPUT_DIR)
-	docker save $(DOCKER_REPOSITORY):$(DOCKER_TAG) | gzip > $@
-
-$(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-ubuntu-x86_64-build.tar.gz: build-ubuntu-build | $(OUTPUT_DIR)
-	docker save $(DOCKER_REPOSITORY):$(DOCKER_TAG)-build | gzip > $@
-
-# Alpine x86_64
-$(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-alpine.tar.gz: build-alpine-runtime | $(OUTPUT_DIR)
-	docker save $(DOCKER_REPOSITORY):$(DOCKER_TAG)-alpine | gzip > $@
-
-$(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-alpine-build.tar.gz: build-alpine-build $(OUTPUT_DIR)
-	docker save $(DOCKER_REPOSITORY):$(DOCKER_TAG)-alpine-build | gzip > $@
 
 .PHONY: build-%-runtime
 build-%-runtime: %.Dockerfile $(BUILD_CONTEXT)/crystal-amd64.tar.gz
@@ -74,8 +59,7 @@ smoke-%: # Run smoke tests on docker images
 	docker run --rm -v $(CURDIR)/smoke.sh:/smoke.sh -e CRYSTAL_VERSION=$(CRYSTAL_VERSION) $(DOCKER_REPOSITORY):$(DOCKER_TAG)$(subst -ubuntu,,-$*) /smoke.sh $*
 
 .PHONY: clean
-clean: ## Clean up build and output directories
-	rm -Rf $(OUTPUT_DIR)
+clean: ## Clean up build context
 	rm -Rf $(BUILD_CONTEXT)
 
 .PHONY: help
