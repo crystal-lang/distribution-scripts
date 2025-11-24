@@ -1,4 +1,4 @@
-# Recipies for this Makefile
+# Recipes for this Makefile
 
 ## Build all docker images
 ##   $ make DOCKER_TAG=nightly CRYSTAL_VERSION=0.xy.z
@@ -16,7 +16,7 @@ CRYSTAL_VERSION ?=   ## How the binaries should be branded
 TARBALLS ?= tarballs## Path to folder which contains the Crystal tarballs to install in docker images.
 
 DOCKER_TAG ?= $(CRYSTAL_VERSION)## How to tag the docker image (examples: `0.27.2`, `nightly20190307`). `-build` will be appended for build images.
-DOCKER_REPOSITORY ?= crystallang/crystal## Docker hub repository to commit image
+DOCKER_REPOSITORY ?= crystallang/crystal## Docker hub repository to commit image (default: `crystallang/crystal`)
 
 OUTPUT_DIR := build
 BUILD_CONTEXT := build-context
