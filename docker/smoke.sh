@@ -6,7 +6,12 @@
 
 set -eux
 
-crystal --version | grep -q "${CRYSTAL_VERSION}"
+if [[ "$CRYSTAL_VERSION" =~ "^[0-9]+(\.[0-9]+)*$" ]]; then
+  crystal --version | grep -q "${CRYSTAL_VERSION}"
+else
+  # $CRYSTAL_VERSION is not a version number on maintenance builds
+  crystal --version | grep -q "Crystal"
+fi
 
 shards --version | grep -q Shards
 
