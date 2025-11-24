@@ -78,7 +78,7 @@ smoke-all: smoke-ubuntu-build
 
 .PHONY: smoke-%
 smoke-%: # Run smoke tests on docker images
-	docker run --rm -v $(CURDIR)/smoke.sh:/smoke.sh -e CRYSTAL_VERSION=$(CRYSTAL_VERSION) $(DOCKER_REPOSITORY):$(DOCKER_TAG)-$(subst -ubuntu,,$*) /smoke.sh $*
+	docker run --rm -v $(CURDIR)/smoke.sh:/smoke.sh -e CRYSTAL_VERSION=$(CRYSTAL_VERSION) $(DOCKER_REPOSITORY):$(DOCKER_TAG)$(subst -ubuntu,,-$*) /smoke.sh $*
 
 .PHONY: clean
 clean: ## Clean up build and output directories
