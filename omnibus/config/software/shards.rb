@@ -108,7 +108,7 @@ build do
   other_target = "#{other_machine}-apple-macosx#{ENV["MACOSX_DEPLOYMENT_TARGET"]}"
   crflags += " --cross-compile --target #{other_target}"
   make "bin/shards CRYSTAL=#{install_dir}/bin/crystal FLAGS='#{crflags}'", env: env
-  command "clang bin/shards.o -o bin/shards_#{other_machine} -target #{other_target} -L#{install_dir}/embedded/lib -lyaml -lpcre2-8 -lgc -lpthread -levent -liconv -ldl", env: env
+  command "clang bin/shards.o -o bin/shards_#{other_machine} -target #{other_target} -L#{install_dir}/embedded/lib -lyaml -lpcre2-8 -lgc -lpthread -liconv -ldl", env: env
 
   # Lipo them up
   command "lipo -create -output bin/shards bin/shards_x86_64 bin/shards_arm64"
