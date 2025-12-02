@@ -23,6 +23,9 @@ TARBALLS ?= ./tarballs## Path to folder which contains the Crystal tarballs to i
 BUILD_CONTEXT := ./build-context
 TAG := crystallang/crystal:$(VERSION)## Base tag of the docker image. Classifiers like `-ubuntu` and `-build` will be appended.
 
+PLATFORMS := linux/amd64
+PLATFORM_TARBALLS := $(patsubst linux/%,$(BUILD_CONTEXT)/crystal-%.tar.gz,$(PLATFORMS))
+
 .PHONY: all
 all: ## Build all images
 all: build-ubuntu
@@ -37,7 +40,6 @@ push: push-ubuntu-build
 push: push-alpine
 push: push-alpine-build
 
-.PHONY: push-%
 push-%: build-%
 	docker push $(TAG)$(subst -ubuntu,,-$*)
 
@@ -47,11 +49,21 @@ $(BUILD_CONTEXT)/crystal-amd64.tar.gz: $(TARBALLS)/crystal-$(VERSION)-1-linux-x8
 $(BUILD_CONTEXT):
 	mkdir -p $@
 
-.SECONDEXPANSION:
+.PHONY: build-alpine
+build-alpine: alpine.Dockerfile $(PLATFORM_TARBALLS)
+	docker build --file alpine.Dockerfile -t $(TAG)-alpine --target runtime $(BUILD_CONTEXT)
 
-.PHONY: build-%
-build-%: $$(subst -build,,$$*).Dockerfile $(BUILD_CONTEXT)/crystal-amd64.tar.gz
-	docker build --file $(subst -build,,$*).Dockerfile -t $(TAG)$(subst -ubuntu,,-$*) --target runtime $(BUILD_CONTEXT)
+.PHONY: build-alpine-build
+build-alpine-build: alpine.Dockerfile $(PLATFORM_TARBALLS)
+	docker build --file alpine.Dockerfile -t $(TAG)-alpine-build --target build $(BUILD_CONTEXT)
+
+.PHONY: build-ubuntu
+build-ubuntu: ubuntu.Dockerfile $(PLATFORM_TARBALLS)
+	docker build --file ubuntu.Dockerfile -t $(TAG) --target runtime $(BUILD_CONTEXT)
+
+.PHONY: build-ubuntu-build
+build-ubuntu-build: ubuntu.Dockerfile $(PLATFORM_TARBALLS)
+	docker build --file ubuntu.Dockerfile -t $(TAG)-build --target build $(BUILD_CONTEXT)
 
 alpine-84codes: ## Build and push docker build images based on the base images from 84codes
 	docker buildx build --build-arg crystal_version=$(VERSION) -f alpine-84codes.Dockerfile --platform linux/amd64,linux/arm64 --tag crystallang/crystal:$(VERSION)-alpine-84codes-build --push .
