@@ -1,29 +1,27 @@
 # Recipes for this Makefile
 
 ## Build all docker images
-##   $ make DOCKER_TAG=nightly CRYSTAL_VERSION=0.xy.z
+##   $ make VERSION=1.18.2
 ## Build specific docker images
-##   $ make build-ubuntu DOCKER_TAG=nightly CRYSTAL_VERSION=0.xy.z
-##   $ make build-alpine-build DOCKER_TAG=nightly CRYSTAL_VERSION=0.xy.z
+##   $ make build-ubuntu VERSION=1.18.2
+##   $ make build-alpine-build VERSION=1.18.2
 ##
 ## Push all docker images to registry
-##   $ make push DOCKER_TAG=nightly CRYSTAL_VERSION=0.xy.z
+##   $ make push VERSION=1.18.2
 ## Push a specific docker image to registry
-##   $ make push-ubuntu DOCKER_TAG=nightly CRYSTAL_VERSION=0.xy.z
-##   $ make push-alpine-build DOCKER_TAG=nightly CRYSTAL_VERSION=0.xy.z
+##   $ make push-ubuntu VERSION=1.18.2
+##   $ make push-alpine-build VERSION=1.18.2
 ##
 ## Run smoke tests
 ##   $ make smoke-all
 ##   $ make smoke-ubuntu-build
 ##   $ make smoke-alpine-runtime
 
-CRYSTAL_VERSION ?=   ## How the binaries should be branded
-TARBALLS ?= tarballs## Path to folder which contains the Crystal tarballs to install in docker images.
+VERSION ?= ## Version name of the source tarballs
+TARBALLS ?= ./tarballs## Path to folder which contains the Crystal tarballs to install in docker images.
 
-DOCKER_TAG ?= $(CRYSTAL_VERSION)## How to tag the docker image (examples: `0.27.2`, `nightly20190307`). `-build` will be appended for build images.
-DOCKER_REPOSITORY ?= crystallang/crystal## Docker hub repository to push images to (default: `crystallang/crystal`
-
-BUILD_CONTEXT := build-context
+BUILD_CONTEXT := ./build-context
+TAG := crystallang/crystal:$(VERSION)## Base tag of the docker image. Classifiers like `-ubuntu` and `-build` will be appended.
 
 .PHONY: all
 all: ## Build all images
@@ -41,9 +39,9 @@ push: push-alpine-build
 
 .PHONY: push-%
 push-%: build-%
-	docker push $(DOCKER_REPOSITORY):$(DOCKER_TAG)$(subst -ubuntu,,-$*)
+	docker push $(TAG)$(subst -ubuntu,,-$*)
 
-$(BUILD_CONTEXT)/crystal-amd64.tar.gz: $(TARBALLS)/crystal-$(CRYSTAL_VERSION)-1-linux-x86_64.tar.gz | $(BUILD_CONTEXT)
+$(BUILD_CONTEXT)/crystal-amd64.tar.gz: $(TARBALLS)/crystal-$(VERSION)-1-linux-x86_64.tar.gz | $(BUILD_CONTEXT)
 	cp $< $@
 
 $(BUILD_CONTEXT):
@@ -53,13 +51,13 @@ $(BUILD_CONTEXT):
 
 .PHONY: build-%
 build-%: $$(subst -build,,$$*).Dockerfile $(BUILD_CONTEXT)/crystal-amd64.tar.gz
-	docker build --file $(subst -build,,$*).Dockerfile -t $(DOCKER_REPOSITORY):$(DOCKER_TAG)$(subst -ubuntu,,-$*) --target runtime $(BUILD_CONTEXT)
+	docker build --file $(subst -build,,$*).Dockerfile -t $(TAG)$(subst -ubuntu,,-$*) --target runtime $(BUILD_CONTEXT)
 
 alpine-84codes: ## Build and push docker build images based on the base images from 84codes
-	docker buildx build --build-arg crystal_version=$(CRYSTAL_VERSION) -f alpine-84codes.Dockerfile --platform linux/amd64,linux/arm64 --tag crystallang/crystal:$(CRYSTAL_VERSION)-alpine-84codes-build --push .
+	docker buildx build --build-arg crystal_version=$(VERSION) -f alpine-84codes.Dockerfile --platform linux/amd64,linux/arm64 --tag crystallang/crystal:$(VERSION)-alpine-84codes-build --push .
 
 ubuntu-84codes: ## Build and push docker build images based on the base images from 84codes
-	docker buildx build --build-arg crystal_version=$(CRYSTAL_VERSION) -f ubuntu-84codes.Dockerfile --platform linux/amd64,linux/arm64 --tag crystallang/crystal:$(CRYSTAL_VERSION)-ubuntu-84codes-build --push .
+	docker buildx build --build-arg crystal_version=$(VERSION) -f ubuntu-84codes.Dockerfile --platform linux/amd64,linux/arm64 --tag crystallang/crystal:$(VERSION)-ubuntu-84codes-build --push .
 
 .PHONY: smoke-all
 smoke-all: ## Run smoke tests on all docker images
@@ -70,7 +68,7 @@ smoke-all: smoke-ubuntu-build
 
 .PHONY: smoke-%
 smoke-%: # Run smoke tests on docker images
-	docker run --rm -v $(CURDIR)/smoke.sh:/smoke.sh -e CRYSTAL_VERSION=$(CRYSTAL_VERSION) $(DOCKER_REPOSITORY):$(DOCKER_TAG)$(subst -ubuntu,,-$*) /smoke.sh $*
+	docker run --rm -v $(CURDIR)/smoke.sh:/smoke.sh -e VERSION=$(VERSION) $(TAG)$(subst -ubuntu,,-$*) /smoke.sh $*
 
 .PHONY: clean
 clean: ## Clean up build context
