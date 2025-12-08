@@ -66,10 +66,10 @@ build-ubuntu-build: ubuntu.Dockerfile $(PLATFORM_TARBALLS)
 	docker build --file ubuntu.Dockerfile -t $(TAG)-build --target build $(BUILD_CONTEXT)
 
 alpine-84codes: ## Build and push docker build images based on the base images from 84codes
-	docker buildx build --build-arg crystal_version=$(VERSION) -f alpine-84codes.Dockerfile --platform linux/amd64,linux/arm64 --tag crystallang/crystal:$(VERSION)-alpine-84codes-build --push .
+	docker buildx build --build-arg crystal_version=$(VERSION) -f alpine-84codes.Dockerfile --platform linux/amd64,linux/arm64 --tag $(TAG)-alpine-84codes-build --push .
 
 ubuntu-84codes: ## Build and push docker build images based on the base images from 84codes
-	docker buildx build --build-arg crystal_version=$(VERSION) -f ubuntu-84codes.Dockerfile --platform linux/amd64,linux/arm64 --tag crystallang/crystal:$(VERSION)-ubuntu-84codes-build --push .
+	docker buildx build --build-arg crystal_version=$(VERSION) -f ubuntu-84codes.Dockerfile --platform linux/amd64,linux/arm64 --tag $(TAG)-ubuntu-84codes-build --push .
 
 .PHONY: smoke-all
 smoke-all: ## Run smoke tests on all docker images
