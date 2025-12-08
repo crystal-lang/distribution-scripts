@@ -40,7 +40,7 @@ push: push-ubuntu-build
 push: push-alpine
 push: push-alpine-build
 
-push-%: build-%
+push-%:
 	docker push $(TAG)$(subst -ubuntu,,-$*)
 
 $(BUILD_CONTEXT)/crystal-amd64.tar.gz: $(TARBALLS)/crystal-$(VERSION)-1-linux-x86_64.tar.gz | $(BUILD_CONTEXT)
