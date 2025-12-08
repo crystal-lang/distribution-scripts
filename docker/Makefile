@@ -1,73 +1,75 @@
-# Recipies for this Makefile
+# Recipes for this Makefile
 
 ## Build all docker images
-##   $ make DOCKER_TAG=nightly CRYSTAL_VERSION=0.xy.z
-## Build ubuntu64 docker images
-##   $ make ubuntu64 DOCKER_TAG=nightly CRYSTAL_VERSION=0.xy.z
-## Build alpine docker images
-##   $ make alpine DOCKER_TAG=nightly CRYSTAL_VERSION=0.xy.z
+##   $ make VERSION=1.18.2
+## Build specific docker images
+##   $ make build-ubuntu VERSION=1.18.2
+##   $ make build-alpine-build VERSION=1.18.2
+##
+## Push all docker images to registry
+##   $ make push VERSION=1.18.2
+## Push a specific docker image to registry
+##   $ make push-ubuntu VERSION=1.18.2
+##   $ make push-alpine-build VERSION=1.18.2
 ##
 ## Run smoke tests
 ##   $ make smoke-all
 ##   $ make smoke-ubuntu-build
 ##   $ make smoke-alpine-runtime
 
-CRYSTAL_VERSION ?=   ## How the binaries should be branded
-TARBALLS ?= tarballs## Path to folder which contains the Crystal tarballs to install in docker images.
+VERSION ?= ## Version name of the source tarballs
+TARBALLS ?= ./tarballs## Path to folder which contains the Crystal tarballs to install in docker images.
 
-DOCKER_TAG ?= $(CRYSTAL_VERSION)## How to tag the docker image (examples: `0.27.2`, `nightly20190307`). `-build` will be appended for build images.
-DOCKER_REPOSITORY ?= crystallang/crystal## Docker hub repository to commit image
+BUILD_CONTEXT := ./build-context
+TAG := crystallang/crystal:$(VERSION)## Base tag of the docker image. Classifiers like `-ubuntu` and `-build` will be appended.
 
-OUTPUT_DIR := build
-BUILD_CONTEXT := build-context
-DOCKER_TAG_UBUNTU := $(DOCKER_REPOSITORY):$(DOCKER_TAG)
-DOCKER_TAG_ALPINE := $(DOCKER_REPOSITORY):$(DOCKER_TAG)-alpine
+PLATFORMS := linux/amd64
+PLATFORM_TARBALLS := $(patsubst linux/%,$(BUILD_CONTEXT)/crystal-%.tar.gz,$(PLATFORMS))
 
-.PHONY: all64
-all64: ubuntu64 alpine ## Build all x86_64 images
+.PHONY: all
+all: ## Build all images
+all: build-ubuntu
+all: build-ubuntu-build
+all: build-alpine
+all: build-alpine-build
 
-.PHONY: all_ubuntu
-all_ubuntu: ubuntu64  ## Build all ubuntu images
+.PHONY: push
+push: ## Push all images to the registry
+push: push-ubuntu
+push: push-ubuntu-build
+push: push-alpine
+push: push-alpine-build
 
-.PHONY: ubuntu64
-ubuntu64: ## Build ubuntu x86_64 images
-ubuntu64: $(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-ubuntu-x86_64.tar.gz
-ubuntu64: $(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-ubuntu-x86_64-build.tar.gz
+push-%:
+	docker push $(TAG)$(subst -ubuntu,,-$*)
 
-.PHONY: alpine
-alpine: ## Build alpine images
-alpine: $(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-alpine.tar.gz
-alpine: $(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-alpine-build.tar.gz
-
-$(BUILD_CONTEXT)/crystal-amd64.tar.gz: $(TARBALLS)/crystal-$(CRYSTAL_VERSION)-1-linux-x86_64.tar.gz | $(BUILD_CONTEXT)
+$(BUILD_CONTEXT)/crystal-amd64.tar.gz: $(TARBALLS)/crystal-$(VERSION)-1-linux-x86_64.tar.gz | $(BUILD_CONTEXT)
 	cp $< $@
 
-$(OUTPUT_DIR) $(BUILD_CONTEXT):
+$(BUILD_CONTEXT):
 	mkdir -p $@
 
-# Ubuntu x86_64
-$(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-ubuntu-x86_64.tar.gz: ubuntu.Dockerfile $(BUILD_CONTEXT)/crystal-amd64.tar.gz $(OUTPUT_DIR)
-	docker build --file ubuntu.Dockerfile -t $(DOCKER_TAG_UBUNTU) --target runtime $(BUILD_CONTEXT)
-	docker save $(DOCKER_TAG_UBUNTU) | gzip > $@
+.PHONY: build-alpine
+build-alpine: alpine.Dockerfile $(PLATFORM_TARBALLS)
+	docker build --file alpine.Dockerfile -t $(TAG)-alpine --target runtime $(BUILD_CONTEXT)
 
-$(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-ubuntu-x86_64-build.tar.gz: ubuntu.Dockerfile $(BUILD_CONTEXT)/crystal-amd64.tar.gz $(OUTPUT_DIR)
-	docker build --file ubuntu.Dockerfile -t $(DOCKER_TAG_UBUNTU)-build --target build  $(BUILD_CONTEXT)
-	docker save $(DOCKER_TAG_UBUNTU)-build | gzip > $@
+.PHONY: build-alpine-build
+build-alpine-build: alpine.Dockerfile $(PLATFORM_TARBALLS)
+	docker build --file alpine.Dockerfile -t $(TAG)-alpine-build --target build $(BUILD_CONTEXT)
 
-# Alpine x86_64
-$(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-alpine.tar.gz: alpine.Dockerfile $(BUILD_CONTEXT)/crystal-amd64.tar.gz $(OUTPUT_DIR)
-	docker build --file alpine.Dockerfile -t $(DOCKER_TAG_ALPINE) --target runtime $(BUILD_CONTEXT)
-	docker save $(DOCKER_TAG_ALPINE) | gzip > $@
+.PHONY: build-ubuntu
+build-ubuntu: ubuntu.Dockerfile $(PLATFORM_TARBALLS)
+	docker build --file ubuntu.Dockerfile -t $(TAG) --target runtime $(BUILD_CONTEXT)
 
-$(OUTPUT_DIR)/docker-$(CRYSTAL_VERSION)-alpine-build.tar.gz: alpine.Dockerfile $(BUILD_CONTEXT)/crystal-amd64.tar.gz $(OUTPUT_DIR)
-	docker build --file alpine.Dockerfile -t $(DOCKER_TAG_ALPINE)-build --target build $(BUILD_CONTEXT)
-	docker save $(DOCKER_TAG_ALPINE)-build | gzip > $@
+.PHONY: build-ubuntu-build
+build-ubuntu-build: ubuntu.Dockerfile $(PLATFORM_TARBALLS)
+	docker build --file ubuntu.Dockerfile -t $(TAG)-build --target build $(BUILD_CONTEXT)
 
 alpine-84codes: ## Build and push docker build images based on the base images from 84codes
-	docker buildx build --build-arg crystal_version=$(CRYSTAL_VERSION) -f alpine-84codes.Dockerfile --platform linux/amd64,linux/arm64 --tag crystallang/crystal:$(CRYSTAL_VERSION)-alpine-84codes-build --push .
+	docker buildx build --build-arg crystal_version=$(VERSION) -f alpine-84codes.Dockerfile --platform linux/amd64,linux/arm64 --tag $(TAG)-alpine-84codes-build --push .
 
 ubuntu-84codes: ## Build and push docker build images based on the base images from 84codes
-	docker buildx build --build-arg crystal_version=$(CRYSTAL_VERSION) -f ubuntu-84codes.Dockerfile --platform linux/amd64,linux/arm64 --tag crystallang/crystal:$(CRYSTAL_VERSION)-ubuntu-84codes-build --push .
+	docker buildx build --build-arg crystal_version=$(VERSION) -f ubuntu-84codes.Dockerfile --platform linux/amd64,linux/arm64 --tag $(TAG)-ubuntu-84codes-build --push .
 
 .PHONY: smoke-all
 smoke-all: ## Run smoke tests on all docker images
@@ -78,11 +80,10 @@ smoke-all: smoke-ubuntu-build
 
 .PHONY: smoke-%
 smoke-%: # Run smoke tests on docker images
-	docker run --rm -v $(CURDIR)/smoke.sh:/smoke.sh -e CRYSTAL_VERSION=$(CRYSTAL_VERSION) $(DOCKER_REPOSITORY):$(DOCKER_TAG)$(subst -ubuntu,,-$*) /smoke.sh $*
+	docker run --rm -v $(CURDIR)/smoke.sh:/smoke.sh -e VERSION=$(VERSION) $(TAG)$(subst -ubuntu,,-$*) /smoke.sh $*
 
 .PHONY: clean
-clean: ## Clean up build and output directories
-	rm -Rf $(OUTPUT_DIR)
+clean: ## Clean up build context
 	rm -Rf $(BUILD_CONTEXT)
 
 .PHONY: help
