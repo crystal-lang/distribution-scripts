@@ -55,19 +55,19 @@ $(BUILD_CONTEXT):
 
 .PHONY: build-alpine
 build-alpine: alpine.Dockerfile $(PLATFORM_TARBALLS)
-	docker buildx build --platform $(PLATFORM) --file alpine.Dockerfile -t $(TAG)-alpine --target runtime $(BUILD_CONTEXT)
+	docker buildx build --load --platform $(PLATFORM) --file alpine.Dockerfile -t $(TAG)-alpine --target runtime $(BUILD_CONTEXT)
 
 .PHONY: build-alpine-build
 build-alpine-build: alpine.Dockerfile $(PLATFORM_TARBALLS)
-	docker buildx build --platform $(PLATFORM) --file alpine.Dockerfile -t $(TAG)-alpine-build --target build $(BUILD_CONTEXT)
+	docker buildx build --load --platform $(PLATFORM) --file alpine.Dockerfile -t $(TAG)-alpine-build --target build $(BUILD_CONTEXT)
 
 .PHONY: build-ubuntu
 build-ubuntu: ubuntu.Dockerfile $(PLATFORM_TARBALLS)
-	docker buildx build --platform $(PLATFORM) --file ubuntu.Dockerfile -t $(TAG) --target runtime $(BUILD_CONTEXT)
+	docker buildx build --load --platform $(PLATFORM) --file ubuntu.Dockerfile -t $(TAG) --target runtime $(BUILD_CONTEXT)
 
 .PHONY: build-ubuntu-build
 build-ubuntu-build: ubuntu.Dockerfile $(PLATFORM_TARBALLS)
-	docker buildx build --platform $(PLATFORM) --file ubuntu.Dockerfile -t $(TAG)-build --target build $(BUILD_CONTEXT)
+	docker buildx build --load --platform $(PLATFORM) --file ubuntu.Dockerfile -t $(TAG)-build --target build $(BUILD_CONTEXT)
 
 alpine-84codes: ## Build and push docker build images based on the base images from 84codes
 	docker buildx build --build-arg crystal_version=$(VERSION) -f alpine-84codes.Dockerfile --platform linux/amd64,linux/arm64 --tag $(TAG)-alpine-84codes-build --push .
