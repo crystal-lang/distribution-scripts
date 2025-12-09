@@ -7,10 +7,10 @@
 ##   $ make build-alpine-build VERSION=1.18.2
 ##
 ## Push all docker images to registry
-##   $ make push VERSION=1.18.2
+##   $ make build VERSION=1.18.2 PUSH=1
 ## Push a specific docker image to registry
-##   $ make push-ubuntu VERSION=1.18.2
-##   $ make push-alpine-build VERSION=1.18.2
+##   $ make build-ubuntu VERSION=1.18.2 PUSH=1
+##   $ make build-alpine-build VERSION=1.18.2 PUSH=1
 ##
 ## Run smoke tests
 ##   $ make smoke-all
@@ -19,6 +19,7 @@
 
 VERSION ?= ## Version name of the source tarballs
 TARBALLS ?= ./tarballs## Path to folder which contains the Crystal tarballs to install in docker images.
+PUSH ?= ## Directly push images to registry
 
 BUILD_CONTEXT := ./build-context
 TAG := crystallang/crystal:$(VERSION)## Base tag of the docker image. Classifiers like `-ubuntu` and `-build` will be appended.
@@ -34,16 +35,6 @@ all: build-ubuntu-build
 all: build-alpine
 all: build-alpine-build
 
-.PHONY: push
-push: ## Push all images to the registry
-push: push-ubuntu
-push: push-ubuntu-build
-push: push-alpine
-push: push-alpine-build
-
-push-%:
-	docker push $(TAG)$(subst -ubuntu,,-$*)
-
 $(BUILD_CONTEXT)/crystal-amd64.tar.gz: $(TARBALLS)/crystal-$(VERSION)-1-linux-x86_64.tar.gz | $(BUILD_CONTEXT)
 	cp $< $@
 
@@ -55,19 +46,19 @@ $(BUILD_CONTEXT):
 
 .PHONY: build-alpine
 build-alpine: alpine.Dockerfile $(PLATFORM_TARBALLS)
-	docker buildx build --load --platform $(PLATFORM) --file alpine.Dockerfile -t $(TAG)-alpine --target runtime $(BUILD_CONTEXT)
+	docker buildx build $(if $(PUSH),--push,) --platform $(PLATFORM) --file alpine.Dockerfile -t $(TAG)-alpine --target runtime $(BUILD_CONTEXT)
 
 .PHONY: build-alpine-build
 build-alpine-build: alpine.Dockerfile $(PLATFORM_TARBALLS)
-	docker buildx build --load --platform $(PLATFORM) --file alpine.Dockerfile -t $(TAG)-alpine-build --target build $(BUILD_CONTEXT)
+	docker buildx build $(if $(PUSH),--push,) --platform $(PLATFORM) --file alpine.Dockerfile -t $(TAG)-alpine-build --target build $(BUILD_CONTEXT)
 
 .PHONY: build-ubuntu
 build-ubuntu: ubuntu.Dockerfile $(PLATFORM_TARBALLS)
-	docker buildx build --load --platform $(PLATFORM) --file ubuntu.Dockerfile -t $(TAG) --target runtime $(BUILD_CONTEXT)
+	docker buildx build $(if $(PUSH),--push,) --platform $(PLATFORM) --file ubuntu.Dockerfile -t $(TAG) --target runtime $(BUILD_CONTEXT)
 
 .PHONY: build-ubuntu-build
 build-ubuntu-build: ubuntu.Dockerfile $(PLATFORM_TARBALLS)
-	docker buildx build --load --platform $(PLATFORM) --file ubuntu.Dockerfile -t $(TAG)-build --target build $(BUILD_CONTEXT)
+	docker buildx build $(if $(PUSH),--push,) --platform $(PLATFORM) --file ubuntu.Dockerfile -t $(TAG)-build --target build $(BUILD_CONTEXT)
 
 alpine-84codes: ## Build and push docker build images based on the base images from 84codes
 	docker buildx build --build-arg crystal_version=$(VERSION) -f alpine-84codes.Dockerfile --platform linux/amd64,linux/arm64 --tag $(TAG)-alpine-84codes-build --push .
