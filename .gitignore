@@ -8,6 +8,6 @@ docs/build/
 
 darwin/build/
 
-snapcraft/snap/snapcraft.yaml
+snapcraft/snapcraft.yaml
 snapcraft/*.snap
 snapcraft/build/

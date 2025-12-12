@@ -1,5 +1,5 @@
 name: crystal
-base: core
+base: core22
 summary: A language for humans and computers
 description: |
   * Have a syntax similar to Ruby (but compatibility with it is not a goal)
@@ -7,6 +7,12 @@ description: |
   * Be able to call C code by writing bindings to it in Crystal.
   * Have compile-time evaluation and generation of code, to avoid boilerplate code. Compile to efficient native code.
 adopt-info: crystal
+
+architectures:
+  - build-on: [amd64]
+    build-for: [amd64]
+  - build-on: [amd64, arm64]
+    build-for: [arm64]
 
 grade: ${SNAP_GRADE}
 confinement: classic
@@ -24,10 +30,10 @@ apps:
 parts:
   crystal:
     plugin: dump
-    source: ${CRYSTAL_RELEASE_LINUX64_TARGZ}
+    source: ${CRYSTAL_TARBALL}
     override-pull: |
-      snapcraftctl pull
-      snapcraftctl set-version "$(cat $SNAPCRAFT_PART_SRC/share/crystal/src/VERSION | head -n 1)"
+      craftctl default
+      craftctl set version="$(cat $CRAFT_PART_SRC/share/crystal/src/VERSION | head -n 1)"
 
   snap-wrapper:
     plugin: dump

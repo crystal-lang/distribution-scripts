@@ -1,20 +1,29 @@
 # snap for Crystal
 
-https://snapcraft.io/crystal
+<https://snapcraft.io/crystal>
 
 ## Dependencies
 
 - [`snapcraft`](https://docs.snapcraft.io/snapcraft-overview)
 
-## Build the snap
+For example on Ubuntu:
 
-Define the configuration variables and use `make` to expand the `./snap/local/snapcraft.yaml.tpl`.
-
-```sh
-$ SNAP_GRADE=devel CRYSTAL_RELEASE_LINUX64_TARGZ="https://github.com/crystal-lang/crystal/releases/download/0.29.0/crystal-0.29.0-1-linux-x86_64.tar.gz" make
+```console
+$ sudo apt-get install snapd
+$ snap install snapcraft --classic
 ```
 
-## Snap channels usage
+## Build
+
+Define the configuration variables and use `make` to expand the `./local/snapcraft.yaml.tpl`.
+
+```console
+$ export SNAPCRAFT_BUILD_ENVIRONMENT=host
+$ make GRADE=devel ARCH=amd64 CRYSTAL_TARBALL=../linux/build/crystal-$(CRYSTAL_VERSION)-1-linux-x86_64.tar.gz
+$ make GRADE=devel ARCH=arm64 CRYSTAL_TARBALL=../linux/build/crystal-$(CRYSTAL_VERSION)-1-linux-aarch64.tar.gz
+```
+
+## Channels
 
 | Build             | Channel                    | Version   | Comments                                             |
 |-------------------|----------------------------|-----------|------------------------------------------------------|
@@ -24,15 +33,16 @@ $ SNAP_GRADE=devel CRYSTAL_RELEASE_LINUX64_TARGZ="https://github.com/crystal-lan
 
 ### Configuration
 
-* `CRYSTAL_RELEASE_LINUX64_TARGZ`: Url to crystal-{version}-{package}-linux-x86_64.tar.gz
-* `SNAP_GRADE`: Snap grande usually `devel` for nightlies and `stable` for tagged releases
+* `CRYSTAL_TARBALL`: path to `crystal-{version}-{package}-linux-{arch}.tar.gz`
+* `ARCH`: the architecture to build (`amd64` or `arm64`)
+* `GRADE`: Snap grade (`devel` for nightlies, `stable` for tagged releases)
 
 ## Install the snap
 
 1. [Have snapd installed](https://snapcraft.io/docs/core/install)
 
 2.
-    ```
+    ```console
     $ sudo snap install crystal --classic
     ```
 
