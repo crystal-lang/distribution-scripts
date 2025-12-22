@@ -23,7 +23,7 @@ PREVIOUS_CRYSTAL_VERSION ?= ## Version of the bootstrap compiler
 PREVIOUS_CRYSTAL_PACKAGE_ITERATION ?= 1## Package iteration of the bootstrap compiler
 PREVIOUS_CRYSTAL_RELEASE_LINUX64_TARGZ ?= https://github.com/crystal-lang/crystal/releases/download/$(PREVIOUS_CRYSTAL_VERSION)/crystal-$(PREVIOUS_CRYSTAL_VERSION)-$(PREVIOUS_CRYSTAL_PACKAGE_ITERATION)-linux-$(arch).tar.gz ## url to crystal-{version}-{package}-linux-{arch}.tar.gz
 
-SHARDS_VERSION = v0.19.1
+SHARDS_VERSION = v0.20.0
 GC_VERSION = v8.2.8
 LIBPCRE2_VERSION = 10.46
 
