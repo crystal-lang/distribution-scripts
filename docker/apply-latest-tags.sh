@@ -15,14 +15,10 @@ apply_tag() {
 
   echo "Publishing ${base_tag} as ${new_tag}"
 
-  docker tag "${base_tag}" "${new_tag}"
-  docker push "${new_tag}"
+  docker buildx imagetools create {$base_tag} --tag ${new_tag}
 }
 
 version=$1
-
-docker pull "crystallang/crystal:${version}"
-docker pull "crystallang/crystal:${version}-alpine"
 
 # Tag latest
 apply_tag "crystallang/crystal:${version}"        "crystallang/crystal:latest"
