@@ -15,7 +15,7 @@ apply_tag() {
 
   echo "Publishing ${base_tag} as ${new_tag}"
 
-  docker buildx imagetools create {$base_tag} --tag ${new_tag}
+  docker buildx imagetools create ${base_tag} --tag ${new_tag}
 }
 
 version=$1
