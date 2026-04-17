@@ -46,9 +46,9 @@ osc mv "${OLD_PACKAGE}-docs.dsc" "${PACKAGE}-docs.dsc"
 cat <<EOF > debian.changelog
 ${PACKAGE} (${VERSION}-1) stable; urgency=low
 
-* Create package for ${BASE_PACKAGE} ${VERSION}
+  * Create package for ${BASE_PACKAGE} ${VERSION}
 
--- Crystal Team <crystal@manas.tech>  $(LC_ALL=en_US date --utc +'%a, %-d %b %Y %T +0000')
+  -- Crystal Team <crystal@manas.tech>  $(LC_ALL=en_US date --utc +'%a, %-d %b %Y %T +0000')
 EOF
 echo > *.changes
 
