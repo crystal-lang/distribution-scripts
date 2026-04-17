@@ -5,12 +5,13 @@ RUN crystal --version
 
 ARG output_docs_base_name
 ARG crystal_sha1
+ARG crystal_version
 ARG crystal_repo=https://github.com/crystal-lang/crystal
 RUN git clone "${crystal_repo}" \
  && cd crystal \
  && git checkout ${crystal_sha1} \
  \
- && make docs DOCS_OPTIONS='--json-config-url=/api/versions.json  --canonical-base-url="https://crystal-lang.org/api/latest/"'\
+ && make docs DOCS_OPTIONS='--json-config-url=/api/versions.json  --canonical-base-url="https://crystal-lang.org/api/latest/" --base-path="/api/${crystal_version}"'\
  && git describe --tags --long --always 2>/dev/null > ./docs/revision.txt \
  && mv ./docs ./${output_docs_base_name} \
  \
