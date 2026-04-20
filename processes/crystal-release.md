@@ -89,7 +89,9 @@ document. In this way it's easy to track the progress of the release (*Helper:
       2. Wait for all package build jobs to finish and succeed
    7. When everything is green, create a submit request against the original
       packages: *Submit package* link in the page actions (left sidebar) in your branch.
-   8. (optional) Verify package installation
+      * (minor) `crystal`
+      * `crystal${VERSION%.*}`
+   9. (optional) Verify package installation
       * (`distribution-scripts/packages`) `OBS_PROJECT=devel:languages:crystal bats test`
 4. [ ] Tag `latest` docker images
    * Versioned docker images have been pushed to Docker Hub.
