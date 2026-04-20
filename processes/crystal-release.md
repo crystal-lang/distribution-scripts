@@ -91,7 +91,7 @@ document. In this way it's easy to track the progress of the release (*Helper:
       packages: *Submit package* link in the page actions (left sidebar) in your branch.
       * (minor) `crystal`
       * `crystal${VERSION%.*}`
-   9. (optional) Verify package installation
+   8. (optional) Verify package installation
       * (`distribution-scripts/packages`) `OBS_PROJECT=devel:languages:crystal bats test`
 4. [ ] Tag `latest` docker images
    * Versioned docker images have been pushed to Docker Hub.
