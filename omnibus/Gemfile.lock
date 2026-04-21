@@ -45,7 +45,7 @@ GEM
     iostruct (0.5.0)
     ipaddress (0.8.3)
     jmespath (1.6.2)
-    json (2.15.2)
+    json (2.15.2.1)
     libyajl2 (2.1.0)
     license_scout (1.4.0)
       ffi-yajl (~> 2.2)
