@@ -21,7 +21,7 @@ for cmd in curl jq gh zip; do
 done
 
 if [ -z $1 ]; then
-  echo "Usage: ./download_artifacts.sh <version>"
+  echo "Usage: ./download-crystal-release-artifacts.sh <version>"
   exit 1
 fi
 
