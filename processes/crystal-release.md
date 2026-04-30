@@ -57,20 +57,22 @@ document. In this way it's easy to track the progress of the release (*Helper:
 
 ### Binary releases
 
-1. Publish build artifacts from CircleCI and GitHub Actions to GitHub release. For `URL_TO_CIRCLECI_ARTIFACT` grab the URL
-   of any of the build artifacts in circleCI (doesn't matter which).
-   * [ ] Upload build artifacts from CircleCI: (`crystal`) [`../distribution-scripts/processes/scripts/publish-crystal-packages-on-github.sh $URL_TO_CIRCLECI_ARTIFACT`](https://github.com/crystal-lang/distribution-scripts/blob/master/processes/scripts/publish-crystal-packages-on-github.sh) (run from `crystallang/crystal@${VERSION}` work tree)
+1. [ ] Download build artifacts from CircleCI and GitHub Actions: (`distribution-scripts`) [`./processes/scripts/download-crystal-release-artifacts.sh $VERSION`](https://github.com/crystal-lang/distribution-scripts/blob/master/processes/scripts/download-crystal-release-artifacts.sh). This performs these steps:
+   1. Search the release build from the latest CircleCI pipelines
+   2. Download build artifacts from the CircleCI jobs:
       * `crystal-*-darwin-*.tar.gz`
       * `crystal-*-linux-*.tar.gz`
       * `crystal-*.pkg`
       * `crystal-*-docs.tar.gz`
-   * [ ] Upload build artifacts from GHA (Windows):
-      * Windows CI: `crystal.zip` -> `crystal-${VERSION}-windows-x86_64-msvc-unsupported.zip`
-      * Windows CI: `crystal-installer.zip` -> unzip -> `crystal-${VERSION}-windows-x86_64-msvc-unsupported.exe`
-      * MinGW-w64 CI: `x86_64-mingw-w64-crystal.zip` -> `crystal-${VERSION}-windows-x86_64-gnu-unsupported.zip`
-      * MinGW-w64 CI: `aarch64-mingw-w64-crystal.zip` -> `crystal-${VERSION}-windows-aarch64-gnu-unsupported.zip`
-2. [ ] Publish the GitHub release
-3. [ ] Push changes to OBS for building linux packages
+   3. Search the release build in GitHub Actions
+   4. Download the artifacts from the CircleCI job (MinGW-w64 CI, Windows CI)
+   5. Compress and rename the GHA artifacts:
+      * Windows CI: `crystal/*` -> `crystal-${VERSION}-windows-x86_64-msvc-unsupported.zip`
+      * Windows CI: `crystal-installer/crystal-setup.exe` -> `crystal-${VERSION}-windows-x86_64-msvc-unsupported.exe`
+      * MinGW-w64 CI: `*-mingw-w64-crystal/*` -> `crystal-${VERSION}-windows-*-gnu-unsupported.zip`
+2. [ ] Upload build artifacts to the GitHub Release: (`distribution-scripts`) `gh release -R crystal-lang/crystal upload ${VERSION} crystal-${VERSION}*`
+3. [ ] Publish the GitHub release
+4. [ ] Push changes to OBS for building linux packages
    1. Checkout https://github.com/crystal-lang/distribution-scripts and go to [`./packages`](../packages)
    2. Configure build.opensuse.org credentials in environment variables:
       * `export OBS_USER=`
@@ -93,13 +95,13 @@ document. In this way it's easy to track the progress of the release (*Helper:
       * `crystal${VERSION%.*}`
    8. (optional) Verify package installation
       * (`distribution-scripts/packages`) `OBS_PROJECT=devel:languages:crystal bats test`
-4. [ ] Tag `latest` docker images
+5. [ ] Tag `latest` docker images
    * Versioned docker images have been pushed to Docker Hub.
    * Now just assign the `latest` tags:
    *  (`distribution-scripts`) `./docker/apply-latest-tags.sh ${VERSION}`
-5. [ ] Publish snap package
+6. [ ] Publish snap package
    - On https://snapcraft.io/crystal/releases promote the `latest/edge` release to `latest/beta` and then `latest/stable`
-6. [ ] Check PR for homebrew: https://github.com/Homebrew/homebrew-core/pulls?q=is%3Apr+crystal+sort%3Aupdated-desc
+7. [ ] Check PR for homebrew: https://github.com/Homebrew/homebrew-core/pulls?q=is%3Apr+crystal+sort%3Aupdated-desc
    * It should've been automatically created
 
 ### Publish documentation for the release
