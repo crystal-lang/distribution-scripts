@@ -44,12 +44,12 @@ GHA_MSVC_RUN_ID=$(gh run list -R crystal-lang/crystal --branch "$VERSION" --json
 
 echo "Downloading/compressing release artifacts from GitHub ..."
 gh run -R crystal-lang/crystal download "$GHA_MINGW_RUN_ID"
-sh -c "cd aarch64-mingw-w64-crystal/ && zip -9 -r '../crystal-$VERSION-$REV-windows-aarch64-gnu-unsupported.zip' *"
-sh -c "cd x86_64-mingw-w64-crystal/ && zip -9 -r '../crystal-$VERSION-$REV-windows-x86_64-gnu-unsupported.zip' *"
+sh -c "cd aarch64-mingw-w64-crystal/ && zip -9 -r '../crystal-$VERSION-windows-aarch64-gnu-unsupported.zip' *"
+sh -c "cd x86_64-mingw-w64-crystal/ && zip -9 -r '../crystal-$VERSION-windows-x86_64-gnu-unsupported.zip' *"
 
 gh run -R crystal-lang/crystal download "$GHA_MSVC_RUN_ID"
-sh -c "cd crystal/ && zip -9 -r '../crystal-$VERSION-$REV-windows-msvc-unsupported.zip' *"
-mv crystal-installer/crystal-setup.exe "crystal-$VERSION-$REV-windows-msvc-unsupported.exe"
+sh -c "cd crystal/ && zip -9 -r '../crystal-$VERSION-windows-x86_64-msvc-unsupported.zip' *"
+mv crystal-installer/crystal-setup.exe "crystal-$VERSION-windows-x86_64-msvc-unsupported.exe"
 
 echo "Final list of artifacts to upload:"
 echo crystal-$VERSION*
