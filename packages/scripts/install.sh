@@ -44,7 +44,13 @@ CRYSTAL_VERSION=${CRYSTAL_VERSION:-"latest"}
 CHANNEL="stable"
 
 _error_reporting() {
-  echo >&2 "Please, report to https://forum.crystal-lang.org/c/help-support/11"
+  cat >&2 <<TXT
+This installer script tries to identify your Linux distribution and install the
+appropriate Crystal package from the Open Build Service repository. It supports
+only DEB and RPM based package managers.
+More options to install Crystal are listed on https://crystal-lang.org/install/
+Please report issues to https://forum.crystal-lang.org/c/help-support/11
+TXT
 }
 
 _error() {
