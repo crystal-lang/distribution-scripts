@@ -43,6 +43,10 @@ DISTRO_REPO=${DISTRO_REPO:-}
 CRYSTAL_VERSION=${CRYSTAL_VERSION:-"latest"}
 CHANNEL="stable"
 
+_error_reporting() {
+  echo >&2 "Please, report to https://forum.crystal-lang.org/c/help-support/11"
+}
+
 _error() {
   echo >&2 "ERROR: $*"
 }
@@ -53,7 +57,8 @@ _warn() {
 
 _check_version_id() {
   if [[ -z "${VERSION_ID}" ]]; then
-    _error "Unable to identify distribution repository for ${ID}. Please, report to https://forum.crystal-lang.org/c/help-support/11"
+    _error "Unable to identify distribution repository for ${ID}."
+    _error_reporting
     exit 1
   fi
 }
@@ -64,7 +69,8 @@ _discover_distro_repo() {
   elif [[ -r /usr/lib/os-release ]]; then
     source /usr/lib/os-release
   else
-    _error "Unable to identify distribution. Please, report to https://forum.crystal-lang.org/c/help-support/11"
+    _error "Unable to identify distribution."
+    _error_reporting
     exit 1
   fi
 
@@ -108,7 +114,7 @@ _discover_distro_repo() {
       ;;
     "")
       _error "Unable to identify distribution. You may specify one with environment variable DISTRO_REPO"
-      _error "Please, report to https://forum.crystal-lang.org/c/help-support/11"
+      _error_reporting
       exit 1
       ;;
     *)
@@ -127,8 +133,8 @@ _discover_distro_repo() {
         DISTRO_REPO="RHEL_7"
         ;;
       unsupported_package_manager)
-        _error "Unable to identify distribution type ($ID). You may specify a repository with the environment variable DISTRO_REPO"
-        _error "Please, report to https://forum.crystal-lang.org/c/help-support/11"
+        _error "Unable to identify distribution type ($ID). You may specify a repository with the environment variable DISTRO_REPO."
+        _error_reporting
         exit 1
         ;;
       esac
@@ -287,7 +293,8 @@ case $DISTRO_REPO in
     _install_zypper
     ;;
   *)
-    _error "Unable to install for $DISTRO_REPO. Please, report to https://forum.crystal-lang.org/c/help-support/11"
+    _error "Unable to install for $DISTRO_REPO"
+    _error_reporting
     exit 1
     ;;
 esac
