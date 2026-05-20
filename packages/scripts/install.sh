@@ -199,7 +199,7 @@ _install_apt() {
     apt-get install -y wget gpg
   fi
 
-  # Add repo signign key
+  # Add repo signing key
   wget -qO- https://download.opensuse.org/repositories/${OBS_PROJECT//:/:\/}/${DISTRO_REPO}/Release.key | gpg --dearmor | tee /etc/apt/trusted.gpg.d/devel_languages_crystal.gpg > /dev/null
   echo "deb http://download.opensuse.org/repositories/${OBS_PROJECT//:/:\/}/${DISTRO_REPO}/ /" | tee /etc/apt/sources.list.d/crystal.list
   apt-get update
