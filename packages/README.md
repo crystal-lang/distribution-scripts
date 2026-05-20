@@ -4,9 +4,9 @@
 
 We're using separate OBS projects for the different release strategies:
 
-* Stable releases: https://build.opensuse.org/package/show/devel:languages:crystal/crystal
-* Nightly releases: https://build.opensuse.org/package/show/devel:languages:crystal:nightly/crystal
-* Unstable releases (currently unused): https://build.opensuse.org/package/show/devel:languages:crystal:unstable/crystal
+- Stable releases: https://build.opensuse.org/package/show/devel:languages:crystal/crystal
+- Nightly releases: https://build.opensuse.org/package/show/devel:languages:crystal:nightly/crystal
+- Unstable releases (currently unused): https://build.opensuse.org/package/show/devel:languages:crystal:unstable/crystal
 
 Each project can contain multiple packages. Currently, there is only a `crystal` package in each project.
 
@@ -74,6 +74,6 @@ Alternatively, you can use a branch package to run a test build on OBS.
 
 To test if a build succeeds, we can use a branching strategy. In contrast to git, where you would create a new branch in the repository, in OBS you branch the entire project. The branch project is created in your personal namespace (`home:$USERNAME:branches:$PROJECT`).
 
-After creating the branch package, you check that out locally, apply the changes and commit (see [*Update package*](#Update package)). OBS then builds the packages in your branch project. If everything is green, you create a submit request which would pull the changes into the main project (similar to a pull request on GitHub).
+After creating the branch package, you check that out locally, apply the changes and commit (see [_Update package_](#Update package)). OBS then builds the packages in your branch project. If everything is green, you create a submit request which would pull the changes into the main project (similar to a pull request on GitHub).
 
-See [*Branching a Package* in the OBS Beginner's Guide](https://openbuildservice.org/help/manuals/obs-user-guide/art.obs.bg.html#sec.obsbg.uc.branchprj) for more details on this workflow.
+See [_Branching a Package_ in the OBS Beginner's Guide](https://openbuildservice.org/help/manuals/obs-user-guide/art.obs.bg.html#sec.obsbg.uc.branchprj) for more details on this workflow.

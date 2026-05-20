@@ -33,18 +33,19 @@ $ make GRADE=devel ARCH=arm64 CRYSTAL_TARBALL=../linux/build/crystal-$(CRYSTAL_V
 
 ### Configuration
 
-* `CRYSTAL_TARBALL`: path to `crystal-{version}-{package}-linux-{arch}.tar.gz`
-* `ARCH`: the architecture to build (`amd64` or `arm64`)
-* `GRADE`: Snap grade (`devel` for nightlies, `stable` for tagged releases)
+- `CRYSTAL_TARBALL`: path to `crystal-{version}-{package}-linux-{arch}.tar.gz`
+- `ARCH`: the architecture to build (`amd64` or `arm64`)
+- `GRADE`: Snap grade (`devel` for nightlies, `stable` for tagged releases)
 
 ## Install the snap
 
 1. [Have snapd installed](https://snapcraft.io/docs/core/install)
 
 2.
-    ```console
-    $ sudo snap install crystal --classic
-    ```
+
+   ```console
+   $ sudo snap install crystal --classic
+   ```
 
 ## Post-Install
 
@@ -59,4 +60,3 @@ $ sudo apt-get install gcc pkg-config git tzdata \
 ```
 
 You can find more detailed information in the [Crystal reference](https://crystal-lang.org/reference/installation/on_debian_and_ubuntu.html) and in the [Crystal wiki](https://github.com/crystal-lang/crystal/wiki/All-required-libraries) if you want to be able to build the compiler itself.
-
