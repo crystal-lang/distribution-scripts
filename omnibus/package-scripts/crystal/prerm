@@ -5,7 +5,7 @@
 #
 
 INSTALL_PATH=/usr
-if [ "$(uname)" = "Darwin" -a "$(uname -r|cut -f1 -d.)" -ge 15 ]; then
+if [ "$(uname)" = "Darwin" ] &&  [ "$(uname -r|cut -f1 -d.)" -ge 15 ]; then
 	INSTALL_PATH=/usr/local
 fi
 
