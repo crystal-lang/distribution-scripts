@@ -37,7 +37,7 @@ else
 fi
 
 # Setup for new minor version package
-sed -i -e "s/${OLD_PACKAGE}/${PACKAGE}/" *.spec debian.control *.dsc
+sed -i -e "s/${OLD_PACKAGE}/${PACKAGE}/" ./*.spec debian.control ./*.dsc
 
 osc mv "${OLD_PACKAGE}.dsc" "${PACKAGE}.dsc"
 osc mv "${OLD_PACKAGE}-docs.dsc" "${PACKAGE}-docs.dsc"
