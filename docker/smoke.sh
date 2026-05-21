@@ -17,7 +17,8 @@ shards --version | grep -q Shards
 
 case "$1" in
   *-build)
-    crystal eval 'require "llvm"; puts LLVM.version' | grep -q "$(/usr/bin/llvm-config-* --version)"
+    llvm_config=(/usr/bin/llvm-config-*)
+    crystal eval 'require "llvm"; puts LLVM.version' | grep -q "$("${llvm_config[0]}" --version)"
     ;;
   *)
     crystal eval 'puts "Hello World"' | grep -q "Hello World"
