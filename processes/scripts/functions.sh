@@ -1,4 +1,4 @@
-START_STEP=${START_STEP:-1}
+START_STEP=${START_STEP:-${1:-1}}
 step_number=1
 
 step(){
