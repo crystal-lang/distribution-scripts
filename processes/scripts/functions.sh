@@ -1,3 +1,4 @@
+#!/bin/sh
 START_STEP=${START_STEP:-${1:-1}}
 step_number=1
 
