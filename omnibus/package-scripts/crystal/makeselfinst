@@ -6,8 +6,6 @@
 PROGNAME=$(basename "$0")
 INSTALLER_DIR=$(dirname "$0")
 DEST_DIR=/opt/crystal
-CONFIG_DIR=/etc/crystal
-USAGE="usage: $0"
 
 error_exit()
 {

@@ -170,7 +170,6 @@ case $i in
     --help)
     _help
     exit 0
-    shift
     ;;
     *)
     _warn "Invalid option $i"

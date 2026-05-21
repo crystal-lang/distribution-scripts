@@ -2,10 +2,6 @@
 
 set -eu
 
-DISTRO_TYPE=""
-[[ -x "/usr/bin/apt-get" ]] && DISTRO_TYPE="deb"
-[[ -x "/usr/bin/yum" ]]     && DISTRO_TYPE="rpm"
-
 # Required for Ubuntu <= 20.04 to not ask for input during package installation
 export DEBIAN_FRONTEND=noninteractive
 

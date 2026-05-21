@@ -17,7 +17,6 @@
 set -eu
 
 VERSION=$(cat src/VERSION | tr -d '\n')
-START_STEP=${1:-1}
 
 # shellcheck disable=SC1091
 . "$(dirname "$(realpath "$0")")/functions.sh"

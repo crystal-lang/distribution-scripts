@@ -13,7 +13,6 @@
 # through `gh auth login`.
 
 VERSION=$1
-REV=1
 SLUG=crystal-lang/crystal
 
 for cmd in curl jq gh zip; do
