@@ -120,7 +120,7 @@ document. In this way it's easy to track the progress of the release (*Helper:
 
 1. [ ] Publish release notes on the website
    - Make sure all links to API docs point to `/api/${VERSION}/`
-   - Insert number of changes and contributers
+   - Insert number of changes and contributors
 2. [ ] Wait for website to build, then visit the release notes page. This should
   create a thread for comments on the forum. Publish that topic
   ("List topic" in the wrench icon) and add tag `release`.

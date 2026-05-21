@@ -36,6 +36,6 @@ function handler(event) {
     return redirect(requestPath.replace('/api/latest/', '/api/${CRYSTAL_VERSION}/'))
   }
 
-  // at this point, we assume the request omited the version - eg, `/api/String.html`
+  // at this point, we assume the request omitted the version - eg, `/api/String.html`
   return redirect(requestPath.replace('/api/', '/api/${CRYSTAL_VERSION}/'))
 }
