@@ -23,10 +23,10 @@ set -eu
 
 if ! command -v osc > /dev/null; then
   exec docker run --rm -it \
-    -e OBS_USER=${OBS_USER:-} \
-    -e OBS_PASSWORD=${OBS_PASSWORD:-} \
-    -v $(pwd):/workspace -w /workspace \
-    crystallang/osc /workspace/$0 $@
+    -e "OBS_USER=${OBS_USER:-}" \
+    -e "OBS_PASSWORD=${OBS_PASSWORD:-}" \
+    -v "$(pwd):/workspace" -w /workspace \
+    crystallang/osc "/workspace/$0" "$@"
 fi
 
 PROJECT=$1

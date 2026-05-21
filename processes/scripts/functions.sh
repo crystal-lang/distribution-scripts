@@ -12,7 +12,7 @@ step(){
   echo
   echo -en "$ $command"
   step_number=$(expr $step_number + 1)
-  if [ $step_number -lt $START_STEP ]; then
+  if [ "$step_number" -lt "$START_STEP" ]; then
     echo -e " \033[33m(skipped)\033[0m"
     return
   fi

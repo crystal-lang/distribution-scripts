@@ -23,17 +23,17 @@ else
   VERSION=$1
 fi
 
-. $(dirname $(realpath $0))/functions.sh
+. "$(dirname "$(realpath "$0")")/functions.sh"
 
 case $VERSION in
   *.0.0)
-    TYPE=major
+    TYPE="major"
   ;;
   *.0)
-    TYPE=minor
+    TYPE="minor"
   ;;
   *)
-    TYPE=patch
+    TYPE="patch"
   ;;
 esac
 
@@ -55,9 +55,9 @@ else
   FREEZE_PERIOD=""
 fi
 
-dist_scripts_root=$(dirname $(dirname $(dirname $(realpath $0))))
+dist_scripts_root="$(dirname "$(dirname "$(dirname "$(realpath "$0")")")")"
 
-body=$(sed -E '/^##/,$!d' $dist_scripts_root/processes/crystal-release.md)
+body=$(sed -E '/^##/,$!d' "$dist_scripts_root/processes/crystal-release.md")
 
 case $TYPE in
   patch)
@@ -78,4 +78,4 @@ OLD_VERSION="$major.$minor.$patch"
 body=$(echo "$body" | sed -E "s/\\$\{RELEASE_DATE\}/$RELEASE_DATE/g; s/\\$\{FREEZE_PERIOD\}/$FREEZE_PERIOD/g; s/\\$\{VERSION\}/$VERSION/g; s/\\$\{VERSION%\.\*\}/${VERSION%.*}/g; s/\\$\{OLD_VERSION%\.\*\}/${OLD_VERSION%.*}/g")
 
 body=$(printf "%q" "$body")
-step "Create tracking issue in crystal-lang/distribution-scripts" gh issue create -R crystal-lang/distribution-scripts --body "$body" --label "release" --title \"Release Crystal $VERSION\"
+step "Create tracking issue in crystal-lang/distribution-scripts" gh issue create -R crystal-lang/distribution-scripts --body "$body" --label "release" --title "Release Crystal $VERSION"

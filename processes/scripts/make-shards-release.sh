@@ -18,22 +18,22 @@ set -eu
 
 VERSION=$(cat VERSION | tr -d '\n')
 
-. $(dirname $(realpath $0))/functions.sh
+. "$(dirname "$(realpath "$0")")/functions.sh"
 
 grep -q "version: $VERSION" shard.yml || abort "Missing version $VERSION in shard.yml"
 
-tag=v$VERSION
-step "Tag master commit as version ${tag}" git tag -s -a -m $tag $tag
+tag="v$VERSION"
+step "Tag master commit as version ${tag}" git tag -s -a -m "$tag" "$tag"
 
 git show
 
 step "Push tag to GitHub" git push --tags
 
-sed -E '3,/^## /!d' CHANGELOG.md | sed '$d' | sed -Ez 's/^\n+//; s/\n+$/\n/g' > CHANGELOG.$VERSION.md
+sed -E '3,/^## /!d' CHANGELOG.md | sed '$d' | sed -Ez 's/^\n+//; s/\n+$/\n/g' > "CHANGELOG.$VERSION.md"
 
 echo "$ more CHANGELOG.$VERSION.md"
-more CHANGELOG.$VERSION.md
+more "CHANGELOG.$VERSION.md"
 
-step "Create GitHub release" gh release -R crystal-lang/shards create $tag --title $tag --notes-file CHANGELOG.$VERSION.md
+step "Create GitHub release" gh release -R crystal-lang/shards create "$tag" --title "$tag" --notes-file "CHANGELOG.$VERSION.md"
 
-rm CHANGELOG.$VERSION.md
+rm "CHANGELOG.$VERSION.md"
