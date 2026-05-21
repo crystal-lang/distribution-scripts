@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Smoke tests for Crystal docker images
 #
@@ -6,7 +6,7 @@
 
 set -eux
 
-if [[ "$VERSION" =~ "^[0-9]+(\.[0-9]+)*$" ]]; then
+if [[ "$VERSION" =~ ^[0-9]+(\.[0-9]+)*$ ]]; then
   crystal --version | grep -q "${VERSION}"
 else
   # $VERSION is not a version number on maintenance builds
