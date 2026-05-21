@@ -19,6 +19,7 @@ set -eu
 VERSION=$(cat src/VERSION | tr -d '\n')
 START_STEP=${1:-1}
 
+# shellcheck disable=SC1091
 . "$(dirname "$(realpath "$0")")/functions.sh"
 
 step "Tag master commit as version ${VERSION}" git tag -s -a -m "$VERSION" "$VERSION"

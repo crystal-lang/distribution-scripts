@@ -60,8 +60,10 @@ _check_version_id() {
 
 _discover_distro_repo() {
   if [[ -r /etc/os-release ]]; then
+    # shellcheck source=/dev/null
     source /etc/os-release
   elif [[ -r /usr/lib/os-release ]]; then
+    # shellcheck source=/dev/null
     source /usr/lib/os-release
   else
     _error "Unable to identify distribution. Please, report to https://forum.crystal-lang.org/c/help-support/11"

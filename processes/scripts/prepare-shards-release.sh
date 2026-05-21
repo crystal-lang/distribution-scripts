@@ -23,6 +23,7 @@ else
   VERSION=$1
 fi
 
+# shellcheck disable=SC1091
 . "$(dirname "$(realpath "$0")")/functions.sh"
 
 if [[ ! "$VERSION" =~ ^[0-9] ]]; then

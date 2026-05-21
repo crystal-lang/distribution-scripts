@@ -18,6 +18,7 @@ set -eu
 
 VERSION=$(cat VERSION | tr -d '\n')
 
+# shellcheck disable=SC1091
 . "$(dirname "$(realpath "$0")")/functions.sh"
 
 grep -q "version: $VERSION" shard.yml || abort "Missing version $VERSION in shard.yml"
