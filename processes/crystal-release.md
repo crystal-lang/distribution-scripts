@@ -10,8 +10,8 @@ document. In this way it's easy to track the progress of the release (*Helper:
 
 1. [ ] (minor) Announce expected release date (${RELEASE_DATE}) and time span for feature freeze (starting on ${FREEZE_PERIOD})
    * (minor) Feature freeze is about two weeks before release
-2. Set date on the milestone
-3. [ ] Prepare the changelog entry: (`crystal`) [`scripts/update-changelog.cr ${VERSION}`](https://github.com/crystal-lang/crystal/blob/master/scripts/update-changelog.cr) from the HEAD of the release branch (or `master`)
+2. [ ] Set date on the milestone
+3. [ ] Prepare the changelog entry: (`crystal`) [`scripts/update-changelog.sh ${VERSION}`](https://github.com/crystal-lang/crystal/blob/master/scripts/update-changelog.cr) from the HEAD of the release branch (or `master`)
    * Ensure that all merged PRs are added to the milestone (check [`is:pr is:merged sort:updated-desc no:milestone`](https://github.com/crystal-lang/crystal/pulls?q=is%3Apr+is%3Amerged+sort%3Aupdated-desc+no%3Amilestone+-label%3Astatus%3Areverted+base%3Amaster+merged%3A%3E%3D2023-01-01)).
    * Ensure that all milestoned PRs are properly labelled (check [`is:pr is:merged sort:updated-desc no:label milestone:${VERSION}`](https://github.com/crystal-lang/crystal/pulls?q=is%3Apr+is%3Amerged+sort%3Aupdated-desc+milestone%3A${VERSION}+no%3Alabel)).
    * Ensure the milestone has `Due date` set.
@@ -42,7 +42,7 @@ document. In this way it's easy to track the progress of the release (*Helper:
 3. [ ] Verify Maintenance CI workflow succeeds on the HEAD of the release
    branch: https://app.circleci.com/pipelines/github/crystal-lang/crystal?branch=release%2F${VERSION%.*}
 4. [ ] Smoke test with [test-ecosystem](https://github.com/crystal-lang/test-ecosystem)
-   * Run [*CI Workflow*](https://github.com/crystal-lang/test-ecosystem/actions/workflows/ci.yml) with `crystal=branch:release/{VERSION%.*}`.
+   * Run [*CI Workflow*](https://github.com/crystal-lang/test-ecosystem/actions/workflows/ci.yml) with `crystal=branch:release/${VERSION%.*}`.
 5. [ ] Merge the changelog PR
 6. [ ] Make the release and publish it on GitHub: (`crystal`) [`../distribution-scripts/processes/scripts/make-crystal-release.sh`](https://github.com/crystal-lang/distribution-scripts/blob/master/processes/scripts/make-crystal-release.sh) (run from `crystallang/crystal@${VERSION}` work tree). This performs these steps:
    1. Tag & annotate the commit with the changelog using `<M.m.p>` pattern as version
@@ -110,7 +110,6 @@ document. In this way it's easy to track the progress of the release (*Helper:
    1. Have `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` env variables defined
       * Keys can be generated at https://console.aws.amazon.com/iam/home#/security_credentials (contact a Manas admin if you don't have access).
    2. Run (`distribution-scripts`) `make -C docs publish_docs release_latest_docs CRYSTAL_VERSION=${VERSION}` to publish docs to `api/${VERSION}`, apply redirect from `api/latest` to `api/${VERSION}` and set the 404 error page
-   3. Update API docs' 404 page to add `<base href="/api/${VERSION}/" />` in the `<head>`
 2. [ ] (minor) Publish Crystal book
    1. (minor) Make sure `release/${OLD_VERSION%.*}` branch is merged into `master` (if not, create a PR; **it needs to be merged as a merge commit**)
    2. (minor) Create `release/${VERSION%.*}` branch and push it to `crystal-lang/crystal-book` (deployment happens automatically in GHA)
@@ -122,10 +121,12 @@ document. In this way it's easy to track the progress of the release (*Helper:
    - Make sure all links to API docs point to `/api/${VERSION}/`
    - Insert number of changes and contributors
 2. [ ] Wait for website to build, then visit the release notes page. This should
-  create a thread for comments on the forum. Publish that topic
-  ("List topic" in the wrench icon) and add tag `release`.
-1. [ ] Announce on social media accounts (via Buffer; credentials are in Passbolt) and pin release posts
-3. [ ] (minor) Have the project manager post the release in https://opencollective.com/crystal-lang
+  create a thread for comments on the forum.
+   - Add tag `release`
+   - Replace content with link to release notes (this should insert a preview card)
+   - Publish the topic ("List topic" in the wrench icon)
+3. [ ] Announce on social media accounts (via Buffer; credentials are in Passbolt) and pin release posts
+4. [ ] (minor) Have the project manager post the release in https://opencollective.com/crystal-lang
 
 ## Post-release
 1. [ ] Create a pull request to update `master` branch to use released version:
@@ -142,7 +143,7 @@ document. In this way it's easy to track the progress of the release (*Helper:
 4. [ ] Merge `release/${VERSION%.*}` branch into `master` (if the two have diverged)
    - This needs to be a *merge commit*. Those are disabled in the GitHub UI.
    - Create branch and PR:
-     ```sh
+     ````sh
      git fetch upstream release/${VERSION%.*} master
      git switch -c merge/${VERSION} upstream/master
      git merge upstream/release/${VERSION%.*}
@@ -150,8 +151,18 @@ document. In this way it's easy to track the progress of the release (*Helper:
      git commit -m 'Merge `release/${VERSION%.*}` into master'
      git log --graph --decorate --pretty=oneline --abbrev-commit
      git push -u upstream merge/${VERSION}
-     gh pr create --title 'Merge `release/${VERSION%.*}`@`%{VERSION} into `master`' --label 'topic:infrastructure'
-     ```
+     gh pr create --title 'Merge `release/${VERSION%.*}`@`${VERSION}` into `master`' --label 'topic:infrastructure' --assignee=@me --body-file=<<-'MD'
+      **This PR must be merged as a _merge commit_!**
+
+      ```sh
+      git switch master
+      git merge --ff-only merge/${VERSION}
+      # double check history
+      git log --graph --decorate --pretty=oneline --abbrev-commit
+      git push
+      ```
+      MD
+     ````
    - Merge PR **locally**:
      ```sh
      git switch master
