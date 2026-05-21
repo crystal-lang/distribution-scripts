@@ -13,7 +13,7 @@ set -eu
 
 if [ $# -lt 1 ]; then
   printf "Release version: "
-  read VERSION
+  read -r VERSION
 
   if [ -z "$VERSION" ]; then
     echo "Usage: $0 VERSION"

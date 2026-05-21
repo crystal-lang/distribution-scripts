@@ -13,7 +13,7 @@ set -eu
 
 if [ $# -lt 1 ]; then
   printf "Release version: "
-  read VERSION
+  read -r VERSION
 
   if [ -z "$VERSION" ]; then
     echo "Usage: $0 VERSION"
@@ -40,7 +40,7 @@ esac
 
 if [ $# -lt 2 ]; then
   printf "Scheduled release date: "
-  read RELEASE_DATE
+  read -r RELEASE_DATE
 else
   RELEASE_DATE=$2
 fi
@@ -48,7 +48,7 @@ fi
 if [ "$TYPE" != "patch" ]; then
   if [ $# -lt 3 ]; then
     printf "Freeze period begin: "
-    read FREEZE_PERIOD
+    read -r FREEZE_PERIOD
   else
     FREEZE_PERIOD=$3
   fi
