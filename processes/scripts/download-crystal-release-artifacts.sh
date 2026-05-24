@@ -51,7 +51,7 @@ sh -c "cd crystal/ && zip -9 -r '../crystal-$VERSION-windows-x86_64-msvc-unsuppo
 mv crystal-installer/crystal-setup.exe "crystal-$VERSION-windows-x86_64-msvc-unsupported.exe"
 
 echo "Final list of artifacts to upload:"
-echo "crystal-$VERSION*"
+printf '%s\n' crystal-"$VERSION"*
 
 echo "You can now upload artifacts to the GitHub release:"
 echo "gh release -R crystal-lang/crystal upload $VERSION crystal-$VERSION*"
