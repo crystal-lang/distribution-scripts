@@ -150,20 +150,20 @@ document. In this way it's easy to track the progress of the release (_Helper:
      git switch -c merge/${VERSION} upstream/master
      git merge upstream/release/${VERSION%.*}
      # resolve conflicts
-     git commit -m 'Merge `release/${VERSION%.*}` into master'
+     git commit -m 'Merge `release/${VERSION%.*}`@`${VERSION}` into master'
      git log --graph --decorate --pretty=oneline --abbrev-commit
      git push -u upstream merge/${VERSION}
-     gh pr create --title 'Merge `release/${VERSION%.*}`@`${VERSION}` into `master`' --label 'topic:infrastructure' --assignee=@me --body-file=<<-'MD'
-      **This PR must be merged as a _merge commit_!**
+     gh pr create --title 'Merge `release/${VERSION%.*}`@`${VERSION}` into `master`' --label 'topic:infrastructure' --assignee=@me --body-file - <<-'MD'
+     **This PR must be merged as a _merge commit_!**
 
-      ```sh
-      git switch master
-      git merge --ff-only merge/${VERSION}
-      # double check history
-      git log --graph --decorate --pretty=oneline --abbrev-commit
-      git push
-      ```
-      MD
+     ```sh
+     git switch master
+     git merge --ff-only merge/${VERSION}
+     # double check history
+     git log --graph --decorate --pretty=oneline --abbrev-commit
+     git push
+     ```
+     MD
      ````
 
    - Merge PR **locally**:
