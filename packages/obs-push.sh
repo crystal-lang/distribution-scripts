@@ -32,8 +32,8 @@ cp "$CRYSTAL_DOCS_TARGZ" "$PACKAGE-snapshot-docs.tar.gz"
 
 # Update version in *.dsc and *.spec
 PACKAGE_VERSION="${VERSION}~${SNAPSHOT}.git.${COMMIT_HASH:0:8}"
-sed -i -e "s/^Version: .*/Version: ${PACKAGE_VERSION}-1/" *.dsc
-sed -i -e "s/^Version: .*/Version: ${PACKAGE_VERSION}/" *.spec
+sed -i -e "s/^Version: .*/Version: ${PACKAGE_VERSION}-1/" ./*.dsc
+sed -i -e "s/^Version: .*/Version: ${PACKAGE_VERSION}/" ./*.spec
 
 # Commit changes to OBS
 message="Update $PROJECT to $SNAPSHOT"
@@ -43,4 +43,4 @@ osc commit -m "$message"
 
 # Remove OSC working dir
 popd
-rm -r "$PROJECT/$PACKAGE"
+rm -r "${PROJECT:?}/$PACKAGE"

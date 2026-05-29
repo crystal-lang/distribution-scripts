@@ -71,8 +71,10 @@ _check_version_id() {
 
 _discover_distro_repo() {
   if [[ -r /etc/os-release ]]; then
+    # shellcheck source=/dev/null
     source /etc/os-release
   elif [[ -r /usr/lib/os-release ]]; then
+    # shellcheck source=/dev/null
     source /usr/lib/os-release
   else
     _error "Unable to identify distribution."
@@ -180,7 +182,6 @@ case $i in
     --help)
     _help
     exit 0
-    shift
     ;;
     *)
     _warn "Invalid option $i"
@@ -212,7 +213,7 @@ _install_apt() {
   fi
 
   # Add repo signing key
-  wget -qO- https://download.opensuse.org/repositories/${OBS_PROJECT//:/:\/}/${DISTRO_REPO}/Release.key | gpg --dearmor | tee /etc/apt/trusted.gpg.d/devel_languages_crystal.gpg > /dev/null
+  wget -qO- "https://download.opensuse.org/repositories/${OBS_PROJECT//:/:\/}/${DISTRO_REPO}/Release.key" | gpg --dearmor | tee /etc/apt/trusted.gpg.d/devel_languages_crystal.gpg > /dev/null
   echo "deb http://download.opensuse.org/repositories/${OBS_PROJECT//:/:\/}/${DISTRO_REPO}/ /" | tee /etc/apt/sources.list.d/crystal.list
   apt-get update
 
@@ -224,7 +225,7 @@ _install_apt() {
 }
 
 _install_rpm_key() {
-  rpm --verbose --import https://build.opensuse.org/projects/${OBS_PROJECT}/signing_keys/download?kind=gpg
+  rpm --verbose --import "https://build.opensuse.org/projects/${OBS_PROJECT}/signing_keys/download?kind=gpg"
 }
 
 _add_yum_repo() {
@@ -268,7 +269,7 @@ _install_zypper() {
   fi
 
   _install_rpm_key
-  zypper --non-interactive addrepo https://download.opensuse.org/repositories/${OBS_PROJECT//:/:\/}/$DISTRO_REPO/${OBS_PROJECT}.repo
+  zypper --non-interactive addrepo "https://download.opensuse.org/repositories/${OBS_PROJECT//:/:\/}/$DISTRO_REPO/${OBS_PROJECT}.repo"
   zypper --non-interactive refresh
 
   if [[ "$CRYSTAL_VERSION" == "latest" ]]; then
