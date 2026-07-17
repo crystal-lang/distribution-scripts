@@ -1,5 +1,5 @@
 name "bdw-gc"
-default_version "8.2.0"
+default_version "8.2.12"
 skip_transitive_dependency_licensing true
 
 source :url => "https://github.com/ivmai/bdwgc/releases/download/v#{version}/gc-#{version}.tar.gz"
@@ -26,6 +26,10 @@ end
 
 version "8.2.0" do
   source md5: "c3c04af9c1e4209e315eee50efe7b320"
+end
+
+version "8.2.12" do
+  source md5: "5e7c74f8bd57f64d3f86673ff3c17230"
 end
 
 relative_path "gc-#{version}"
