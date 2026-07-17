@@ -1,6 +1,6 @@
 ARG base_docker_image=ubuntu:24.04
 FROM ${base_docker_image} AS runtime
-ARG llvm_version=20
+ARG llvm_version=22
 
 RUN \
   apt-get update && \
