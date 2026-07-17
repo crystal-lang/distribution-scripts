@@ -17,7 +17,7 @@ RUN git clone https://github.com/ivmai/bdwgc \
  && ./configure --disable-debug --disable-shared --enable-large-config \
  && make -j$(nproc)
 
-FROM alpine:3.22
+FROM alpine:3.24
 ARG llvm_version=20
 
 # Install dependencies
