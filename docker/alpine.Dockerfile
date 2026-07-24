@@ -1,4 +1,4 @@
-ARG base_docker_image=alpine:3.22
+ARG base_docker_image=alpine:3.24
 FROM ${base_docker_image} AS runtime
 ARG llvm_version=20
 
