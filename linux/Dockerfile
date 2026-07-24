@@ -1,4 +1,4 @@
-FROM debian:12 AS bdwgc
+FROM debian:13 AS bdwgc
 
 RUN apt-get update \
  && apt-get install -y build-essential automake libtool git clang-16

@@ -1,4 +1,4 @@
-FROM debian:11 AS debian
+FROM debian:13 AS debian
 
 RUN apt-get update \
  && apt-get install -y curl build-essential git automake libtool pkg-config
