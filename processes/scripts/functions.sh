@@ -1,3 +1,4 @@
+#!/bin/sh
 START_STEP=${START_STEP:-1}
 step_number=1
 
@@ -7,13 +8,13 @@ step(){
   command="$*"
 
   echo
-  echo -e "\033[33m===============================================================================\033[0m"
-  echo -e "\033[33m$step_number. $message\033[0m"
+  printf "\033[33m===============================================================================\033[0m\n"
+  printf "\033[33m%2d. %s\033[0m\n" "$step_number" "$message"
   echo
-  echo -en "$ $command"
-  step_number=$(expr $step_number + 1)
-  if [ $step_number -lt $START_STEP ]; then
-    echo -e " \033[33m(skipped)\033[0m"
+  printf "$ %s" "$command"
+  step_number=$((step_number + 1))
+  if [ "$step_number" -lt "$START_STEP" ]; then
+    printf " \033[33m(skipped)\033[0m\n"
     return
   fi
 
@@ -22,6 +23,6 @@ step(){
   if [ "$REPLY" != "skip" ]; then
     eval "$command"
   else
-    echo -e "\033[33m(skipped)\033[0m"
+    printf "\033[33m(skipped)\033[0m\n"
   fi
 }

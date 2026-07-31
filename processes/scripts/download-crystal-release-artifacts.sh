@@ -13,14 +13,13 @@
 # through `gh auth login`.
 
 VERSION=$1
-REV=1
 SLUG=crystal-lang/crystal
 
 for cmd in curl jq gh zip; do
   command -v $cmd > /dev/null || { echo "Command not found: $cmd"; exit 1; }
 done
 
-if [ -z $1 ]; then
+if [ -z "$1" ]; then
   echo "Usage: ./download-crystal-release-artifacts.sh <version>"
   exit 1
 fi
@@ -52,7 +51,7 @@ sh -c "cd crystal/ && zip -9 -r '../crystal-$VERSION-windows-x86_64-msvc-unsuppo
 mv crystal-installer/crystal-setup.exe "crystal-$VERSION-windows-x86_64-msvc-unsupported.exe"
 
 echo "Final list of artifacts to upload:"
-echo crystal-$VERSION*
+printf '%s\n' crystal-"$VERSION"*
 
 echo "You can now upload artifacts to the GitHub release:"
 echo "gh release -R crystal-lang/crystal upload $VERSION crystal-$VERSION*"

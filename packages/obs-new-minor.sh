@@ -4,10 +4,10 @@ set -eu
 
 if ! command -v osc > /dev/null; then
   exec docker run --rm -it \
-    -e OBS_USER=${OBS_USER:-} \
-    -e OBS_PASSWORD=${OBS_PASSWORD:-} \
-    -v $(pwd):/workspace -w /workspace \
-    crystallang/osc /bin/bash -x /workspace/$0 $@
+    -e "OBS_USER=${OBS_USER:-}" \
+    -e "OBS_PASSWORD=${OBS_PASSWORD:-}" \
+    -v "$(pwd):/workspace" -w /workspace \
+    crystallang/osc /bin/bash -x "/workspace/$0" "$@"
 fi
 
 PROJECT=$1
@@ -37,7 +37,7 @@ else
 fi
 
 # Setup for new minor version package
-sed -i -e "s/${OLD_PACKAGE}/${PACKAGE}/" *.spec debian.control *.dsc
+sed -i -e "s/${OLD_PACKAGE}/${PACKAGE}/" ./*.spec debian.control ./*.dsc
 
 osc mv "${OLD_PACKAGE}.dsc" "${PACKAGE}.dsc"
 osc mv "${OLD_PACKAGE}-docs.dsc" "${PACKAGE}-docs.dsc"
@@ -53,4 +53,4 @@ EOF
 echo > *.changes
 
 popd
-./obs-release.sh $PROJECT $PACKAGE $VERSION
+./obs-release.sh "$PROJECT" "$PACKAGE" "$VERSION"

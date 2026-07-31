@@ -17,23 +17,23 @@
 set -eu
 
 VERSION=$(cat src/VERSION | tr -d '\n')
-START_STEP=${1:-1}
 
-. $(dirname $(realpath $0))/functions.sh
+# shellcheck disable=SC1091
+. "$(dirname "$(realpath "$0")")/functions.sh"
 
-step "Tag master commit as version ${VERSION}" git tag -s -a -m $VERSION $VERSION
+step "Tag master commit as version ${VERSION}" git tag -s -a -m "$VERSION" "$VERSION"
 
 git show
 
 step "Push tag to GitHub" git push upstream --tags
 
-sed -E '7,/^## /!d' doc/changelogs/v${VERSION%.*}.md | sed '$d' | sed -E 's/^\n+//; s/\n+$/\n/g' > CHANGELOG.$VERSION.md
+sed -E '7,/^## /!d' "doc/changelogs/v${VERSION%.*}.md" | sed '$d' | sed -E 's/^\n+//; s/\n+$/\n/g' > "CHANGELOG.$VERSION.md"
 
 echo "$ more CHANGELOG.$VERSION.md"
-more CHANGELOG.$VERSION.md
+more "CHANGELOG.$VERSION.md"
 
-step "Create GitHub release" gh release -R crystal-lang/crystal create $VERSION --draft --title $VERSION --notes-file CHANGELOG.$VERSION.md
+step "Create GitHub release" gh release -R crystal-lang/crystal create "$VERSION" --draft --title "$VERSION" --notes-file "CHANGELOG.$VERSION.md"
 
-rm CHANGELOG.$VERSION.md
+rm "CHANGELOG.$VERSION.md"
 
 step "Wait for CI workflow to build artifacts ☕" echo

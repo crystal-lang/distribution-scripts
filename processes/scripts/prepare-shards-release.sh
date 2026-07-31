@@ -13,7 +13,7 @@ set -eu
 
 if [ $# -lt 1 ]; then
   printf "Release version: "
-  read VERSION
+  read -r VERSION
 
   if [ -z "$VERSION" ]; then
     echo "Usage: $0 VERSION"
@@ -23,7 +23,8 @@ else
   VERSION=$1
 fi
 
-. $(dirname $(realpath $0))/functions.sh
+# shellcheck disable=SC1091
+. "$(dirname "$(realpath "$0")")/functions.sh"
 
 if [[ ! "$VERSION" =~ ^[0-9] ]]; then
   echo "Invalid VERSION: ${VERSION}"
@@ -32,19 +33,19 @@ fi
 
 case $VERSION in
   *.0.0)
-    TYPE=major
+    TYPE="major"
   ;;
   *.0)
-    TYPE=minor
+    TYPE="minor"
   ;;
   *)
-    TYPE=patch
+    TYPE="patch"
   ;;
 esac
 
-dist_scripts_root=$(dirname $(dirname $(dirname $(realpath $0))))
+dist_scripts_root=$(dirname "$(dirname "$(dirname "$(realpath "$0")")")")
 
-body=$(sed -E '/^##/,$!d' $dist_scripts_root/processes/shards-release.md)
+body=$(sed -E '/^##/,$!d' "$dist_scripts_root/processes/shards-release.md")
 
 case $TYPE in
   patch)
@@ -61,4 +62,4 @@ esac
 body=$(echo "$body" | sed -E "s/\\$\{VERSION\}/$VERSION/g")
 
 body=$(printf "%q" "$body")
-step "Create tracking issue in crystal-lang/distribution-scripts" gh issue create -R crystal-lang/distribution-scripts --body "$body" --label "release" --title \"Release Shards $VERSION\"
+step "Create tracking issue in crystal-lang/distribution-scripts" gh issue create -R crystal-lang/distribution-scripts --body "$body" --label "release" --title "Release Shards $VERSION"
