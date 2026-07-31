@@ -1,4 +1,4 @@
-ARG base_docker_image=ubuntu:24.04
+ARG base_docker_image=ubuntu:26.04
 FROM ${base_docker_image} AS runtime
 ARG llvm_version=22
 
