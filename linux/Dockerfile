@@ -18,7 +18,7 @@ RUN git clone https://github.com/ivmai/bdwgc \
  && make -j$(nproc)
 
 FROM alpine:3.24
-ARG llvm_version=20
+ARG llvm_version=22
 
 # Install dependencies
 RUN apk add --no-cache \
