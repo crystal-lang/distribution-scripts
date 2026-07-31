@@ -1,11 +1,11 @@
 FROM debian:13 AS bdwgc
 
 RUN apt-get update \
- && apt-get install -y build-essential automake libtool git clang-16
+ && apt-get install -y build-essential automake libtool git clang-19
 
 ARG release
 ENV CFLAGS="-fPIC -pipe ${release:+-O2}"
-ENV CC="clang-16"
+ENV CC="clang-19"
 
 # Build libgc
 ARG gc_version
