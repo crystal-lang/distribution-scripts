@@ -59,7 +59,7 @@ RUN git clone ${crystal_repo} \
  && cd crystal \
  && git checkout ${crystal_sha1} \
  \
- && make crystal stats=true static=true ${release:+release=true} \
+ && make crystal stats=true static=true FLAGS=--link-flags=-no-pie ${release:+release=true} \
                  CRYSTAL_CONFIG_TARGET=${gnu_target} \
  && ( (readelf --program-headers .build/crystal | grep -q "Elf file type is EXEC") || { echo 'crystal is not statically linked'; exit 1; }) \
  && .build/crystal --version
@@ -71,7 +71,7 @@ RUN git clone https://github.com/crystal-lang/shards \
  && cd shards \
  && git checkout ${shards_version} \
  && make CRYSTAL=/crystal/bin/crystal \
-         FLAGS="--stats --target ${musl_target} --static ${release:+--release}" \
+         FLAGS="--stats --target ${musl_target} --static --link-flags=-no-pie ${release:+--release}" \
  \
  && bin/shards --version \
  && ( (readelf --program-headers bin/shards | grep -q "Elf file type is EXEC") || { echo 'shards is not statically linked'; exit 1; })
