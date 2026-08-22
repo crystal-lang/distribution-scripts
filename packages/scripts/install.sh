@@ -42,6 +42,7 @@ OBS_PROJECT=${OBS_PROJECT:-"devel:languages:crystal"}
 DISTRO_REPO=${DISTRO_REPO:-}
 CRYSTAL_VERSION=${CRYSTAL_VERSION:-"latest"}
 CHANNEL="stable"
+SCRIPT_COMMAND="$0 $@"
 
 _error_reporting() {
   cat >&2 <<TXT
@@ -130,22 +131,23 @@ _discover_distro_repo() {
       # if the distro is apt, dnf or rpm based and use a default repository.
       _discover_package_manager
 
+      _error "Unable to identify distribution type ($ID). You may specify a repository with the environment variable DISTRO_REPO."
+
+      echo >&2 "See https://software.opensuse.org/download.html?project=devel%3Alanguages%3Acrystal&package=crystal for available repositories."
+
+      echo >&2
+      echo >&2 "         Example:"
       case "$PACKAGE_MANAGER" in
-      apt)
-        DISTRO_REPO="Debian_Unstable"
-        ;;
       dnf)
-        DISTRO_REPO="Fedora_Rawhide"
+        echo >&2 "         DISTRO_REPO=Fedora_Rawhide $SCRIPT_COMMAND"
         ;;
-      yum)
-        DISTRO_REPO="RHEL_7"
-        ;;
-      unsupported_package_manager)
-        _error "Unable to identify distribution type ($ID). You may specify a repository with the environment variable DISTRO_REPO."
-        _error_reporting
-        exit 1
+      *)
+        echo >&2 "         DISTRO_REPO=Debian_Unstable $SCRIPT_COMMAND"
         ;;
       esac
+      echo >&2
+
+      exit 1
   esac
 }
 
@@ -153,7 +155,7 @@ _discover_package_manager() {
   [[ $(command -v apt-get) ]] && PACKAGE_MANAGER="apt" && return
   [[ $(command -v dnf) ]]     && PACKAGE_MANAGER="dnf" && return
   [[ $(command -v yum) ]]     && PACKAGE_MANAGER="yum" && return
-  PACKAGE_MANAGER="unsupported_package_manager"
+  PACKAGE_MANAGER="unknown"
 }
 
 if [[ $EUID -ne 0 ]]; then
