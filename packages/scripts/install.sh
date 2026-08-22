@@ -126,6 +126,25 @@ _discover_distro_repo() {
       exit 1
       ;;
     *)
+      if [[ -n "${UBUNTU_CODENAME:-}" ]]; then
+        # Map UBUNTU_CODENAME to the corresponding repo version for
+        # distros that use Ubuntu package sources, such as Linux Mint.
+        case "${UBUNTU_CODENAME}" in
+          jammy)
+            DISTRO_REPO="xUbuntu_22.04"
+            return 0
+            ;;
+          noble)
+            DISTRO_REPO="xUbuntu_24.04"
+            return 0
+            ;;
+          resolute)
+            DISTRO_REPO="xUbuntu_26.04"
+            return 0
+            ;;
+        esac
+      fi
+
       # If there's no dedicated repository for the distro, try to figure out
       # if the distro is apt, dnf or rpm based and use a default repository.
       _discover_package_manager
