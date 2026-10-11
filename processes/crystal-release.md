@@ -67,8 +67,8 @@ document. In this way it's easy to track the progress of the release (_Helper:
    3. Search the release build in GitHub Actions
    4. Download the artifacts from the CircleCI job (MinGW-w64 CI, Windows CI)
    5. Compress and rename the GHA artifacts:
-      - Windows CI: `crystal-*-windows-msvc/*` -> `crystal-${VERSION}-windows-*-msvc-unsupported.zip`
-      - Windows CI: `crystal-*-windows-msvc-installer/crystal-setup.exe` -> `crystal-${VERSION}-windows-*-msvc-unsupported.exe`
+      - Windows CI: `crystal/*` -> `crystal-${VERSION}-windows-x86_64-msvc-unsupported.zip`
+      - Windows CI: `crystal-installer/crystal-setup.exe` -> `crystal-${VERSION}-windows-x86_64-msvc-unsupported.exe`
       - MinGW-w64 CI: `*-mingw-w64-crystal/*` -> `crystal-${VERSION}-windows-*-gnu-unsupported.zip`
 2. [ ] Upload build artifacts to the GitHub Release: (`distribution-scripts`) `gh release -R crystal-lang/crystal upload ${VERSION} crystal-${VERSION}*`
 3. [ ] Publish the GitHub release
