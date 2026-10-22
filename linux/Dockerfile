@@ -4,7 +4,7 @@ RUN apt-get update \
  && apt-get install -y build-essential automake libtool git clang-19
 
 ARG release
-ENV CFLAGS="-fPIC -pipe ${release:+-O2}"
+ENV CFLAGS="-fPIC -pipe ${release:+-O2} -std=c17"
 ENV CC="clang-19"
 
 # Build libgc
