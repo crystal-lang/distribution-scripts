@@ -1,11 +1,11 @@
-FROM debian:13 AS bdwgc
+FROM ubuntu:22.04 AS glibc
 
 RUN apt-get update \
- && apt-get install -y build-essential automake libtool git clang-19
+ && apt-get install -y build-essential automake libtool git clang
 
 ARG release
-ENV CFLAGS="-fPIC -pipe ${release:+-O2} -std=c17"
-ENV CC="clang-19"
+ENV CFLAGS="-fPIC -pipe ${release:+-O2}"
+ENV CC="clang"
 
 # Build libgc
 ARG gc_version
@@ -76,14 +76,14 @@ RUN git clone https://github.com/crystal-lang/shards \
  && bin/shards --version \
  && ( ((! readelf --dynamic bin/shards | grep -q NEEDED) && (! readelf --program-headers bin/shards | grep -q INTERP)) || { echo 'shards is not statically linked'; exit 1; })
 
-COPY --from=bdwgc /bdwgc/.libs/libgc.a /libgc-debian.a
+COPY --from=glibc /bdwgc/.libs/libgc.a /libgc-glibc.a
 
 ARG package_iteration
 
 RUN \
  # Copy libgc.a to /lib/crystal/
  mkdir -p /output/lib/crystal/ \
- && cp /libgc-debian.a /output/lib/crystal/libgc.a \
+ && cp /libgc-glibc.a /output/lib/crystal/libgc.a \
  \
  # Install crystal
  && make -C /crystal install DESTDIR=/output PREFIX= \

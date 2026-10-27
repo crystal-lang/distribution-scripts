@@ -1,4 +1,4 @@
-FROM debian:13 AS debian
+FROM ubuntu:22.04 AS glibc
 
 RUN apt-get update \
  && apt-get install -y curl build-essential git automake libtool pkg-config
@@ -6,14 +6,14 @@ RUN apt-get update \
 ENV CFLAGS="-fPIC -pipe ${release:+-O2}"
 
 # build libpcre2
-FROM debian AS libpcre2
+FROM glibc AS libpcre2
 ARG libpcre2_version
 RUN curl -L https://github.com/PCRE2Project/pcre2/releases/download/pcre2-${libpcre2_version}/pcre2-${libpcre2_version}.tar.gz | tar -zx \
  && cd pcre2-${libpcre2_version} \
  && ./configure --disable-shared --disable-cpp --enable-jit --enable-utf --enable-unicode-properties \
  && make -j$(nproc)
 
-FROM debian
+FROM glibc
 ARG crystal_version
 ARG package_iteration
 ARG libpcre2_version
