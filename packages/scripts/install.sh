@@ -235,8 +235,8 @@ _install_apt() {
 
   # Add repo signing key
   mkdir -m 0755 -p /etc/apt/keyrings
-  wget -qO- "https://download.opensuse.org/repositories/${OBS_PROJECT//:/:\/}/${DISTRO_REPO}/Release.key" | gpg --dearmor --yes -o /etc/apt/keyrings/crystal.gpg
-  echo "deb [signed-by=/etc/apt/keyrings/crystal.gpg] http://download.opensuse.org/repositories/${OBS_PROJECT//:/:\/}/${DISTRO_REPO}/ /" | tee /etc/apt/sources.list.d/crystal.list
+  wget -qO- "https://download.opensuse.org/repositories/${OBS_PROJECT//:/:\/}/${DISTRO_REPO}/Release.key" | gpg --dearmor --yes -o /etc/apt/keyrings/devel_languages_crystal.gpg
+  echo "deb [signed-by=/etc/apt/keyrings/devel_languages_crystal.gpg] http://download.opensuse.org/repositories/${OBS_PROJECT//:/:\/}/${DISTRO_REPO}/ /" | tee /etc/apt/sources.list.d/crystal.list
   apt-get update
 
   if [[ "$CRYSTAL_VERSION" == "latest" ]]; then
