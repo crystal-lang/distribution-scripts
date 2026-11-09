@@ -4,10 +4,14 @@
   ./test-install-on-docker.sh fedora:rawhide
 }
 
-@test "Fedora 40" {
-  ./test-install-on-docker.sh fedora:40
+@test "Fedora 44" {
+  ./test-install-on-docker.sh fedora:44
 }
 
-@test "Fedora 39" {
-  ./test-install-on-docker.sh fedora:39
+@test "Fedora 43" {
+  ./test-install-on-docker.sh fedora:43
+}
+
+@test "Fedora 42" {
+  ./test-install-on-docker.sh fedora:42
 }
