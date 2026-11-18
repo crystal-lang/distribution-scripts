@@ -79,7 +79,6 @@ build do
   other_target = "#{other_machine}-apple-macosx#{ENV["MACOSX_DEPLOYMENT_TARGET"]}"
   make "crystal stats=true release=true target=#{other_target} FLAGS=\"#{crflags}\" CRYSTAL_CONFIG_TARGET=#{other_target} CRYSTAL_CONFIG_LIBRARY_PATH= O=#{output_path}", env: env
 
-
   command "clang #{output_path}/crystal.o -o #{output_bin}_#{other_machine} -target #{other_target} #{llvm_ext} `llvm-config --libs --system-libs --ldflags 2>/dev/null` -lstdc++ -lpcre2-8 -lgc -lpthread -liconv -ldl -v", env: env
   delete "#{output_path}/crystal.o"
 
