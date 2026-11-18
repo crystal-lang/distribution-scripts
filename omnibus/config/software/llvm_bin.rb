@@ -1,5 +1,5 @@
 name "llvm_bin"
-LLVM_VERSION = (ENV['LLVM_VERSION'] || "15.0.7").strip
+LLVM_VERSION = (ENV['LLVM_VERSION'] || "23.1.5").strip
 default_version "#{LLVM_VERSION}-3"
 skip_transitive_dependency_licensing true
 
@@ -11,6 +11,8 @@ if (macos? || mac_os_x?) && _64_bit?
     source_md5 = "d32c4d28b8fc50efda3f451e0d8265ea" # 10.0.0-3 (universal darwin)
   when "15.0.7"
     source_md5 = "0ab0ffe63a0e72346a979d7a0e964b94" # 15.0.7-3 (universal darwin)
+  when "23.1.5"
+    source_md5 = "6a4e781051ee689b6c842950e638dbfc" # 23.1.5-3 (universal darwin)
   else
     raise "llvm_bin #{LLVM_VERSION} not supported on osx"
   end
