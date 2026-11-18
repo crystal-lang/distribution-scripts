@@ -45,10 +45,14 @@ else
 end
 
 build do
+  if llvm_bin && !ChefUtils::VersionString.new(llvm_bin.version).satisfies?(">= 18.0")
+    llvm_ext = "src/llvm/ext/llvm_ext.o"
+  end
+
   command "git checkout #{CRYSTAL_SHA1}", cwd: project_dir
 
   mkdir "#{project_dir}/deps"
-  make "deps", env: env
+  make "deps", env: env if llvm_ext
   mkdir ".build"
   command "echo #{Dir.pwd}", env: env
 
@@ -69,14 +73,14 @@ build do
   copy "#{output_bin}_#{ohai['kernel']['machine']}", ".build/crystal"
 
   # Cross-compile for other arch
-
-  make "deps", env: env
+  make "deps", env: env if llvm_ext
 
   other_machine = ohai['kernel']['machine'] == "x86_64" ? "arm64" : "x86_64"
   other_target = "#{other_machine}-apple-macosx#{ENV["MACOSX_DEPLOYMENT_TARGET"]}"
   make "crystal stats=true release=true target=#{other_target} FLAGS=\"#{crflags}\" CRYSTAL_CONFIG_TARGET=#{other_target} CRYSTAL_CONFIG_LIBRARY_PATH= O=#{output_path}", env: env
 
-  command "clang #{output_path}/crystal.o -o #{output_bin}_#{other_machine} -target #{other_target} src/llvm/ext/llvm_ext.o `llvm-config --libs --system-libs --ldflags 2>/dev/null` -lstdc++ -lpcre2-8 -lgc -lpthread -liconv -ldl -v", env: env
+
+  command "clang #{output_path}/crystal.o -o #{output_bin}_#{other_machine} -target #{other_target} #{llvm_ext} `llvm-config --libs --system-libs --ldflags 2>/dev/null` -lstdc++ -lpcre2-8 -lgc -lpthread -liconv -ldl -v", env: env
   delete "#{output_path}/crystal.o"
 
   # Lipo them up
