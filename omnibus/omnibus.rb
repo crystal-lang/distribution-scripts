@@ -50,3 +50,6 @@ build_retries 0
 # local_software_dirs ['/path/to/local/software']
 
 append_timestamp false
+
+# Skip health checks because it seems to be broken (https://github.com/chef/omnibus/issues/1066)
+health_check false

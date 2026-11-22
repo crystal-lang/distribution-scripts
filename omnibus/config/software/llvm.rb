@@ -1,5 +1,5 @@
 name "llvm"
-LLVM_VERSION = (ENV['LLVM_VERSION'] || "15.0.7").strip
+LLVM_VERSION = (ENV['LLVM_VERSION'] || "23.1.5").strip
 default_version LLVM_VERSION
 skip_transitive_dependency_licensing true
 
@@ -23,7 +23,12 @@ version "15.0.7" do
          md5: "bac436dbd5d37e38d3da75b03629053c"
 end
 
-if version == "15.0.7"
+version "23.1.5" do
+  source url: "https://github.com/llvm/llvm-project/releases/download/llvmorg-#{version}/llvm-project-#{version}.src.tar.xz",
+         md5: "3d07c9325a4cd1833211a1f3954ef39d"
+end
+
+if version == "15.0.7" || version == "23.1.5"
   # This is bringing the whole project because flags weren't sufficient to prevent certain parts from being fetched by the build system.
   relative_path "llvm-project-#{version}.src/llvm"
 else
